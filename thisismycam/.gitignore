@@ -1,0 +1,9 @@
+*.pyc
+media/*
+static/*
+
+settings.py
+
+dev_db
+
+.DS_Store
