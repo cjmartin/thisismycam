@@ -71,7 +71,11 @@ def flickr_extra_values(sender, user, response, details, **kwargs):
     
         flickr_user.save()
     
-    profile = user.get_profile()
+    try:
+      profile = user.get_profile()
+    except:
+      profile = UserProfile.objects.create(user = user)
+      
     profile.flickr_nsid = response['id']
     profile.flickr_username = response['username']
     profile.flickr_fullname = response['fullname']
