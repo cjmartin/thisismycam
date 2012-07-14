@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.template.defaultfilters import slugify
 from django.utils import simplejson, timezone
+from django.utils.dateparse import parse_datetime
+
 from datetime import datetime, date, timedelta
 
 from celery.task import task
@@ -15,6 +17,7 @@ from photos.models import Photo
 
 import re
 import time
+import pytz
 
 @task(ignore_result=True)
 def fetch_photos_for_flickr_user(user):
@@ -91,6 +94,11 @@ def process_flickr_photo(api_photo, user):
             exif_camera = exif['photo']['camera']
 
         if exif_model:
+            naive = parse_datetime(api_photo['datetaken'])
+            api_date_taken = pytz.UTC.localize(naive)
+            
+            api_date_upload = datetime.utcfromtimestamp(api_photo['dateupload'])
+            
             photo = Photo(
                 photo_id = api_photo['id'],
                 secret = api_photo['secret'],
@@ -101,7 +109,9 @@ def process_flickr_photo(api_photo, user):
                 media = api_photo['media'],
                 owner_nsid = api_photo['owner'],
                 owner_name = api_photo['ownername'],
-                path_alias = api_photo['pathalias']
+                path_alias = api_photo['pathalias'],
+                date_taken = api_date_taken,
+                date_upload = api_date_upload
             )
 
             camera_slug = slugify(exif_make + " " + exif_model)
