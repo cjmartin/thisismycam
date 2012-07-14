@@ -152,7 +152,6 @@ def process_flickr_photo(api_photo, user):
                     'model' : exif_model,
                     'exif_model' : raw_exif_model,
                     'count' : 0,
-                    'count_day' : day_count,
                 }
 
                 camera = Camera.objects.create(**args)
