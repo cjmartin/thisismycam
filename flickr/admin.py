@@ -13,5 +13,4 @@ class FlickrUserAdmin(admin.ModelAdmin):
     ]
 
 admin.site.register(FlickrUser, FlickrUserAdmin)
-#admin.site.register(FlickrUser)
 admin.site.register(FlickrUserCamera)
