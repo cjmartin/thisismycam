@@ -96,10 +96,10 @@ def process_flickr_photo(api_photo, user):
             exif_camera = exif['photo']['camera']
 
         if exif_model:
-            naive = parse_datetime(api_photo['datetaken'])
-            api_date_taken = pytz.UTC.localize(naive)
+            #naive = parse_datetime(api_photo['datetaken'])
+            #api_date_taken = pytz.timezone("UTC").localize(naive)
             
-            api_date_upload = datetime.utcfromtimestamp(float(api_photo['dateupload']))
+            api_date_upload = datetime.utcfromtimestamp(float(api_photo['dateupload'])).replace(tzinfo=timezone.utc)
             
             photo = Photo(
                 photo_id = api_photo['id'],
@@ -112,7 +112,7 @@ def process_flickr_photo(api_photo, user):
                 owner_nsid = api_photo['owner'],
                 owner_name = api_photo['ownername'],
                 path_alias = api_photo['pathalias'],
-                date_taken = api_date_taken,
+                date_taken = api_photo['datetaken'],
                 date_upload = api_date_upload
             )
 
