@@ -13,6 +13,8 @@ from cameras.models import Camera
 from cameras.tasks import add_aws_item_to_camera
 from cameras.tasks import add_aws_photos_to_camera
 
+from flickr.models import FlickrUserCamera
+
 from photos.models import Photo
 
 import re
