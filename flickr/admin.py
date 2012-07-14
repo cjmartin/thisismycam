@@ -14,4 +14,4 @@ from flickr.models import FlickrUser
 
 #admin.site.register(FlickrUser, FlickrUserAdmin)
 admin.site.register(FlickrUser)
-admin.site.register(FlickrUserCamera)
+#admin.site.register(FlickrUserCamera)
