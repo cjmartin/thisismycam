@@ -12,6 +12,5 @@ class UserProfileAdmin(admin.ModelAdmin):
         FlickrContactInline
     ]
 
-#admin.site.register(UserProfile, UserProfileAdmin)
-admin.site.register(UserProfile)
+admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(FlickrContact)
