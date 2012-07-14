@@ -97,7 +97,7 @@ def process_flickr_photo(api_photo, user):
             naive = parse_datetime(api_photo['datetaken'])
             api_date_taken = pytz.UTC.localize(naive)
             
-            api_date_upload = datetime.utcfromtimestamp(api_photo['dateupload'])
+            api_date_upload = datetime.utcfromtimestamp(float(api_photo['dateupload']))
             
             photo = Photo(
                 photo_id = api_photo['id'],
