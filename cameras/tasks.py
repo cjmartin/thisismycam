@@ -41,28 +41,28 @@ def add_aws_photos_to_camera(camera):
             camera.amazon_image_response = simplejson.dumps(aws_photos)
             camera.save()
             
-            def get_aws_items(camera):
-                #print "Fetching Amazon items for camera %s.\n" % camera.name
-                amazon = bottlenose.Amazon(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY, settings.AWS_ASSOCIATE_TAG)
+def get_aws_items(camera):
+    #print "Fetching Amazon items for camera %s.\n" % camera.name
+    amazon = bottlenose.Amazon(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY, settings.AWS_ASSOCIATE_TAG)
 
-                try :
-                    aws_res = amazon.ItemSearch(SearchIndex="Electronics", Manufacturer=camera.make, Keywords=camera.model, Style="http://resources.cjmart.in/xml2json.xslt")
+    try :
+        aws_res = amazon.ItemSearch(SearchIndex="Electronics", Manufacturer=camera.make, Keywords=camera.model, Style="http://resources.cjmart.in/xml2json.xslt")
 
-                    aws_search_res = simplejson.loads(aws_res)
-                    aws_item = aws_search_res['ItemSearchResponse']['Items']['Item']
+        aws_search_res = simplejson.loads(aws_res)
+        aws_item = aws_search_res['ItemSearchResponse']['Items']['Item']
 
-                    try :
-                        # If there is only one item, aws_items will be the item.
-                        aws_title = aws_item['ItemAttributes']['Title']
-                        aws_items = [aws_item]
+        try :
+            # If there is only one item, aws_items will be the item.
+            aws_title = aws_item['ItemAttributes']['Title']
+            aws_items = [aws_item]
 
-                    except Exception, e :
-                        aws_items = aws_item
+        except Exception, e :
+            aws_items = aws_item
 
-                    return aws_items
+        return aws_items
 
-                except Exception, e :
-                    return None
+    except Exception, e :
+        return None
 
 def get_aws_photos_for_item(item):
     #print "Fetching photos for Amazon item %s.\n" % item['ASIN']
