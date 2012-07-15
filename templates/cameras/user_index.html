@@ -1,53 +1,82 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block body %}
-<div class="the-camera-title">
-    <h3 class="title">The fantastic</h3>
-    <h1 class="section-title">{{ user_cameras.0.camera.name }}</h1>
-    <h3 class="title">is your camera of choice.</h3>
-</div>
-
 <div class="inset-section">
     <div class="container">
+        <div class="the-camera-title">
+            <h3 class="title">The fantastic</h3>
+            <h1 class="title section-title brand">{{ primary_camera.camera.name }}</h1>
+            <h3 class="title">is your camera of choice.</h3>
+        </div>
+        
         <div class="row">
             <div class="span5 offset1">
                 <div class="the-camera">
-                    <div class="image camera-image the-camera-image" style="background-image: url('{{ user_cameras.0.camera.large_photo_url }}');">
-                        <img src="{{ user_cameras.0.camera.large_photo_url }}">
+                    <div class="image camera-image the-camera-image" style="background-image: url('{{ primary_camera.camera.large_photo_url }}');">
+                        <img src="{{ primary_camera.camera.large_photo_url }}">
                     </div>
                 </div>
             </div>
             <div class="span5">
                 <div class="the-camera-story">
                     <p>
-                        <strong>Your journey</strong> with the <strong><a href="#">{{ user_cameras.0.camera.model }}</a></strong> began on <strong>{{ user_cameras.0.date_first_taken|date:"l" }} the {{ user_cameras.0.date_first_taken|date:"jS" }} of {{ user_cameras.0.date_first_taken|date:"F, Y" }}</strong>, when you took your <strong><a href="{{ user.flickr_user.photos_url }}{{ user_cameras.0.first_taken_id }}" target="_blank">first photo</a></strong> together in <strong>San Francisco, California</strong>.
+                        <strong>Your journey</strong> with the <strong><a href="/cameras/{{ primary_camera.camera }}">{{ primary_camera.camera.model }}</a></strong> began on <strong>{{ primary_camera.date_first_taken|date:"l" }} the {{ primary_camera.date_first_taken|date:"jS" }} of {{ primary_camera.date_first_taken|date:"F, Y" }}</strong>, when you took your <strong><a href="{{ user.flickr_user.photos_url }}{{ primary_camera.first_taken_id }}" target="_blank">first photo</a></strong> together{% if first_taken_photo.has_geo and first_taken_photo.flickr_place.locality_name %} in <strong>{{ first_taken_photo.flickr_place.locality_name }}</strong>{% endif %}.
                     </p>
                     <p>
-                        Since then, you've posted <strong>{{ user_cameras.0.count_photos }} photos</strong> to Flickr{% if user_cameras.0.comments_count %} which have received <strong>{{ user_cameras.0.comments_count }} comments</strong>{% endif %}{% if user_cameras.0.faves_count %} and brought joy to the lives of the people who faved them <strong>{{ user_cameras.0.faves_count }} times!</strong>{% endif %}. Just think of the joy those photos have added to the world!
+                        Since then, you've posted <strong>{{ primary_camera.count_photos }} photos</strong> from your {{ primary_camera.camera.model }} to Flickr{% if primary_camera.comments_count %} which have received <strong>{{ primary_camera.comments_count }} comments</strong>{% endif %}{% if primary_camera.faves_count %} and brought joy to those who've faved them <strong>{{ primary_camera.faves_count }} times</strong>{% endif %}. Just think of the good those photos have done for the world!
+                    </p>
+                    <p>
+                        The <strong><a href="{{ user.flickr_user.photos_url }}{{ primary_camera.last_taken_id }}" target="_blank">last photo</a></strong> you took with your {{ primary_camera.camera.model }} was <strong>{{ primary_camera.date_last_taken|naturaltime }}</strong>. Maybe it's time to go outside and take a few more?
                     </p>
                 </div>
+            </div>
+        </div>
+        
+        <h2 class="title section-title">Oh, what things you've seen!</h2>
+        
+        <div class="row">
+            <div class="span12">
+                <ul class="thumbnails">
+                    {% for photo in photos %}
+                        <li class="span2">
+                            <a href="#" class="thumbnail">
+                                <img src="{{ photo.square_150_url }}" alt="{{ photo.title|safe }}">
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
     </div>
 </div>
 
 <div class="section">
-    <h1 class="section-title">Your Camera Collection</h1>
+    <h1 class="title section-title">Your Camera Collection</h1>
     <div class="section-content inset">
         <div class="container">
             <div class="row">
-                {% for user_camera in user_cameras %}
+                {% for camera in user_cameras %}
                     <div class="span3">
                         <div class="collection-camera">
-                            <div class="image camera-image collection-camera-image" style="background-image: url('{{ user_camera.camera.medium_photo_url }}');">
-                                <img src="{{ user_camera.camera.medium_photo_url }}">
+                            <div class="image camera-image collection-camera-image" style="background-image: url('{{ camera.user_camera.camera.medium_photo_url }}');">
+                                <img src="{{ camera.user_camera.camera.medium_photo_url }}">
+                                <a href="/cameras/{{ camera.user_camera.camera.slug }}">
                             </div>
-                            <h4>{{ user_camera.camera.name }}</h4>
-                            <p>{{ user_camera.count_photos }}</p>
+                            <h3 class="title collection-camera-title">{{ camera.user_camera.camera.name }}</h3>
+                            <p>{{ camera.user_camera.count_photos }} Photos</p>
+                            <div class="collection-camera-thumbnails">
+                                {% for photo in camera.photos %}
+                                    <a href="#" class="collection-camera-thumbnail">
+                                        <img src="{{ photo.square_150_url }}" alt="{{ photo.title|safe }}">
+                                    </a>
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
                     {% if forloop.counter|divisibleby:"4" %}
                         </div>
+                        <hr />
                         <div class="row">
                     {% endif %}
                 {% endfor %}

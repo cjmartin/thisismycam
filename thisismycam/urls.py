@@ -6,6 +6,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', 'cameras.views.index', name='index'),
+    url(r'^cameras/', include('cameras.urls')),
     
     # Examples:
     # url(r'^$', 'thisismycam.views.home', name='home'),

@@ -7,7 +7,7 @@ from cameras.models import Category
 from flickr.models import FlickrPlace
 
 class Photo(models.Model):
-    photo_id = models.BigIntegerField()
+    photo_id = models.BigIntegerField(unique=True, primary_key=True)
     secret = models.CharField(max_length=255)
     server = models.IntegerField()
     farm = models.IntegerField()
@@ -34,3 +34,17 @@ class Photo(models.Model):
     
     def __unicode__(self):
         return "%s + %s" % (self.photo_id, self.camera.name)
+        
+    def flickr_photo_page(self):
+        if self.path_alias:
+            identifier = self.path_alias
+        else:
+            identifier = self.owner_nsid
+            
+        return "http://flickr.com/photos/%s/%s" % (identifier, self.photo_id)
+        
+    def square_150_url(self):
+        return "http://farm%s.staticflickr.com/%s/%s_%s_q.jpg" % (self.farm, self.server, self.photo_id, self.secret)
+        
+    def square_75_url(self):
+        return "http://farm%s.staticflickr.com/%s/%s_%s_s.jpg" % (self.farm, self.server, self.photo_id, self.secret)

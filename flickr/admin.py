@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from flickr.models import FlickrUser
 from flickr.models import FlickrUserCamera
+from flickr.models import FlickrPlace
 
 class FlickrUserCameraInline(admin.TabularInline):
     model = FlickrUserCamera
@@ -14,3 +15,4 @@ class FlickrUserAdmin(admin.ModelAdmin):
 
 admin.site.register(FlickrUser, FlickrUserAdmin)
 admin.site.register(FlickrUserCamera)
+admin.site.register(FlickrPlace)

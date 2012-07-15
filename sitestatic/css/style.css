@@ -1,4 +1,5 @@
 body {
+    font-family: 'PT Serif', serif;
     padding-top: 40px;
     
 	color: #443E37;	
@@ -36,8 +37,14 @@ a:hover {
     background-color: #FFFFFF;
 }
 
-.image img {
+.image > img {
     display: none;
+}
+
+.image > a {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 #header {
@@ -79,7 +86,7 @@ a:hover {
     -moz-box-shadow: 0 0 1px rgba(0,0,0,0.2) inset;
     box-shadow: 0 0 1px rgba(0,0,0,0.2) inset;
     
-    border-radius: 2px;
+    border-radius: 3px;
 }
 
 a.header-login:hover {
@@ -124,7 +131,7 @@ a.header-login:hover {
 /* General Page Components */
 
 .inset-section {
-    padding: 30px 0;
+    padding: 0 0 30px;
     background: #F8F8F8;
     
     -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.2) inset;
@@ -134,41 +141,52 @@ a.header-login:hover {
 
 .section {
     border-top: 1px solid #F9F9F9;
+    margin-bottom: 30px;
 }
 
 .title {
     font-family: 'Lobster Two', cursive;
 	font-style: italic;
 	font-weight: 400;
-	color: #D9D9D9;
+	color: #CACACA;
 	
 	text-align: center;
 	
     text-shadow: rgba(0,0,0,0.4) 0 -1px 1px;
+}
+
+.inset-section .title {
+    text-shadow: 0px 1px 0px #FFFFFF;
 }
 
 .section-title {
-    margin: .5em 0;
-    
-    font-size: 70px;
     line-height: 1em;
-    
-    font-family: 'Lobster Two', cursive;
-	font-style: italic;
-	color: #D9D9D9;
-	
-	text-align: center;
-	
-    text-shadow: rgba(0,0,0,0.4) 0 -1px 1px;
+    font-weight: 700;
+}
+
+h1.title {
+    margin: .5em 0;
+    font-size: 70px;
+}
+
+h2.title {
+    margin: .75em 0;
+    font-size: 50px;
+}
+
+h3.title {
+    font-size: 30px;
+    line-height: 35px;
 }
 
 .the-camera-title {
-    margin: 20px;
+    margin: 40px;
     text-align: center;
 }
 
 .the-camera-title .section-title {
-    margin: 0;
+    margin: .2em;
+    font-size: 80px;
 }
 
 .section-content {
@@ -189,6 +207,17 @@ a.header-login:hover {
     -webkit-box-shadow: 0 0 1px rgba(0,0,0,0.2) inset;
     -moz-box-shadow: 0 0 1px rgba(0,0,0,0.2) inset;
     box-shadow: 0 0 1px rgba(0,0,0,0.2) inset;
+}
+
+.thumbnail, a.thumbnail:hover, .collection-camera {
+    background-color: #FFFFFF;
+    border: 1px solid #DDD;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
+    -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.075);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 
 /* Cameras */
@@ -212,10 +241,15 @@ a.header-login:hover {
     font-family: 'PT Serif', serif;
     font-size: 18px;
     
-    line-height: 24px;
+    line-height: 30px;
+}
+
+.the-camera-story strong {
+    font-size: 19px;
 }
 
 .collection-camera {
+    min-height: 474px;
     text-align: center;
     background-color: #FFFFFF;
 }
@@ -223,6 +257,24 @@ a.header-login:hover {
 .collection-camera-image {
     width: 200px;
     height: 200px;
+}
+
+.collection-camera .title {
+    margin-bottom: 10px;
+}
+
+.collection-camera-thumbnails {
+    margin-bottom: 10px;
+}
+
+.collection-camera-thumbnail {
+    display: inline-block;
+    width: 25%;
+    margin: 0 1% 3%;
+}
+
+.collection-camera-thumbnail > img {
+    max-width: 100%;
 }
 
 /* Teh Media Queries */
