@@ -9,16 +9,16 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         
         # Adding field 'FlickrUserCamera.date_first_taken'
-        db.add_column('flickr_flickrusercamera', 'date_first_taken', self.gf('django.db.models.fields.DateTimeField')(default=0), keep_default=False)
+        db.add_column('flickr_flickrusercamera', 'date_first_taken', self.gf('django.db.models.fields.DateTimeField')(default='2012-07-15 06:49:47.530465'), keep_default=False)
 
         # Adding field 'FlickrUserCamera.date_last_taken'
-        db.add_column('flickr_flickrusercamera', 'date_last_taken', self.gf('django.db.models.fields.DateTimeField')(default=0), keep_default=False)
+        db.add_column('flickr_flickrusercamera', 'date_last_taken', self.gf('django.db.models.fields.DateTimeField')(default='2012-07-15 06:49:47.530465'), keep_default=False)
 
         # Adding field 'FlickrUserCamera.date_first_upload'
-        db.add_column('flickr_flickrusercamera', 'date_first_upload', self.gf('django.db.models.fields.DateTimeField')(default=0), keep_default=False)
+        db.add_column('flickr_flickrusercamera', 'date_first_upload', self.gf('django.db.models.fields.DateTimeField')(default='2012-07-15 06:49:47.530465'), keep_default=False)
 
         # Adding field 'FlickrUserCamera.date_last_upload'
-        db.add_column('flickr_flickrusercamera', 'date_last_upload', self.gf('django.db.models.fields.DateTimeField')(default=0), keep_default=False)
+        db.add_column('flickr_flickrusercamera', 'date_last_upload', self.gf('django.db.models.fields.DateTimeField')(default='2012-07-15 06:49:47.530465'), keep_default=False)
 
 
     def backwards(self, orm):
