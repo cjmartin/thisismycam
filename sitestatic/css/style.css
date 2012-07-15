@@ -1,0 +1,44 @@
+.brand {
+    font-family: 'Lobster Two', cursive;
+	font-style: italic;
+	color: #7BC0D6 !important;
+
+	text-shadow: 0px 1px 0px #ffffff !important;
+}
+
+.inset-section {
+    padding: 30px 0;
+    background: #F8F8F8;
+    
+    -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.2) inset;
+    -moz-box-shadow: 0 0 5px rgba(0,0,0,0.2) inset;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2) inset;
+}
+
+.section-title {
+    margin: 40px;
+    
+    font-size: 70px;
+    line-height: 70px;
+    
+    font-family: 'Lobster Two', cursive;
+	font-style: italic;
+	color: #D9D9D9;
+	
+	text-align: center;
+	
+    text-shadow: rgba(0,0,0,0.4) 0 -1px 1px;
+}
+
+/* Welcome Page */
+
+.huge-welcome {
+    padding: 30px 0;
+    text-align: center;
+}
+
+.huge-welcome h1 {
+    padding-bottom: .2em;
+    font-size: 140px;
+	line-height: 1em;
+}
