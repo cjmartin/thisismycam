@@ -137,10 +137,10 @@ a.header-login:hover {
 }
 
 .section-title {
-    margin: 40px;
+    margin: 40px 0;
     
     font-size: 70px;
-    line-height: 70px;
+    line-height: 1em;
     
     font-family: 'Lobster Two', cursive;
 	font-style: italic;
@@ -185,14 +185,22 @@ a.header-login:hover {
 /* Teh Media Queries */
 
 @media (max-width: 480px) {
-    h1.brand {
+    .huge-welcome h1 {
         font-size: 60px;
+    }
+    
+    .section-title {
+        font-size: 30px;
     }
 }
 
 @media (max-width: 768px) {
-    h1.brand {
+    .huge-welcome h1 {
         font-size: 80px;
+    }
+    
+    .section-title {
+        font-size: 40px;
     }
     
     .section-content {
@@ -201,8 +209,12 @@ a.header-login:hover {
 }
 
 @media (min-width: 768px) and (max-width: 980px) {
-    h1.brand {
+    .huge-welcome h1 {
         font-size: 100px;
+    }
+    
+    .section-title {
+        font-size: 50px;
     }
     
     .section-content {
