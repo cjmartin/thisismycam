@@ -14,6 +14,7 @@ from cameras.tasks import add_aws_item_to_camera
 from cameras.tasks import add_aws_photos_to_camera
 
 from flickr.models import FlickrUserCamera
+from flickr.models import FlickrPlace
 
 from photos.models import Photo
 
@@ -30,7 +31,7 @@ def fetch_photos_for_flickr_user(user):
     
     while page <= pages:
         print "Fetching page %s for %s" % (page, user.username)
-        photos_rsp = flickr.people.getPublicPhotos(user_id=user.nsid,extras="date_taken,date_upload,license,owner_name,media,path_alias",page=page,format="json",nojsoncallback="true")
+        photos_rsp = flickr.people.getPublicPhotos(user_id=user.nsid,extras="date_taken,date_upload,license,owner_name,media,path_alias,count_comments,count_faves,geo",page=page,format="json",nojsoncallback="true")
         json = simplejson.loads(photos_rsp)
     
         if json and json['stat'] == 'ok':
@@ -113,8 +114,29 @@ def process_flickr_photo(api_photo, user):
                 owner_name = api_photo['ownername'],
                 path_alias = api_photo['pathalias'],
                 date_taken = api_date_taken,
-                date_upload = api_date_upload
+                date_upload = api_date_upload,
+                comments_count = api_photo['count_comments'],
+                faves_count = api_photo['count_faves'],
             )
+            
+            if api_photo['latitude'] or api_photo['longitude'] and api_photo['geo_is_public']:
+                photo.has_geo =  1
+                photo.latitude = api_photo['latitude']
+                photo.longitude = api_photo['longitude']
+                photo.accuracy = api_photo['accuracy']
+                photo.context = api_photo['context']
+                
+                try:
+                    flickr_place = FlickrPlace.objects.get(place_id = api_photo['place_id'])
+                except FlickrPlace.DoesNotExist:
+                    flickr_place = FlickrPlace(
+                        place_id = api_photo['place_id'],
+                    )
+                    flickr_place.save()
+                    
+                photo.flickr_place = flickr_place
+            else:
+                photo.has_geo = 0
 
             camera_slug = slugify(exif_make + " " + exif_model)
 
@@ -184,13 +206,20 @@ def process_flickr_photo(api_photo, user):
                 
                 if photo.date_taken > flickr_user_camera.date_last_taken:
                     flickr_user_camera.date_last_taken = photo.date_taken
+                    flickr_user_camera.last_taken_id = photo.photo_id
                 elif photo.date_taken < flickr_user_camera.date_first_taken:
                     flickr_user_camera.date_first_taken = photo.date_taken
+                    flickr_user_camera.first_taken_id = photo.photo_id
                     
                 if photo.date_upload > flickr_user_camera.date_last_upload:
                     flickr_user_camera.date_last_upload = photo.date_upload
+                    flickr_user_camera.last_upload_id = photo.photo_id
                 elif photo.date_upload < flickr_user_camera.date_first_upload:
                     flickr_user_camera.date_first_upload = photo.date_upload
+                    flickr_user_camera.first_upload_id = photo.photo_id
+                    
+                flickr_user_camera.comments_count = flickr_user_camera.comments_count + int(photo.comments_count)
+                flickr_user_camera.faves_count = flickr_user_camera.faves_count + int(photo.faves_count)
                 
                 flickr_user_camera.save()
                 print "We've already seen this camera for this user, updating the count."
@@ -205,6 +234,12 @@ def process_flickr_photo(api_photo, user):
                     date_last_taken = photo.date_taken,
                     date_first_upload = photo.date_upload,
                     date_last_upload = photo.date_upload,
+                    first_taken_id = photo.photo_id,
+                    last_taken_id = photo.photo_id,
+                    first_upload_id = photo.photo_id,
+                    last_upload_id = photo.photo_id,
+                    comments_count = photo.comments_count,
+                    faves_count = photo.faves_count,
                 )
                 camera.count = camera.count + 1
                 camera.save()

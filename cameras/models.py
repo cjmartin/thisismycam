@@ -28,6 +28,9 @@ class Camera(models.Model):
     amazon_image_response = models.TextField(null=True, blank=True)
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
+    large_photo_url = models.CharField(max_length=255, null=True, blank=True)
+    medium_photo_url = models.CharField(max_length=255, null=True, blank=True)
+    small_photo_url = models.CharField(max_length=255, null=True, blank=True)
     
     def __unicode__(self):
         return self.name

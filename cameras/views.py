@@ -12,19 +12,21 @@ def index(request):
         return render_to_response('cameras/index.html', data)
     else:
         user = request.user.get_profile()
-        user_cameras = user.flickr_user.cameras.all()
-        for camera in user_cameras:
-            if camera.amazon_image_response:
-                camera.amazon_image_response = simplejson.loads(camera.amazon_image_response)
+        # user_cameras = user.flickr_user.cameras.all()
+        user_cameras = user.flickr_user.flickrusercamera_set.order_by('-date_last_taken', '-count_photos')
+        
+        for user_camera in user_cameras:
+            if user_camera.camera.amazon_image_response:
+                user_camera.camera.amazon_image_response = simplejson.loads(user_camera.camera.amazon_image_response)
                 
-            if camera.amazon_item_response:
-                camera.amazon_item_response = simplejson.loads(camera.amazon_item_response)
-                if not camera.amazon_url:
+            if user_camera.camera.amazon_item_response:
+                user_camera.camera.amazon_item_response = simplejson.loads(user_camera.camera.amazon_item_response)
+                if not user_camera.camera.amazon_url:
                     # Clean up and add the item url
-                    url = urllib2.unquote(camera.amazon_item_response['DetailPageURL'])
+                    url = urllib2.unquote(user_camera.camera.amazon_item_response['DetailPageURL'])
                     split_url = url.split('?')
                     pretty_url = split_url[0] + "?tag=" + settings.AWS_ASSOCIATE_TAG
-                    camera.amazon_url = pretty_url
+                    user_camera.camera.amazon_url = pretty_url
         
         data = {
             'user': user,

@@ -20,6 +20,14 @@ class FlickrUser(models.Model):
     def __unicode__(self):
         return self.username
         
+    def photos_url(self):
+        if self.path_alias:
+            identifier = self.path_alias
+        else:
+            identifier = self.nsid
+            
+        return "http://flickr.com/photos/%s/" % identifier
+        
 class FlickrUserCamera(models.Model):
     flickr_user = models.ForeignKey(FlickrUser)
     camera = models.ForeignKey(Camera)
@@ -28,8 +36,17 @@ class FlickrUserCamera(models.Model):
     date_last_taken = models.DateTimeField()
     date_first_upload = models.DateTimeField()
     date_last_upload = models.DateTimeField()
+    first_taken_id = models.BigIntegerField()
+    last_taken_id = models.BigIntegerField()
+    first_upload_id = models.BigIntegerField()
+    last_upload_id = models.BigIntegerField()
+    comments_count = models.IntegerField(null=True, blank=True)
+    faves_count = models.IntegerField(null=True, blank=True)
 
     date_update = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return "%s + %s" % (self.flickr_user.username, self.camera.name)
+        
+class FlickrPlace(models.Model):
+    place_id = models.CharField(max_length=255, unique=True, primary_key=True)

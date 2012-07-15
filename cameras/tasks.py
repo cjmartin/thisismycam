@@ -27,6 +27,15 @@ def add_aws_item_to_camera(camera):
         
         if aws_photos:
             camera.amazon_image_response = simplejson.dumps(aws_photos)
+            
+            if aws_photos[0]['LargeImage']['URL']:
+                camera.large_photo_url = aws_photos[0]['LargeImage']['URL']
+                
+            if aws_photos[0]['MediumImage']['URL']:
+                camera.medium_photo_url = aws_photos[0]['MediumImage']['URL']
+                
+            if aws_photos[0]['SmallImage']['URL']:
+                camera.small_photo_url = aws_photos[0]['SmallImage']['URL']
         
         camera.save()
         

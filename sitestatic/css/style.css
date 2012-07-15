@@ -136,6 +136,17 @@ a.header-login:hover {
     border-top: 1px solid #F9F9F9;
 }
 
+.title {
+    font-family: 'Lobster Two', cursive;
+	font-style: italic;
+	font-weight: 400;
+	color: #D9D9D9;
+	
+	text-align: center;
+	
+    text-shadow: rgba(0,0,0,0.4) 0 -1px 1px;
+}
+
 .section-title {
     margin: .5em 0;
     
@@ -149,6 +160,15 @@ a.header-login:hover {
 	text-align: center;
 	
     text-shadow: rgba(0,0,0,0.4) 0 -1px 1px;
+}
+
+.the-camera-title {
+    margin: 20px;
+    text-align: center;
+}
+
+.the-camera-title .section-title {
+    margin: 0;
 }
 
 .section-content {
@@ -171,7 +191,29 @@ a.header-login:hover {
     box-shadow: 0 0 1px rgba(0,0,0,0.2) inset;
 }
 
-/* Camera Collections */
+/* Cameras */
+
+.the-camera {
+    padding: 10px 0;
+    
+    text-align: center;
+    background: #FFFFFF;
+    
+    border: 10px solid #7BC0D6;
+    border-radius: 5px;
+}
+
+.the-camera-image {
+    width: 300px;
+    height: 300px;
+}
+
+.the-camera-story {
+    font-family: 'PT Serif', serif;
+    font-size: 18px;
+    
+    line-height: 24px;
+}
 
 .collection-camera {
     text-align: center;
@@ -211,6 +253,14 @@ a.header-login:hover {
     .inset {
         padding: 10px;
     }
+    
+    .collection-camera-image {
+        max-width: 100%;
+    }
+    
+    .the-camera-image {
+        max-width: 100%;
+    }
 }
 
 @media (min-width: 768px) and (max-width: 980px) {
@@ -222,17 +272,27 @@ a.header-login:hover {
         font-size: 50px;
     }
     
+    .section-content {
+        width: 744px;
+    }
+    
     .collection-camera-image {
         width: 160px;
         height: 160px;
     }
     
-    .section-content {
-        width: 744px;
+    .the-camera-image {
+        width: 228px;
+        height: 228px;
     }
 }
 
 @media (min-width: 1200px) {
+    .the-camera-image {
+        width: 370px;
+        height: 370px;
+    }
+    
     .section-content {
         width: 1190px;
     }
