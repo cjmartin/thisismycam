@@ -23,8 +23,13 @@ def process_flickr_place(flickr_place_id):
         flickr_place.place_url = location['place_url']
         flickr_place.place_type = location['place_type']
         flickr_place.place_type_id = location['place_type_id']
-        flickr_place.name = location['name']
         
+        try:
+            if location['name']:
+                flickr_place.name = location['name']
+        except:
+            True
+                    
         try:
             if location['timezone']:
                 flickr_place.timezone = location['timezone']
