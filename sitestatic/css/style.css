@@ -1,9 +1,92 @@
 body {
     padding-top: 40px;
     
-    background: #F8F8F8;
 	color: #443E37;	
-	text-shadow: 0px 1px 0px #ffffff;
+	text-shadow: 0px 1px 0px #FFFFFF;
+}
+
+a {
+    color: #7BC0D6;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #7BC0D6;
+    text-decoration: none;
+    border-bottom: 1px dotted #7BC0D6;
+}
+
+.image {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    
+    background-repeat: no-repeat;
+    background-position: center center;
+    
+    -webkit-background-size: cover !important;
+    -moz-background-size: cover !important;
+    -o-background-size: cover !important;
+    background-size: cover !important;
+}
+
+#header {
+    position: fixed;
+    top: 0px;
+    z-index: 5;
+    
+    width: 100%;
+    line-height: 40px;
+    
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #F9F9F9;
+    
+    -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+
+#header h2 {
+    line-height: 40px;
+}
+
+#header h2.brand {
+    float: left;
+}
+
+.header-login {
+    display: block;
+    float: right;
+    line-height: 30px;
+    margin: 5px;
+    padding: 0 10px;
+        
+    background: #F8F8F8;
+    border: none;
+    
+    -webkit-box-shadow: 0 0 1px rgba(0,0,0,0.2) inset;
+    -moz-box-shadow: 0 0 1px rgba(0,0,0,0.2) inset;
+    box-shadow: 0 0 1px rgba(0,0,0,0.2) inset;
+    
+    border-radius: 2px;
+}
+
+a.header-login:hover {
+    color: #FFFFFF;
+    text-shadow: none;
+    
+    background: #7BC0D6;
+    border: none;
+}
+
+.header-buddyicon {
+    float: left;
+    width: 25px;
+    height: 20px;
+    margin-right: 5px;
+    margin-top: 5px;
+    
+    border-radius: 3px;
 }
 
 .brand {
@@ -14,13 +97,30 @@ body {
 	text-shadow: 0px 1px 0px #ffffff !important;
 }
 
+/* Welcome Page */
+
+.huge-welcome {
+    padding: 30px 0;
+    text-align: center;
+}
+
+.huge-welcome h1 {
+    padding-bottom: .2em;
+    font-size: 140px;
+	line-height: 1em;
+}
+
 .inset-section {
     padding: 30px 0;
-    background: #FFFFFF;
+    background: #F8F8F8;
     
     -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.2) inset;
     -moz-box-shadow: 0 0 5px rgba(0,0,0,0.2) inset;
     box-shadow: 0 0 5px rgba(0,0,0,0.2) inset;
+}
+
+.section {
+    border-top: 1px solid #F9F9F9;
 }
 
 .section-title {
@@ -38,15 +138,56 @@ body {
     text-shadow: rgba(0,0,0,0.4) 0 -1px 1px;
 }
 
-/* Welcome Page */
-
-.huge-welcome {
-    padding: 30px 0;
-    text-align: center;
+.section-content {
+    position: relative;
+    margin: 0 auto;
+    width: 960px;
 }
 
-.huge-welcome h1 {
-    padding-bottom: .2em;
-    font-size: 140px;
-	line-height: 1em;
+.inset {
+    padding: 10px 0;
+    
+    background: #F8F8F8;
+    
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    
+    -webkit-box-shadow: 0 0 1px rgba(0,0,0,0.2) inset;
+    -moz-box-shadow: 0 0 1px rgba(0,0,0,0.2) inset;
+    box-shadow: 0 0 1px rgba(0,0,0,0.2) inset;
+}
+
+/* Teh Media Queries */
+
+@media (max-width: 480px) {
+    h1.brand {
+        font-size: 60px;
+    }
+}
+
+@media (max-width: 768px) {
+    h1.brand {
+        font-size: 80px;
+    }
+    
+    .section-content {
+        width: auto;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 980px) {
+    h1.brand {
+        font-size: 100px;
+    }
+    
+    .section-content {
+        width: 744px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .section-content {
+        width: 1190px;
+    }
 }

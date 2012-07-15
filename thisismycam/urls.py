@@ -19,4 +19,5 @@ urlpatterns = patterns('',
     
     # Authentication
     url(r'', include('social_auth.urls')),
+    url(r'^logout/', 'accounts.views.logout_view', name='logout'),
 )

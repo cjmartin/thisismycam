@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="section">
+    <h1 class="section-title">Collection</h1>
+    <div class="section-content inset">
+        <div class="container">
+            <ul class="thumbnails">
+                {% for camera in user_cameras %}
+                    <li class="span3">
+                        <div class="thumbnail">
+                            <img src="{{ camera.amazon_image_response.0.MediumImage.URL }}" alt="">
+                            <h5>{{ camera.name }}</h5>
+                            <p>{{ camera.amazon_image_response.0.MediumImage.Width }} x {{ camera.amazon_image_response.0.MediumImage.Height }}</p>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

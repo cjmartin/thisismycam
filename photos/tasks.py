@@ -181,6 +181,17 @@ def process_flickr_photo(api_photo, user):
             try:
                 flickr_user_camera = FlickrUserCamera.objects.get(flickr_user=user, camera=camera)
                 flickr_user_camera.count_photos = flickr_user_camera.count_photos + 1
+                
+                if photo.date_taken > flickr_user_camera.date_last_taken:
+                    flickr_user_camera.date_last_taken = photo.date_taken
+                elif photo.date_taken < flickr_user_camera.date_first_taken:
+                    flickr_user_camera.date_first_taken = photo.date_taken
+                    
+                if photo.date_upload > flickr_user_camera.date_last_upload:
+                    flickr_user_camera.date_last_upload = photo.date_upload
+                elif photo.date_upload < flickr_user_camera.date_first_upload:
+                    flickr_user_camera.date_first_upload = photo.date_upload
+                
                 flickr_user_camera.save()
                 print "We've already seen this camera for this user, updating the count."
 
@@ -190,6 +201,10 @@ def process_flickr_photo(api_photo, user):
                     camera = camera,
                     flickr_user = user,
                     count_photos = 1,
+                    date_first_taken = photo.date_taken,
+                    date_last_taken = photo.date_taken,
+                    date_first_upload = photo.date_upload,
+                    date_last_upload = photo.date_upload,
                 )
                 camera.count = camera.count + 1
                 camera.save()

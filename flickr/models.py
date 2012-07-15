@@ -24,6 +24,10 @@ class FlickrUserCamera(models.Model):
     flickr_user = models.ForeignKey(FlickrUser)
     camera = models.ForeignKey(Camera)
     count_photos = models.IntegerField()
+    date_first_taken = models.DateTimeField()
+    date_last_taken = models.DateTimeField()
+    date_first_upload = models.DateTimeField()
+    date_last_upload = models.DateTimeField()
 
     date_update = models.DateTimeField(auto_now=True)
 

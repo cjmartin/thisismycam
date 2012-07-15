@@ -5,7 +5,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="description" content="Show off the beloved cameras you use to take beautiful photos.">
     
-	<title>{% block title %}This Is My Cam!{% endblock %}</title>
+	<title>{% block title %}This is my Cam!{% endblock %}</title>
 	
 	<!-- styles -->
 	{% block stylesheets %}
@@ -20,6 +20,20 @@
 </head>
 <body>
     <div id="wrap">
+        <div id="header">
+            <div class="container">
+                <h2 class="brand">This is my Cam!</h2>
+                {% if user %}
+                    <div class="header-login">
+                        <span class="image header-buddyicon" style="background-image: url('http://flickr.com/buddyicons/{{ user.flickr_nsid }}.jpg');"></span>Hi, {{ user.flickr_username }}!
+                    </div>
+                {% else %}
+                    <a class="header-login" href="{% url socialauth_begin 'flickr' %}">Log in with Flickr</a>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+        
         <div id="main">
             {% block body %}{% endblock %}
         </div>
