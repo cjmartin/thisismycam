@@ -4,7 +4,7 @@ from cameras.models import Camera
 from cameras.models import Make
 from cameras.models import Category
 
-from flickr.models import FlickrPlace
+# from flickr.models import FlickrPlace
 
 class Photo(models.Model):
     photo_id = models.BigIntegerField(unique=True, primary_key=True)
@@ -30,7 +30,7 @@ class Photo(models.Model):
     longitude = models.FloatField(null=True, blank=True)
     accuracy = models.IntegerField(null=True, blank=True)
     context = models.IntegerField(null=True, blank=True)
-    flickr_place = models.ForeignKey(FlickrPlace, null=True, blank=True)
+    # flickr_place = models.ForeignKey(FlickrPlace, null=True, blank=True)
     
     def __unicode__(self):
         return "%s + %s" % (self.photo_id, self.camera.name)

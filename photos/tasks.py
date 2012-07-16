@@ -14,8 +14,8 @@ from cameras.tasks import add_aws_item_to_camera
 from cameras.tasks import add_aws_photos_to_camera
 
 from flickr.models import FlickrUserCamera
-from flickr.models import FlickrPlace
-from flickr.tasks import process_flickr_place
+# from flickr.models import FlickrPlace
+# from flickr.tasks import process_flickr_place
 
 from photos.models import Photo
 
@@ -127,21 +127,21 @@ def process_flickr_photo(api_photo, user):
                 photo.accuracy = api_photo['accuracy']
                 photo.context = api_photo['context']
                 
-                try:
-                    flickr_place = FlickrPlace.objects.get(place_id = api_photo['place_id'])
-                except FlickrPlace.DoesNotExist:
-                    flickr_place = FlickrPlace(
-                        place_id = api_photo['place_id'],
-                    )
-                    flickr_place.save()
-                    
-                    if settings.DEBUG:
-                        print "Fetching data for Flickr place %s" % flickr_place.place_id
-                        process_flickr_place(flickr_place.place_id)
-                    else:
-                        process_flickr_place.delay(flickr_place.place_id)
-                    
-                photo.flickr_place = flickr_place
+                # try:
+                #     flickr_place = FlickrPlace.objects.get(place_id = api_photo['place_id'])
+                # except FlickrPlace.DoesNotExist:
+                #     flickr_place = FlickrPlace(
+                #         place_id = api_photo['place_id'],
+                #     )
+                #     flickr_place.save()
+                #     
+                #     if settings.DEBUG:
+                #         print "Fetching data for Flickr place %s" % flickr_place.place_id
+                #         process_flickr_place(flickr_place.place_id)
+                #     else:
+                #         process_flickr_place.delay(flickr_place.place_id)
+                #     
+                # photo.flickr_place = flickr_place
             else:
                 photo.has_geo = 0
 
