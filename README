@@ -1,10 +1,12 @@
 Notes:
 
-sudo apt-get install git apache2 nginx libapache2-mod-wsgi build-essential mysql-client python2.7-dev python-pip python-mysqldb
+sudo apt-get install git apache2 nginx libapache2-mod-wsgi build-essential mysql-client python2.7-dev python-pip python-mysqldb memcached
 
-sudo pip install django celery django-celery south django-social-auth bottlenose pytz
+sudo pip install django celery django-celery south django-social-auth bottlenose pytz python-memcached
 
 RabbitMQ: http://www.rabbitmq.com/install-debian.html Install with dpkg.
+
+RabbitMQ configuration: http://ask.github.com/celery/getting-started/broker-installation.html
 
 Date taken should be stored as UTC and always displayed as the UTC time.
 
