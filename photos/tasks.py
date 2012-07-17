@@ -101,22 +101,22 @@ def process_flickr_photo(api_photo, nsid):
         raw_exif_model = ""
         exif_model = ""
         exif_software = ""
-
+        
         for tag in exif['photo']['exif'] :
             if tag['label'] == "Make" :
                 raw_exif_make = tag['raw']['_content']
                 exif_make = clean_make(tag['raw']['_content'])
-
+                
             if tag['label'] == "Model" :
                 raw_exif_model = tag['raw']['_content']
                 exif_model = clean_model(tag['raw']['_content'], exif_make)
-
+                
             if tag['label'] == "Software" :
                 exif_software = tag['raw']['_content']
-
+                
         if exif['photo']['camera']:
             exif_camera = exif['photo']['camera']
-
+            
         if exif_model:
             naive = parse_datetime(api_photo['datetaken'])
             api_date_taken = pytz.timezone("UTC").localize(naive)
@@ -164,13 +164,13 @@ def process_flickr_photo(api_photo, nsid):
                 # photo.flickr_place = flickr_place
             else:
                 photo.has_geo = 0
-
+                
             camera_slug = slugify(exif_make + " " + exif_model)
-
+            
             try:
                 camera = Camera.objects.get(slug = camera_slug)
                 photo.camera_make = camera.make
-
+                
             except Camera.DoesNotExist:
                 make = None
                 if exif_make:
@@ -178,27 +178,27 @@ def process_flickr_photo(api_photo, nsid):
                     try:
                         make = Make.objects.get(slug = make_slug)
                         make.count = make.count + 1
-
+                        
                     except Make.DoesNotExist:
                         make = Make(
                             slug = make_slug,
                             name = exif_make,
                             count = 1
                         )
-
+                        
                     try:
                         make.save()
                     except IntegrityError:
                         raise process_flickr_photo.retry()
                         
                 photo.camera_make = make
-
+                
                 if not exif_camera:
                     if exif_make:
                         exif_camera = exif_make + " " + exif_model
                     else:
                         exif_camera = exif_model
-
+                        
                 args = {
                     'slug' : camera_slug,
                     'name' : exif_camera,
@@ -215,7 +215,7 @@ def process_flickr_photo(api_photo, nsid):
                     raise process_flickr_photo.retry()
                     
             photo.camera = camera
-
+            
             print "Saving photo %s for camera %s.\n" % (photo.photo_id, camera.name)    
             photo.save()
             
@@ -249,12 +249,12 @@ def process_flickr_photo(api_photo, nsid):
                     else:
                         print "AWS image update for %s already scheculed, skipping." % (camera.name)
             
-            # # Update the FlickrUserCamera
-            # if settings.DEBUG:
-            #     update_flickr_user_camera(nsid, camera.id, photo.photo_id)
-            # else:
-            #     update_flickr_user_camera.delay(nsid, camera.id, photo.photo_id)
-
+            # Update the FlickrUserCamera
+            if settings.DEBUG:
+                update_flickr_user_camera(nsid, camera.id, photo.photo_id)
+            else:
+                update_flickr_user_camera.delay(nsid, camera.id, photo.photo_id)
+                
 def clean_make(make):
     crap_words = [
     'PHOTO FILM CO\., LTD\.',

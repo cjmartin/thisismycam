@@ -14,6 +14,7 @@ from cameras.models import Camera
 from photos.models import Photo
 
 @task(ignore_result=True)
+@transaction.commit_on_success()
 def update_flickr_user_camera(nsid, camera_id, photo_id):
     flickr_user = FlickrUser.objects.get(pk = nsid)
     camera = Camera.objects.get(pk = camera_id)
@@ -21,7 +22,7 @@ def update_flickr_user_camera(nsid, camera_id, photo_id):
     
     print "Updating flickr_user (%s) with camera (%s)." % (flickr_user, camera)
     try:
-        flickr_user_camera = FlickrUserCamera.objects.select_for_update().filter(flickr_user=flickr_user, camera=camera)
+        flickr_user_camera = FlickrUserCamera.objects.select_for_update().get(flickr_user=flickr_user, camera=camera)
     
         if photo.date_taken > flickr_user_camera.date_last_taken:
             flickr_user_camera.date_last_taken = photo.date_taken
@@ -69,7 +70,8 @@ def update_flickr_user_camera(nsid, camera_id, photo_id):
         except IntegrityError:
             raise update_flickr_user_camera.retry()
             
-
+    return
+    
 # @task(ignore_result=True)
 # def process_flickr_place(flickr_place_id):
 #     print "Fetching Flickr place for place id %s" % flickr_place_id
