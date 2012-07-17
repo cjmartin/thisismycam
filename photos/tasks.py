@@ -36,57 +36,57 @@ def fetch_photos_for_flickr_user(nsid):
     nsid_digest = md5(flickr_user.nsid).hexdigest()
     lock_id = "%s-lock-%s" % ("fetch_photos", nsid_digest)
     
-    # cache.add fails if if the key already exists
-    acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
-    
-    if acquire_lock():
-        page = 1
-        pages = 1
-        photos_processed = 0
-        update_time = time.time()
-    
-        while page <= pages:
-            print "Fetching page %s for %s" % (page, flickr_user.username)
-            photos_rsp = flickr.people.getPublicPhotos(user_id=flickr_user.nsid,extras="date_taken,date_upload,license,owner_name,media,path_alias,count_comments,count_faves,geo",page=page,format="json",nojsoncallback="true")
-            json = simplejson.loads(photos_rsp)
-    
-            if json and json['stat'] == 'ok':
-                pages = json['photos']['pages']
-                for photo in json['photos']['photo']:
-                    if int(photo['dateupload']) >= flickr_user.date_last_photo_update:
-                        if settings.DEBUG:
-                            print "Go %s, %s is after %s" % (photo['id'], photo['dateupload'], flickr_user.date_last_photo_update)
-                            process_flickr_photo(photo, flickr_user.nsid)
-                        else:
-                            process_flickr_photo.delay(photo, flickr_user.nsid)
-                        
-                        photos_processed+=1
+    # # cache.add fails if if the key already exists
+    # acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
+    # 
+    # if acquire_lock():
+    page = 1
+    pages = 1
+    photos_processed = 0
+    update_time = time.time()
+
+    while page <= pages:
+        print "Fetching page %s for %s" % (page, flickr_user.username)
+        photos_rsp = flickr.people.getPublicPhotos(user_id=flickr_user.nsid,extras="date_taken,date_upload,license,owner_name,media,path_alias,count_comments,count_faves,geo",page=page,format="json",nojsoncallback="true")
+        json = simplejson.loads(photos_rsp)
+
+        if json and json['stat'] == 'ok':
+            pages = json['photos']['pages']
+            for photo in json['photos']['photo']:
+                if int(photo['dateupload']) >= flickr_user.date_last_photo_update:
+                    if settings.DEBUG:
+                        print "Go %s, %s is after %s" % (photo['id'], photo['dateupload'], flickr_user.date_last_photo_update)
+                        process_flickr_photo(photo, flickr_user.nsid)
                     else:
-                        print "Setting last photo update to %s for %s" % (update_time, flickr_user.username)
-                        flickr_user.date_last_photo_update = update_time
-                        page = pages
-                        break
-            else:
-                break
-            
-            page+=1
+                        process_flickr_photo.delay(photo, flickr_user.nsid)
+                    
+                    photos_processed+=1
+                else:
+                    print "Setting last photo update to %s for %s" % (update_time, flickr_user.username)
+                    flickr_user.date_last_photo_update = update_time
+                    page = pages
+                    break
+        else:
+            break
         
-        if not flickr_user.date_last_photo_update:
-            print "Setting last photo update to %s for %s" % (update_time, flickr_user.username)
-            flickr_user.date_last_photo_update = update_time
-        
-        print "Processed %s photos for %s" % (photos_processed, flickr_user.username)
-        if flickr_user.count_photos_processed:
-            photos_processed = photos_processed + flickr_user.count_photos_processed
-        
-        flickr_user.count_photos_processed = photos_processed
-        flickr_user.save()
-        
-        print "That was fun!"
-        return
+        page+=1
     
-    print "Photos for %s have already been fetched within the last hour." % (flickr_user.username)
+    if not flickr_user.date_last_photo_update:
+        print "Setting last photo update to %s for %s" % (update_time, flickr_user.username)
+        flickr_user.date_last_photo_update = update_time
+    
+    print "Processed %s photos for %s" % (photos_processed, flickr_user.username)
+    if flickr_user.count_photos_processed:
+        photos_processed = photos_processed + flickr_user.count_photos_processed
+    
+    flickr_user.count_photos_processed = photos_processed
+    flickr_user.save()
+    
+    print "That was fun!"
     return
+    # 
+    # print "Photos for %s have already been fetched within the last hour." % (flickr_user.username)
+    # return
     
 @task(ignore_result=True)
 def process_flickr_photo(api_photo, nsid):
