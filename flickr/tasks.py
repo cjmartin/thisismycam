@@ -15,7 +15,6 @@ from cameras.models import Camera
 from photos.models import Photo
 
 @task(ignore_result=True)
-@transaction.commit_on_success()
 def update_flickr_user_camera(nsid, camera_id, photo_id):
     flickr_user = FlickrUser.objects.get(pk = nsid)
     camera = Camera.objects.get(pk = camera_id)
@@ -23,32 +22,32 @@ def update_flickr_user_camera(nsid, camera_id, photo_id):
     
     print "Updating flickr_user (%s) with camera (%s)." % (flickr_user, camera)
     try:
-        flickr_user_camera = FlickrUserCamera.objects.select_for_update().get(flickr_user=flickr_user, camera=camera)
+        with transaction.commit_on_success():
+            flickr_user_camera = FlickrUserCamera.objects.select_for_update().get(flickr_user=flickr_user, camera=camera)
     
-        if photo.date_taken > flickr_user_camera.date_last_taken:
-            flickr_user_camera.date_last_taken = photo.date_taken
-            flickr_user_camera.last_taken_id = photo.photo_id
-        elif photo.date_taken < flickr_user_camera.date_first_taken:
-            flickr_user_camera.date_first_taken = photo.date_taken
-            flickr_user_camera.first_taken_id = photo.photo_id
+            if photo.date_taken > flickr_user_camera.date_last_taken:
+                flickr_user_camera.date_last_taken = photo.date_taken
+                flickr_user_camera.last_taken_id = photo.photo_id
+            elif photo.date_taken < flickr_user_camera.date_first_taken:
+                flickr_user_camera.date_first_taken = photo.date_taken
+                flickr_user_camera.first_taken_id = photo.photo_id
         
-        if photo.date_upload > flickr_user_camera.date_last_upload:
-            flickr_user_camera.date_last_upload = photo.date_upload
-            flickr_user_camera.last_upload_id = photo.photo_id
-        elif photo.date_upload < flickr_user_camera.date_first_upload:
-            flickr_user_camera.date_first_upload = photo.date_upload
-            flickr_user_camera.first_upload_id = photo.photo_id
+            if photo.date_upload > flickr_user_camera.date_last_upload:
+                flickr_user_camera.date_last_upload = photo.date_upload
+                flickr_user_camera.last_upload_id = photo.photo_id
+            elif photo.date_upload < flickr_user_camera.date_first_upload:
+                flickr_user_camera.date_first_upload = photo.date_upload
+                flickr_user_camera.first_upload_id = photo.photo_id
         
-        flickr_user_camera.count_photos = flickr_user_camera.count_photos + 1
-        flickr_user_camera.comments_count = flickr_user_camera.comments_count + int(photo.comments_count)
-        flickr_user_camera.faves_count = flickr_user_camera.faves_count + int(photo.faves_count)
+            flickr_user_camera.count_photos = flickr_user_camera.count_photos + 1
+            flickr_user_camera.comments_count = flickr_user_camera.comments_count + int(photo.comments_count)
+            flickr_user_camera.faves_count = flickr_user_camera.faves_count + int(photo.faves_count)
         
-        flickr_user_camera.save()
-        
-        print "We've already seen this camera for this user, updating the count."
+            flickr_user_camera.save()
+            print "We've already seen this camera for this user, updating the count."
+            return
 
     except FlickrUserCamera.DoesNotExist:
-        print "We've never seen this camera for this user, lets add it."
         try:
             flickr_user_camera = FlickrUserCamera.objects.create(
                 camera = camera,
@@ -67,6 +66,7 @@ def update_flickr_user_camera(nsid, camera_id, photo_id):
             )
             camera.count = camera.count + 1
             camera.save()
+            print "We've never seen this camera for this user, lets add it."
             
         except IntegrityError:
             raise update_flickr_user_camera.retry()
