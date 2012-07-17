@@ -211,7 +211,7 @@ def process_flickr_photo(api_photo, nsid):
             photo.save()
             
             # In case we need to create cache keys
-            id_digest = md5(camera.id).hexdigest()
+            id_digest = md5(str(camera.id)).hexdigest()
             
             if not camera.amazon_item_response:
                 lock_id = "%s-lock-%s" % ("aws_update", id_digest)
