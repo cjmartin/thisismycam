@@ -1,13 +1,13 @@
-# -*- coding: utf-8 -*-
+# encoding: utf-8
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
-
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        
         # Adding model 'Make'
         db.create_table('cameras_make', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -27,7 +27,7 @@ class Migration(SchemaMigration):
         # Adding model 'Camera'
         db.create_table('cameras_camera', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('slug', self.gf('django.db.models.fields.SlugField')(unique=True, max_length=255)),
+            ('slug', self.gf('django.db.models.fields.SlugField')(unique=True, max_length=255, db_index=True)),
             ('make', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['cameras.Make'], null=True, blank=True)),
             ('exif_make', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('model', self.gf('django.db.models.fields.CharField')(max_length=255)),
@@ -39,6 +39,9 @@ class Migration(SchemaMigration):
             ('amazon_image_response', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
             ('date_create', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('date_update', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('large_photo_url', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('medium_photo_url', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('small_photo_url', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
         ))
         db.send_create_signal('cameras', ['Camera'])
 
@@ -52,6 +55,7 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
+        
         # Deleting model 'Make'
         db.delete_table('cameras_make')
 
@@ -78,10 +82,13 @@ class Migration(SchemaMigration):
             'exif_make': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'exif_model': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'large_photo_url': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'make': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cameras.Make']", 'null': 'True', 'blank': 'True'}),
+            'medium_photo_url': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'model': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255'})
+            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255', 'db_index': 'True'}),
+            'small_photo_url': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         'cameras.category': {
             'Meta': {'object_name': 'Category'},
