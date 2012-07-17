@@ -18,6 +18,7 @@ from cameras.tasks import add_aws_photos_to_camera
 from flickr.models import FlickrUser
 # from flickr.models import FlickrUserCamera
 # from flickr.models import FlickrPlace
+from flickr.tasks import update_flickr_user_camera
 # from flickr.tasks import process_flickr_place
 
 from photos.models import Photo
