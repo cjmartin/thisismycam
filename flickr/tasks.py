@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.utils import simplejson
+from django.db import IntegrityError
 
 from celery.task import task
 from flickr_api.api import flickr
@@ -65,7 +66,7 @@ def update_flickr_user_camera(nsid, camera_id, photo_id):
             camera.count = camera.count + 1
             camera.save()
             
-        except FlickrUserCamera.IntegrityError:
+        except IntegrityError:
             raise update_flickr_user_camera.retry()
             
 

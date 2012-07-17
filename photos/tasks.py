@@ -4,6 +4,7 @@ from django.utils import simplejson, timezone
 from django.utils.dateparse import parse_datetime
 from django.core.cache import cache
 from django.utils.hashcompat import md5_constructor as md5
+from django.db import IntegrityError
 
 from datetime import datetime, date, timedelta
 
@@ -207,7 +208,7 @@ def process_flickr_photo(api_photo, nsid):
                 try:
                     camera = Camera.objects.create(**args)
                     
-                except Camera.IntegrityError:
+                except IntegrityError:
                     raise process_flickr_photo.retry()
                     
             photo.camera = camera
