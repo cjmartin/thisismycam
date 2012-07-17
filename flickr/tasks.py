@@ -20,8 +20,7 @@ def update_flickr_user_camera(nsid, camera_id, photo_id):
     
     print "Updating flickr_user (%s) with camera (%s)." % (flickr_user, camera)
     try:
-        flickr_user_camera = FlickrUserCamera.objects.get(flickr_user=flickr_user, camera=camera)
-        flickr_user_camera.count_photos = flickr_user_camera.count_photos + 1
+        flickr_user_camera = FlickrUserCamera.objects.select_for_update().filter(flickr_user=flickr_user, camera=camera)
     
         if photo.date_taken > flickr_user_camera.date_last_taken:
             flickr_user_camera.date_last_taken = photo.date_taken
@@ -37,10 +36,12 @@ def update_flickr_user_camera(nsid, camera_id, photo_id):
             flickr_user_camera.date_first_upload = photo.date_upload
             flickr_user_camera.first_upload_id = photo.photo_id
         
+        flickr_user_camera.count_photos = flickr_user_camera.count_photos + 1
         flickr_user_camera.comments_count = flickr_user_camera.comments_count + int(photo.comments_count)
         flickr_user_camera.faves_count = flickr_user_camera.faves_count + int(photo.faves_count)
-    
+        
         flickr_user_camera.save()
+        
         print "We've already seen this camera for this user, updating the count."
 
     except FlickrUserCamera.DoesNotExist:
