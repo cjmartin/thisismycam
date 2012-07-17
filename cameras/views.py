@@ -30,13 +30,13 @@ def index(request):
                     pretty_url = split_url[0] + "?tag=" + settings.AWS_ASSOCIATE_TAG
                     user_camera.camera.amazon_url = pretty_url
                     
-            photos = Photo.objects.filter(camera = user_camera.camera, owner_nsid = user.flickr_nsid).order_by('date_create')[:6]
+            photos = Photo.objects.filter(camera = user_camera.camera, owner_nsid = user.flickr_nsid).order_by('-date_taken')[:6]
             cameras_and_photos.append({'user_camera':user_camera, 'photos':photos})
         
         primary_camera = user_cameras[0]
         first_taken_photo = Photo.objects.get(photo_id = primary_camera.first_taken_id)
         
-        photos = Photo.objects.filter(camera = primary_camera.camera, owner_nsid = user.flickr_nsid).order_by('date_create')[:18]
+        photos = Photo.objects.filter(camera = primary_camera.camera, owner_nsid = user.flickr_nsid).order_by('-date_taken')[:18]
         
         data = {
             'user': user,
@@ -75,13 +75,13 @@ def camera(request, slug):
                     pretty_url = split_url[0] + "?tag=" + settings.AWS_ASSOCIATE_TAG
                     user_camera.camera.amazon_url = pretty_url
                     
-            photos = Photo.objects.filter(camera = user_camera.camera, owner_nsid = user.flickr_nsid).order_by('date_taken')[:6]
+            photos = Photo.objects.filter(camera = user_camera.camera, owner_nsid = user.flickr_nsid).order_by('-date_taken')[:6]
             cameras_and_photos.append({'user_camera':user_camera, 'photos':photos})
         
         primary_camera = user.flickr_user.flickrusercamera_set.get(camera = camera)
         first_taken_photo = Photo.objects.get(photo_id = primary_camera.first_taken_id)
         
-        photos = Photo.objects.filter(camera = primary_camera.camera, owner_nsid = user.flickr_nsid).order_by('date_taken')[:18]
+        photos = Photo.objects.filter(camera = primary_camera.camera, owner_nsid = user.flickr_nsid).order_by('-date_taken')[:18]
         
         data = {
             'user': user,
