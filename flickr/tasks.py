@@ -65,7 +65,7 @@ def update_flickr_user_camera(nsid, camera_id, photo_id):
             camera.count = camera.count + 1
             camera.save()
             
-        except IntegrityError:
+        except FlickrUserCamera.IntegrityError:
             raise update_flickr_user_camera.retry()
             
 

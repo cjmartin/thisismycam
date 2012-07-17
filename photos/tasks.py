@@ -207,7 +207,7 @@ def process_flickr_photo(api_photo, nsid):
                 try:
                     camera = Camera.objects.create(**args)
                     
-                except IntegrityError:
+                except Camera.IntegrityError:
                     raise process_flickr_photo.retry()
                     
             photo.camera = camera
