@@ -33,7 +33,7 @@ def fetch_photos_for_flickr_user(nsid):
     flickr_user = FlickrUser.objects.get(nsid = nsid)
     
     nsid_digest = md5(flickr_user.nsid).hexdigest()
-    lock_id = "%s-lock-%s" % (self.name, nsid_digest)
+    lock_id = "%s-lock-%s" % ("fetch_photos", nsid_digest)
     
     # cache.add fails if if the key already exists
     acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
