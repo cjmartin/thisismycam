@@ -186,8 +186,12 @@ def process_flickr_photo(api_photo, nsid):
                             count = 1
                         )
 
-                    make.save()
-                    photo.camera_make = make
+                    try:
+                        make.save()
+                    except IntegrityError:
+                        raise process_flickr_photo.retry()
+                        
+                photo.camera_make = make
 
                 if not exif_camera:
                     if exif_make:
@@ -207,7 +211,6 @@ def process_flickr_photo(api_photo, nsid):
                 
                 try:
                     camera = Camera.objects.create(**args)
-                    
                 except IntegrityError:
                     raise process_flickr_photo.retry()
                     
@@ -246,11 +249,11 @@ def process_flickr_photo(api_photo, nsid):
                     else:
                         print "AWS image update for %s already scheculed, skipping." % (camera.name)
             
-            # Update the FlickrUserCamera
-            if settings.DEBUG:
-                update_flickr_user_camera(nsid, camera.id, photo.photo_id)
-            else:
-                update_flickr_user_camera.delay(nsid, camera.id, photo.photo_id)
+            # # Update the FlickrUserCamera
+            # if settings.DEBUG:
+            #     update_flickr_user_camera(nsid, camera.id, photo.photo_id)
+            # else:
+            #     update_flickr_user_camera.delay(nsid, camera.id, photo.photo_id)
 
 def clean_make(make):
     crap_words = [
