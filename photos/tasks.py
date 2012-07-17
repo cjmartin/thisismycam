@@ -16,7 +16,7 @@ from cameras.tasks import add_aws_item_to_camera
 from cameras.tasks import add_aws_photos_to_camera
 
 from flickr.models import FlickrUser
-from flickr.models import FlickrUserCamera
+# from flickr.models import FlickrUserCamera
 # from flickr.models import FlickrPlace
 # from flickr.tasks import process_flickr_place
 
@@ -202,9 +202,13 @@ def process_flickr_photo(api_photo, nsid):
                     'exif_model' : raw_exif_model,
                     'count' : 0,
                 }
-
-                camera = Camera.objects.create(**args)
-
+                
+                try:
+                    camera = Camera.objects.create(**args)
+                    
+                except IntegrityError:
+                    camera = Camera.objects.get(slug = camera_slug)
+                    
             photo.camera = camera
 
             print "Saving photo %s for camera %s.\n" % (photo.photo_id, camera.name)    
@@ -240,51 +244,11 @@ def process_flickr_photo(api_photo, nsid):
                     else:
                         print "AWS image update for %s already scheculed, skipping." % (camera.name)
             
-            flickr_user = FlickrUser.objects.get(nsid = nsid)
-            print "Ooh, there's a flickr_user (%s), lets update that they have this camera (%s)." % (flickr_user, camera.id)
-            try:
-                flickr_user_camera = FlickrUserCamera.objects.get(flickr_user=flickr_user, camera=camera)
-                flickr_user_camera.count_photos = flickr_user_camera.count_photos + 1
-                
-                if photo.date_taken > flickr_user_camera.date_last_taken:
-                    flickr_user_camera.date_last_taken = photo.date_taken
-                    flickr_user_camera.last_taken_id = photo.photo_id
-                elif photo.date_taken < flickr_user_camera.date_first_taken:
-                    flickr_user_camera.date_first_taken = photo.date_taken
-                    flickr_user_camera.first_taken_id = photo.photo_id
-                    
-                if photo.date_upload > flickr_user_camera.date_last_upload:
-                    flickr_user_camera.date_last_upload = photo.date_upload
-                    flickr_user_camera.last_upload_id = photo.photo_id
-                elif photo.date_upload < flickr_user_camera.date_first_upload:
-                    flickr_user_camera.date_first_upload = photo.date_upload
-                    flickr_user_camera.first_upload_id = photo.photo_id
-                    
-                flickr_user_camera.comments_count = flickr_user_camera.comments_count + int(photo.comments_count)
-                flickr_user_camera.faves_count = flickr_user_camera.faves_count + int(photo.faves_count)
-                
-                flickr_user_camera.save()
-                print "We've already seen this camera for this user, updating the count."
-
-            except FlickrUserCamera.DoesNotExist:
-                print "We've never seen this camera for this user, lets add it."
-                flickr_user_camera = FlickrUserCamera.objects.create(
-                    camera = camera,
-                    flickr_user = flickr_user,
-                    count_photos = 1,
-                    date_first_taken = photo.date_taken,
-                    date_last_taken = photo.date_taken,
-                    date_first_upload = photo.date_upload,
-                    date_last_upload = photo.date_upload,
-                    first_taken_id = photo.photo_id,
-                    last_taken_id = photo.photo_id,
-                    first_upload_id = photo.photo_id,
-                    last_upload_id = photo.photo_id,
-                    comments_count = photo.comments_count,
-                    faves_count = photo.faves_count,
-                )
-                camera.count = camera.count + 1
-                camera.save()
+            # Update the FlickrUserCamera
+            if settings.DEBUG:
+                update_flickr_user_camera(nsid, camera.id, photo.photo_id)
+            else:
+                update_flickr_user_camera.delay(nsid, camera.id, photo.photo_id)
 
 def clean_make(make):
     crap_words = [

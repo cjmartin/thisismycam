@@ -4,7 +4,69 @@ from django.utils import simplejson
 from celery.task import task
 from flickr_api.api import flickr
 
+from flickr.models import FlickrUser
+from flickr.models import FlickrUserCamera
 #from flickr.models import FlickrPlace
+
+from cameras.models import Camera
+
+from photos.models import Photo
+
+@task(ignore_result=True)
+def update_flickr_user_camera(nsid, camera_id, photo_id):
+    flickr_user = FlickrUser.objects.get(pk = nsid)
+    camera = Camera.objects.get(pk = camera_id)
+    photo = Photo.objects.get(pk = photo_id)
+    
+    print "Updating flickr_user (%s) with camera (%s)." % (flickr_user, camera)
+    try:
+        flickr_user_camera = FlickrUserCamera.objects.get(flickr_user=flickr_user, camera=camera)
+        flickr_user_camera.count_photos = flickr_user_camera.count_photos + 1
+    
+        if photo.date_taken > flickr_user_camera.date_last_taken:
+            flickr_user_camera.date_last_taken = photo.date_taken
+            flickr_user_camera.last_taken_id = photo.photo_id
+        elif photo.date_taken < flickr_user_camera.date_first_taken:
+            flickr_user_camera.date_first_taken = photo.date_taken
+            flickr_user_camera.first_taken_id = photo.photo_id
+        
+        if photo.date_upload > flickr_user_camera.date_last_upload:
+            flickr_user_camera.date_last_upload = photo.date_upload
+            flickr_user_camera.last_upload_id = photo.photo_id
+        elif photo.date_upload < flickr_user_camera.date_first_upload:
+            flickr_user_camera.date_first_upload = photo.date_upload
+            flickr_user_camera.first_upload_id = photo.photo_id
+        
+        flickr_user_camera.comments_count = flickr_user_camera.comments_count + int(photo.comments_count)
+        flickr_user_camera.faves_count = flickr_user_camera.faves_count + int(photo.faves_count)
+    
+        flickr_user_camera.save()
+        print "We've already seen this camera for this user, updating the count."
+
+    except FlickrUserCamera.DoesNotExist:
+        print "We've never seen this camera for this user, lets add it."
+        try:
+            flickr_user_camera = FlickrUserCamera.objects.create(
+                camera = camera,
+                flickr_user = flickr_user,
+                count_photos = 1,
+                date_first_taken = photo.date_taken,
+                date_last_taken = photo.date_taken,
+                date_first_upload = photo.date_upload,
+                date_last_upload = photo.date_upload,
+                first_taken_id = photo.photo_id,
+                last_taken_id = photo.photo_id,
+                first_upload_id = photo.photo_id,
+                last_upload_id = photo.photo_id,
+                comments_count = photo.comments_count,
+                faves_count = photo.faves_count,
+            )
+            camera.count = camera.count + 1
+            camera.save()
+            
+        except IntegrityError:
+            raise update_flickr_user_camera.retry()
+            
 
 # @task(ignore_result=True)
 # def process_flickr_place(flickr_place_id):

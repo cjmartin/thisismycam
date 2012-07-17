@@ -44,7 +44,10 @@ class FlickrUserCamera(models.Model):
     faves_count = models.IntegerField(null=True, blank=True)
 
     date_update = models.DateTimeField(auto_now=True)
-
+    
+    class Meta:
+        unique_together = ("flickr_user", "camera")
+        
     def __unicode__(self):
         return "%s + %s" % (self.flickr_user.username, self.camera.name)
         
