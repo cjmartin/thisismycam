@@ -1,13 +1,13 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
         # Adding model 'Make'
         db.create_table('cameras_make', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -27,7 +27,7 @@ class Migration(SchemaMigration):
         # Adding model 'Camera'
         db.create_table('cameras_camera', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('slug', self.gf('django.db.models.fields.SlugField')(unique=True, max_length=255, db_index=True)),
+            ('slug', self.gf('django.db.models.fields.SlugField')(unique=True, max_length=255)),
             ('make', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['cameras.Make'], null=True, blank=True)),
             ('exif_make', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('model', self.gf('django.db.models.fields.CharField')(max_length=255)),
@@ -55,7 +55,6 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        
         # Deleting model 'Make'
         db.delete_table('cameras_make')
 
@@ -87,7 +86,7 @@ class Migration(SchemaMigration):
             'medium_photo_url': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'model': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255', 'db_index': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255'}),
             'small_photo_url': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         'cameras.category': {
