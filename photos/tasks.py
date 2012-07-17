@@ -3,6 +3,7 @@ from django.template.defaultfilters import slugify
 from django.utils import simplejson, timezone
 from django.utils.dateparse import parse_datetime
 from django.core.cache import cache
+from django.utils.hashcompat import md5_constructor as md5
 
 from datetime import datetime, date, timedelta
 
@@ -31,8 +32,6 @@ LOCK_EXPIRE = 60 * 60 # Lock expires in 60 minutes
 def fetch_photos_for_flickr_user(nsid):
     flickr_user = FlickrUser.objects.get(nsid = nsid)
     
-    # The cache key consists of the task name and the MD5 digest
-    # of the feed URL.
     nsid_digest = md5(flickr_user.nsid).hexdigest()
     lock_id = "%s-lock-%s" % (self.name, nsid_digest)
     
@@ -210,9 +209,12 @@ def process_flickr_photo(api_photo, nsid):
 
             print "Saving photo %s for camera %s.\n" % (photo.photo_id, camera.name)    
             photo.save()
-
+            
+            # In case we need to create cache keys
+            id_digest = md5(camera.id).hexdigest()
+            
             if not camera.amazon_item_response:
-                lock_id = "%s-lock-%s" % ("aws_update", camera.id)
+                lock_id = "%s-lock-%s" % ("aws_update", id_digest)
                 acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
                 
                 if acquire_lock():
@@ -226,7 +228,7 @@ def process_flickr_photo(api_photo, nsid):
                     
             else:
                 if not camera.amazon_image_response:
-                    lock_id = "%s-lock-%s" % ("aws_image_update", camera.id)
+                    lock_id = "%s-lock-%s" % ("aws_image_update", id_digest)
                     acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
                     
                     if acquire_lock():
