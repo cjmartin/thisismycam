@@ -94,7 +94,7 @@ def fetch_photos_for_flickr_user(nsid):
     
 @task(ignore_result=True)
 def process_flickr_photo(api_photo, nsid):
-    loger.info("Processing photo %s for user %s.\n" % (api_photo['id'], nsid))
+    logger.info("Processing photo %s for user %s.\n" % (api_photo['id'], nsid))
     return
     # try:
     #     exif_rsp = flickr.photos.getExif(photo_id=api_photo['id'],format="json",nojsoncallback="true")
