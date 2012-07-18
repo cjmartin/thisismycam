@@ -32,7 +32,7 @@ import urllib2
 LOCK_EXPIRE = 60 * 60 # Lock expires in 60 minutes
 
 @task(ignore_result=True)
-def fetch_photos_for_flickr_user(nsid, page = 1, pages = 1):
+def fetch_photos_for_flickr_user(nsid):
     flickr_user = FlickrUser.objects.get(nsid = nsid)
     
     nsid_digest = md5(flickr_user.nsid).hexdigest()
@@ -360,7 +360,7 @@ def clean_model(model, make):
     model = re.sub(r"(?i)(^Camera ZOOM FX for Android.+)", "Camera Zoom FX for Android", model)
 
     # Remove the make if it's in the model
-    model = re.sub(r'(?i)(^' + make + ')', "", model)
+    model = re.sub(r'(?i)(' + make + ')', "", model)
 
     # A whole section just for fixing Motorola bullshit
     model = re.sub(r"(?i)(^DROIDX\s[0-9][0-9a-z]+)", "DROID X", model)
