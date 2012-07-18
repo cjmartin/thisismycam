@@ -74,7 +74,7 @@ def fetch_photos_for_flickr_user(nsid, page = 1, pages = 1):
             page+=1
             
         except urllib2.URLError as e:
-            print "Problem talking to Flickr (%s) could not be reached due to %s, re-scheduling task." % (e.url, e.reason)
+            print "Problem talking to Flickr due to %s, re-scheduling task." % (e.reason)
             raise fetch_photos_for_flickr_user.retry()
             
     if not flickr_user.date_last_photo_update:
@@ -262,7 +262,7 @@ def process_flickr_photo(api_photo, nsid):
                     update_flickr_user_camera.delay(nsid, camera.id, photo.photo_id)
                     
     except urllib2.URLError as e:
-        print "Problem talking to Flickr (%s) could not be reached due to %s, re-scheduling task." % (e.url, e.reason)
+        print "Problem talking to Flickr due to %s, re-scheduling task." % (e.reason)
         raise fetch_photos_for_flickr_user.retry()
                     
 def clean_make(make):
