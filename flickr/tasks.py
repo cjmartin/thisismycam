@@ -29,7 +29,7 @@ def flickr_user_fetch_photos_complete(nsid, photos_processed, update_time):
         photos_processed = photos_processed + flickr_user.count_photos_processed
     
     flickr_user.count_photos_processed = photos_processed
-    flickr_user.save()
+    # flickr_user.save()
     
     logger.info("Fetch for %s complete. That was fun!" % (flickr_user.username))
     return
