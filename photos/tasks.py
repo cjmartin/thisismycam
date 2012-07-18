@@ -48,6 +48,8 @@ def fetch_photos_for_flickr_user(nsid):
     # acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
     # 
     # if acquire_lock():
+    page = 1
+    pages = 1
     photos_processed = 0
     update_time = time.time()
     
