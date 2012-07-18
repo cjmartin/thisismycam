@@ -27,11 +27,12 @@ from photos.models import Photo
 import re
 import time
 import pytz
+import urllib2
 
 LOCK_EXPIRE = 60 * 60 # Lock expires in 60 minutes
 
 @task(ignore_result=True)
-def fetch_photos_for_flickr_user(nsid):
+def fetch_photos_for_flickr_user(nsid, page = 1, pages = 1):
     flickr_user = FlickrUser.objects.get(nsid = nsid)
     
     nsid_digest = md5(flickr_user.nsid).hexdigest()
@@ -41,37 +42,42 @@ def fetch_photos_for_flickr_user(nsid):
     # acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
     # 
     # if acquire_lock():
-    page = 1
-    pages = 1
     photos_processed = 0
     update_time = time.time()
 
     while page <= pages:
         print "Fetching page %s for %s" % (page, flickr_user.username)
-        photos_rsp = flickr.people.getPublicPhotos(user_id=flickr_user.nsid,extras="date_taken,date_upload,license,owner_name,media,path_alias,count_comments,count_faves,geo",page=page,format="json",nojsoncallback="true")
-        json = simplejson.loads(photos_rsp)
-
-        if json and json['stat'] == 'ok':
-            pages = json['photos']['pages']
-            for photo in json['photos']['photo']:
-                if int(photo['dateupload']) >= flickr_user.date_last_photo_update:
-                    if settings.DEBUG:
-                        print "Go %s, %s is after %s" % (photo['id'], photo['dateupload'], flickr_user.date_last_photo_update)
-                        process_flickr_photo(photo, flickr_user.nsid)
-                    else:
-                        process_flickr_photo.delay(photo, flickr_user.nsid)
-                    
-                    photos_processed+=1
-                else:
-                    print "Setting last photo update to %s for %s" % (update_time, flickr_user.username)
-                    flickr_user.date_last_photo_update = update_time
-                    page = pages
-                    break
-        else:
-            break
         
-        page+=1
-    
+        try:
+            photos_rsp = flickr.people.getPublicPhotos(user_id=flickr_user.nsid,extras="date_taken,date_upload,license,owner_name,media,path_alias,count_comments,count_faves,geo",page=page,format="json",nojsoncallback="true")
+            json = simplejson.loads(photos_rsp)
+
+            if json and json['stat'] == 'ok':
+                pages = json['photos']['pages']
+                for photo in json['photos']['photo']:
+                    if int(photo['dateupload']) >= flickr_user.date_last_photo_update:
+                        if settings.DEBUG:
+                            print "Go %s, %s is after %s" % (photo['id'], photo['dateupload'], flickr_user.date_last_photo_update)
+                            process_flickr_photo(photo, flickr_user.nsid)
+                        else:
+                            process_flickr_photo.delay(photo, flickr_user.nsid)
+                    
+                        photos_processed+=1
+                    else:
+                        print "Setting last photo update to %s for %s" % (update_time, flickr_user.username)
+                        flickr_user.date_last_photo_update = update_time
+                        flickr_user.save()
+                        page = pages
+                        break
+            else:
+                break
+        
+            page+=1
+            
+        except urllib2.URLError as e:
+            print "Problem talking to Flickr (%s) could not be reached due to %s, re-scheduling task." % (e.url, e.reason)
+            raise fetch_photos_for_flickr_user.retry()
+            
     if not flickr_user.date_last_photo_update:
         print "Setting last photo update to %s for %s" % (update_time, flickr_user.username)
         flickr_user.date_last_photo_update = update_time
