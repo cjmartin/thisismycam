@@ -80,7 +80,7 @@ def fetch_photos_for_flickr_user(nsid):
                 raise fetch_photos_for_flickr_user.retry()
         
             # page+=1
-            page = pages
+            page = pages+1
             
         except urllib2.URLError as e:
             logger.error("Problem talking to Flickr due to %s, re-scheduling task." % (e.reason))
