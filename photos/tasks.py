@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 LOCK_EXPIRE = 60 * 60 # Lock expires in 60 minutes
 
-@task(ignore_result=True)
+@task()
 def fetch_photos_for_flickr_user(nsid):
     flickr_user = FlickrUser.objects.get(nsid = nsid)
     
@@ -92,7 +92,7 @@ def fetch_photos_for_flickr_user(nsid):
     # print "Photos for %s have already been fetched within the last hour." % (flickr_user.username)
     # return
     
-@task(ignore_result=True)
+@task()
 def process_flickr_photo(api_photo, nsid):
     logger.info("Processing photo %s for user %s.\n" % (api_photo['id'], nsid))
     return
