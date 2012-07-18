@@ -1,15 +1,25 @@
 from django.conf import settings
+
+from django.utils import simplejson
 from django.template.defaultfilters import slugify
-from django.utils import simplejson, timezone
-from django.utils.dateparse import parse_datetime
-from django.core.cache import cache
 from django.utils.hashcompat import md5_constructor as md5
+
+from django.core.cache import cache
 from django.db import IntegrityError
 
-from datetime import datetime, date, timedelta
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
+from datetime import datetime
 
 from celery.task import task
+from celery import chord
+
 from flickr_api.api import flickr
+
+import re
+import time
+import pytz
+import urllib2
 
 from cameras.models import Make
 from cameras.models import Camera
@@ -17,17 +27,13 @@ from cameras.tasks import add_aws_item_to_camera
 from cameras.tasks import add_aws_photos_to_camera
 
 from flickr.models import FlickrUser
-# from flickr.models import FlickrUserCamera
-# from flickr.models import FlickrPlace
 from flickr.tasks import update_flickr_user_camera
-# from flickr.tasks import process_flickr_place
+from flickr.tasks import flickr_user_fetch_photos_complete
 
 from photos.models import Photo
 
-import re
-import time
-import pytz
-import urllib2
+import logging
+logger = logging.getLogger(__name__)
 
 LOCK_EXPIRE = 60 * 60 # Lock expires in 60 minutes
 
@@ -44,52 +50,41 @@ def fetch_photos_for_flickr_user(nsid):
     # if acquire_lock():
     photos_processed = 0
     update_time = time.time()
-
+    
+    photo_updates = []
+    
     while page <= pages:
-        print "Fetching page %s for %s" % (page, flickr_user.username)
+        logger.info("Fetching page %s for %s" % (page, flickr_user.username))
         try:
             photos_rsp = flickr.people.getPublicPhotos(user_id=flickr_user.nsid,extras="date_taken,date_upload,license,owner_name,media,path_alias,count_comments,count_faves,geo",page=page,format="json",nojsoncallback="true")
             json = simplejson.loads(photos_rsp)
 
             if json and json['stat'] == 'ok':
                 pages = json['photos']['pages']
+                
                 for photo in json['photos']['photo']:
                     if int(photo['dateupload']) >= flickr_user.date_last_photo_update:
-                        if settings.DEBUG:
-                            print "Go %s, %s is after %s" % (photo['id'], photo['dateupload'], flickr_user.date_last_photo_update)
-                            process_flickr_photo(photo, flickr_user.nsid)
-                        else:
-                            process_flickr_photo.delay(photo, flickr_user.nsid)
-                    
+                        logger.info("Adding photo %s to task group, %s is after %s" % (photo['id'], photo['dateupload'], flickr_user.date_last_photo_update))
+                        
+                        photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid)))
                         photos_processed+=1
+                        
                     else:
-                        print "Setting last photo update to %s for %s" % (update_time, flickr_user.username)
-                        flickr_user.date_last_photo_update = update_time
-                        flickr_user.save()
                         page = pages
                         break
+                        
             else:
-                break
+                logger.error("Flickr api query did not respond OK, re-scheduling task.")
+                raise fetch_photos_for_flickr_user.retry()
         
             page+=1
             
         except urllib2.URLError as e:
-            print "Problem talking to Flickr due to %s, re-scheduling task." % (e.reason)
+            logger.error("Problem talking to Flickr due to %s, re-scheduling task." % (e.reason))
             raise fetch_photos_for_flickr_user.retry()
             
-    if not flickr_user.date_last_photo_update:
-        print "Setting last photo update to %s for %s" % (update_time, flickr_user.username)
-        flickr_user.date_last_photo_update = update_time
-    
-    print "Processed %s photos for %s" % (photos_processed, flickr_user.username)
-    if flickr_user.count_photos_processed:
-        photos_processed = photos_processed + flickr_user.count_photos_processed
-    
-    flickr_user.count_photos_processed = photos_processed
-    flickr_user.save()
-    
-    print "That was fun!"
-    return
+    logger.info("Tuna blaster engaged, FIRING!")
+    chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((nsid, photos_processed, update_time)))
     # 
     # print "Photos for %s have already been fetched within the last hour." % (flickr_user.username)
     # return
