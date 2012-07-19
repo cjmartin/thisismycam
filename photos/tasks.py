@@ -96,8 +96,8 @@ def fetch_photos_for_flickr_user(nsid):
             page+=1
             # page = pages+1
             
-        except urllib2.URLError as e:
-            logger.error("Problem talking to Flickr due to %s, re-scheduling task." % (e.reason))
+        except:
+            logger.error("Problem talking to Flickr, re-scheduling task.")
             raise fetch_photos_for_flickr_user.retry(countdown=10)
     
     logger.info("%s batches (pages) in queue, executing first batch." % (len(photo_update_batches)))        
