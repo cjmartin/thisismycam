@@ -98,9 +98,9 @@ def fetch_photos_for_flickr_user(nsid, page=1):
         except:
             logger.error("Problem talking to Flickr, will try again.")
             # raise fetch_photos_for_flickr_user.retry(args=[nsid, page], countdown=10)
-    
-    logger.info("%s batches (pages) in queue, executing first batch." % (len(photo_update_batches)))        
+            
     process_flickr_photos_batch.delay(None, photo_update_batches)
+    logger.info("%s batches (pages) in queue, executing first batch." % (len(photo_update_batches)))
     
     return
     # 
