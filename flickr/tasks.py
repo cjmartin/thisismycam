@@ -43,7 +43,7 @@ def update_flickr_user_camera(photo_id, nsid):
         photo = Photo.objects.get(pk = photo_id)
         camera = photo.camera
     
-        print "Updating flickr_user (%s) with camera (%s)." % (flickr_user, camera)
+        logger.info("Updating flickr_user (%s) with camera (%s)." % (flickr_user, camera))
         try:
             flickr_user_camera = FlickrUserCamera.objects.get(flickr_user=flickr_user, camera=camera)
             return
