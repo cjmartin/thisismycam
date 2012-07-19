@@ -18,7 +18,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 @task()
-def flickr_user_fetch_photos_complete(nsid, photos_processed, update_time):
+def flickr_user_fetch_photos_complete(photos_processed, nsid, update_time):
+    ## Figure out what photos_processed actually is.    
     flickr_user = FlickrUser.objects.get(nsid = nsid)
     
     logger.info("Setting last photo update to %s for %s" % (update_time, flickr_user.username))
@@ -26,7 +27,7 @@ def flickr_user_fetch_photos_complete(nsid, photos_processed, update_time):
     
     logger.info("Processed %s photos for %s" % (str(photos_processed), flickr_user.username))
     if flickr_user.count_photos_processed:
-        photos_processed = photos_processed + flickr_user.count_photos_processed
+        photos_processed = len(photos_processed) + flickr_user.count_photos_processed
     
     flickr_user.count_photos_processed = photos_processed
     # flickr_user.save()
@@ -34,11 +35,11 @@ def flickr_user_fetch_photos_complete(nsid, photos_processed, update_time):
     logger.info("Fetch for %s complete. That was fun!" % (flickr_user.username))
     return
 
-@task(ignore_result=True)
-def update_flickr_user_camera(nsid, camera_id, photo_id):
+@task()
+def update_flickr_user_camera(photo_id, nsid):
     flickr_user = FlickrUser.objects.get(pk = nsid)
-    camera = Camera.objects.get(pk = camera_id)
     photo = Photo.objects.get(pk = photo_id)
+    camera = photo.camera
     
     print "Updating flickr_user (%s) with camera (%s)." % (flickr_user, camera)
     try:
