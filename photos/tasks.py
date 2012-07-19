@@ -90,6 +90,7 @@ def fetch_photos_for_flickr_user(nsid):
                     return group(photo_updates)
                     
             else:
+                logger.info("Adding page %s to batches" % (page))
                 photo_update_batches.append(photo_updates)
                 
             # logger.info("Tuna blaster engaged, FIRING!")
