@@ -85,83 +85,16 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
                 
         else:
             logger.error("Flickr api query did not respond OK, will try again.")
-            raise fetch_photos_for_flickr_user.retry(countdown=10)
+            return fetch_photos_for_flickr_user.delay(None, user.nsid, page)
             
     except:
         logger.error("Problem talking to Flickr, will try again.")
         return fetch_photos_for_flickr_user.delay(None, user.nsid, page)
         
-    ## Bankruptcy
-    # pages = 1
-    # photos_processed = 0
-    # update_time = time.time()
-    # 
-    # photo_update_batches = []
-    # 
-    # while page <= pages:
-    #     logger.info("Fetching page %s for %s" % (page, flickr_user.username))
-    #     photo_updates = []
-    #     
-    #     try:
-    #         photos_rsp = flickr.people.getPublicPhotos(user_id=flickr_user.nsid,extras="date_taken,date_upload,license,owner_name,media,path_alias,count_comments,count_faves,geo",per_page=per_page,page=page,format="json",nojsoncallback="true")
-    #         json = simplejson.loads(photos_rsp)
-    # 
-    #         if json and json['stat'] == 'ok':
-    #             pages = json['photos']['pages']
-    #             
-    #             for photo in json['photos']['photo']:
-    #                 if int(photo['dateupload']) >= flickr_user.date_last_photo_update:
-    #                     logger.info("Adding photo %s to task group, %s is after %s" % (photo['id'], photo['dateupload'], flickr_user.date_last_photo_update))
-    #                     
-    #                     if page <= 10 and page != pages:
-    #                         process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))).delay()
-    #                         
-    #                     else:
-    #                         photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))))
-    #                         
-    #                     photos_processed+=1
-    #                     
-    #                 else:
-    #                     page = pages
-    #                     break
-    #                     
-    #             if len(photo_updates):
-    #                 logger.info("Adding page %s to batches" % (page))
-    #                 photo_update_batches.append(photo_updates)
-    # 
-    #             page+=1
-    #             # page = pages+1
-    #             
-    #         else:
-    #             logger.error("Flickr api query did not respond OK, will try again.")
-    #             # raise fetch_photos_for_flickr_user.retry(args=[nsid, page], countdown=10)
-    #             
-    #     except:
-    #         logger.error("Problem talking to Flickr, will try again.")
-    #         # raise fetch_photos_for_flickr_user.retry(args=[nsid, page], countdown=10)
-    #         
-    # process_flickr_photos_batch.delay(None, photo_update_batches)
-    # logger.info("%s batches (pages) in queue, executing first batch." % (len(photo_update_batches)))
-    # 
-    # return
-    
     ## When it's all working, re-enable this.
     # 
     # print "Photos for %s have already been fetched within the last hour." % (flickr_user.username)
     # return
-    
-# @task()
-# def process_flickr_photos_batch(results, photo_update_batches):
-#     photo_updates = photo_update_batches.pop(0)
-#     
-#     if photo_update_batches:
-#         logger.info("Executing batch with more to go.")
-#         chord(photo_updates)(process_flickr_photos_batch.subtask((photo_update_batches, )))
-#     else:
-#         logger.info("Executing last batch!")
-#         chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
-#         
-#     return
 
 @task()
 def process_flickr_photo(api_photo, nsid):
