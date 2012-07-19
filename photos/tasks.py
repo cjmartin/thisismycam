@@ -89,7 +89,7 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
             
     except:
         logger.error("Problem talking to Flickr, will try again.")
-        raise fetch_photos_for_flickr_user.retry(countdown=10)
+        return fetch_photos_for_flickr_user.delay(None, user.nsid, page)
         
     ## Bankruptcy
     # pages = 1
