@@ -78,26 +78,26 @@ def fetch_photos_for_flickr_user(nsid, page=1):
                         page = pages
                         break
                         
-            else:
-                logger.error("Flickr api query did not respond OK, re-scheduling task.")
-                raise fetch_photos_for_flickr_user.retry(args=[nsid, page], countdown=10)
-                
-            if page <= 15:
-                if page == pages:
-                    chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
+                if page <= 15:
+                    if page == pages:
+                        chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
+                    else:
+                        group(photo_updates).apply_async()
+
                 else:
-                    group(photo_updates).apply_async()
-                    
-            else:
-                logger.info("Adding page %s to batches" % (page))
-                photo_update_batches.append(photo_updates)
+                    logger.info("Adding page %s to batches" % (page))
+                    photo_update_batches.append(photo_updates)
+
+                page+=1
+                # page = pages+1
                 
-            page+=1
-            # page = pages+1
-            
+            else:
+                logger.error("Flickr api query did not respond OK, will try again.")
+                # raise fetch_photos_for_flickr_user.retry(args=[nsid, page], countdown=10)
+                
         except:
-            logger.error("Problem talking to Flickr, re-scheduling task.")
-            raise fetch_photos_for_flickr_user.retry(args=[nsid, page], countdown=10)
+            logger.error("Problem talking to Flickr, will try again.")
+            # raise fetch_photos_for_flickr_user.retry(args=[nsid, page], countdown=10)
     
     logger.info("%s batches (pages) in queue, executing first batch." % (len(photo_update_batches)))        
     process_flickr_photos_batch.delay(None, photo_update_batches)
@@ -248,7 +248,7 @@ def process_flickr_photo(api_photo, nsid):
                         'camera': camera,
                     }
                 )
-
+                
                 photo.title = api_photo['title']
                 photo.path_alias = api_photo['pathalias']
                 photo.date_taken = api_date_taken
@@ -258,14 +258,14 @@ def process_flickr_photo(api_photo, nsid):
                 
                 if camera.make:
                     photo.camera_make = camera.make
-
+                    
                 if api_photo['latitude'] or api_photo['longitude'] and api_photo['geo_is_public']:
                     photo.has_geo =  1
                     photo.latitude = api_photo['latitude']
                     photo.longitude = api_photo['longitude']
                     photo.accuracy = api_photo['accuracy']
                     photo.context = api_photo['context']
-
+                    
                     # try:
                     #     flickr_place = FlickrPlace.objects.get(place_id = api_photo['place_id'])
                     # except FlickrPlace.DoesNotExist:
@@ -296,7 +296,7 @@ def process_flickr_photo(api_photo, nsid):
             # The photo doesn't have camera info
             else:
                 return False
-                        
+                    
     except:
         logger.error("Problem talking to Flickr, re-scheduling task.")
         raise fetch_photos_for_flickr_user.retry(countdown=10)
