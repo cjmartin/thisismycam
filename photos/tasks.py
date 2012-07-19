@@ -54,6 +54,8 @@ def fetch_photos_for_flickr_user(nsid):
     update_time = time.time()
     last_page = False
     
+    photo_update_batches = []
+    
     while page <= pages:
         logger.info("Fetching page %s for %s" % (page, flickr_user.username))
         photo_updates = []
@@ -69,7 +71,7 @@ def fetch_photos_for_flickr_user(nsid):
                     if int(photo['dateupload']) >= flickr_user.date_last_photo_update:
                         logger.info("Adding photo %s to task group, %s is after %s" % (photo['id'], photo['dateupload'], flickr_user.date_last_photo_update))
                         
-                        photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))))
+                        photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid))))
                         photos_processed+=1
                         
                     else:
@@ -80,11 +82,17 @@ def fetch_photos_for_flickr_user(nsid):
                 logger.error("Flickr api query did not respond OK, re-scheduling task.")
                 raise fetch_photos_for_flickr_user.retry()
                 
-            if page == pages:
-                last_page = True
+            if page == 1:
+                if pages == 1:
+                    return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
+                else:
+                    return group(photo_updates)
+                    
+            else:
+                photo_update_batches.append(photo_updates)
                 
-            logger.info("Tuna blaster engaged, FIRING!")
-            chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((nsid, update_time, last_page, )))
+            # logger.info("Tuna blaster engaged, FIRING!")
+            # chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((nsid, update_time, last_page, )))
             
             page+=1
             # page = pages+1
@@ -93,10 +101,20 @@ def fetch_photos_for_flickr_user(nsid):
             logger.error("Problem talking to Flickr due to %s, re-scheduling task." % (e.reason))
             raise fetch_photos_for_flickr_user.retry()
             
+    return process_flickr_photos_batch.delay(None, photo_update_batches)
     # 
     # print "Photos for %s have already been fetched within the last hour." % (flickr_user.username)
     # return
     
+@task()
+def process_flickr_photos_batch(results, photo_update_batches):
+    photo_updates = photo_update_batches.pop(0)
+    
+    if photo_update_batches:
+        return chord(photo_updates)(process_flickr_photos_batch.subtask((photo_update_batches)))
+    else:
+        return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
+
 @task()
 def process_flickr_photo(api_photo, nsid):
     logger.info("Processing photo %s for user %s.\n" % (api_photo['id'], nsid))
