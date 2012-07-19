@@ -46,6 +46,7 @@ def update_flickr_user_camera(photo_id, nsid):
         print "Updating flickr_user (%s) with camera (%s)." % (flickr_user, camera)
         try:
             flickr_user_camera = FlickrUserCamera.objects.get(flickr_user=flickr_user, camera=camera)
+            return
             # with transaction.commit_on_success():
             #     flickr_user_camera = FlickrUserCamera.objects.select_for_update().get(flickr_user=flickr_user, camera=camera)
             #     
