@@ -90,6 +90,7 @@ def update_flickr_user_camera(photo_id, nsid):
                 camera.count = camera.count + 1
                 camera.save()
                 print "We've never seen this camera for this user, lets add it."
+                return
             
             except IntegrityError:
                 logger.warning("FlickrUserCamera %s + %s already exists, but we're trying to add it again. Rescheduling task." % (flickr_user, camera))
