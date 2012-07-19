@@ -79,8 +79,8 @@ def fetch_photos_for_flickr_user(nsid):
                 logger.error("Flickr api query did not respond OK, re-scheduling task.")
                 raise fetch_photos_for_flickr_user.retry()
         
-            # page+=1
-            page = pages+1
+            page+=1
+            # page = pages+1
             
         except urllib2.URLError as e:
             logger.error("Problem talking to Flickr due to %s, re-scheduling task." % (e.reason))
