@@ -67,7 +67,7 @@ def update_flickr_user_camera(photo_id, nsid):
                 flickr_user_camera.faves_count = flickr_user_camera.faves_count + int(photo.faves_count)
         
                 flickr_user_camera.save()
-                print "We've already seen this camera for this user, updating the count."
+                logger.info("We've already seen this camera (%s) for this user, updating the count." % (camera))
                 return
 
         except FlickrUserCamera.DoesNotExist:
@@ -89,7 +89,7 @@ def update_flickr_user_camera(photo_id, nsid):
                 )
                 camera.count = camera.count + 1
                 camera.save()
-                print "We've never seen this camera for this user, lets add it."
+                logger.info("We've never seen this camera (%s) for this user, lets add it." % (camera))
                 return
             
             except IntegrityError:
