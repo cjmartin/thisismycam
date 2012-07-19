@@ -87,9 +87,9 @@ def fetch_photos_for_flickr_user(nsid):
                 if pages == 1:
                     chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
                 else:
-                    # group(photo_updates).apply_async()
-                    chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
-                    return
+                    group(photo_updates).apply_async()
+                    # chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
+                    # return
                     
             else:
                 logger.info("Adding page %s to batches" % (page))
@@ -115,7 +115,7 @@ def process_flickr_photos_batch(results, photo_update_batches):
     photo_updates = photo_update_batches.pop(0)
     
     if photo_update_batches:
-        return chord(photo_updates)(process_flickr_photos_batch.subtask((photo_update_batches)))
+        return chord(photo_updates)(process_flickr_photos_batch.subtask((photo_update_batches, )))
     else:
         return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
 
