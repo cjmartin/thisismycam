@@ -52,11 +52,12 @@ def fetch_photos_for_flickr_user(nsid):
     pages = 1
     photos_processed = 0
     update_time = time.time()
-    
-    photo_updates = []
+    last_page = False
     
     while page <= pages:
         logger.info("Fetching page %s for %s" % (page, flickr_user.username))
+        photo_updates = []
+        
         try:
             photos_rsp = flickr.people.getPublicPhotos(user_id=flickr_user.nsid,extras="date_taken,date_upload,license,owner_name,media,path_alias,count_comments,count_faves,geo",page=page,format="json",nojsoncallback="true")
             json = simplejson.loads(photos_rsp)
@@ -78,7 +79,13 @@ def fetch_photos_for_flickr_user(nsid):
             else:
                 logger.error("Flickr api query did not respond OK, re-scheduling task.")
                 raise fetch_photos_for_flickr_user.retry()
-        
+                
+            if page == pages:
+                last_page = True
+                
+            logger.info("Tuna blaster engaged, FIRING!")
+            chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((nsid, update_time, last_page, )))
+            
             page+=1
             # page = pages+1
             
@@ -86,8 +93,6 @@ def fetch_photos_for_flickr_user(nsid):
             logger.error("Problem talking to Flickr due to %s, re-scheduling task." % (e.reason))
             raise fetch_photos_for_flickr_user.retry()
             
-    logger.info("Tuna blaster engaged, FIRING!")
-    chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((nsid, update_time, )))
     # 
     # print "Photos for %s have already been fetched within the last hour." % (flickr_user.username)
     # return

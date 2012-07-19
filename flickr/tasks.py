@@ -18,12 +18,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 @task()
-def flickr_user_fetch_photos_complete(photos_processed, nsid, update_time):
+def flickr_user_fetch_photos_complete(photos_processed, nsid, update_time, last_page):
     ## Figure out what photos_processed actually is.    
     flickr_user = FlickrUser.objects.get(nsid = nsid)
     
-    logger.info("Setting last photo update to %s for %s" % (update_time, flickr_user.username))
-    flickr_user.date_last_photo_update = update_time
+    if last_page:
+        logger.info("Setting last photo update to %s for %s" % (update_time, flickr_user.username))
+        flickr_user.date_last_photo_update = update_time
     
     logger.info("Processed %s photos for %s" % (str(len(photos_processed)), flickr_user.username))
     if flickr_user.count_photos_processed:
