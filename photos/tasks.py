@@ -106,7 +106,9 @@ def fetch_photos_for_flickr_user(nsid):
             raise fetch_photos_for_flickr_user.retry()
     
     logger.info("%s batches (pages) in queue, executing first batch." % (len(photo_update_batches)))        
-    return process_flickr_photos_batch.delay(None, photo_update_batches)
+    process_flickr_photos_batch.delay(None, photo_update_batches)
+    
+    return
     # 
     # print "Photos for %s have already been fetched within the last hour." % (flickr_user.username)
     # return
@@ -117,10 +119,12 @@ def process_flickr_photos_batch(results, photo_update_batches):
     
     if photo_update_batches:
         logger.info("Executing batch with more to go.")
-        return chord(photo_updates)(process_flickr_photos_batch.subtask((photo_update_batches, )))
+        chord(photo_updates)(process_flickr_photos_batch.subtask((photo_update_batches, )))
     else:
         logger.info("Executing last batch!")
-        return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
+        chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
+        
+    return
 
 @task()
 def process_flickr_photo(api_photo, nsid):
