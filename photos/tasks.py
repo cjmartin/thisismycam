@@ -126,57 +126,13 @@ def process_flickr_photo(api_photo, nsid):
             if exif_model:
                 naive = parse_datetime(api_photo['datetaken'])
                 api_date_taken = pytz.timezone("UTC").localize(naive)
-            
                 api_date_upload = datetime.utcfromtimestamp(float(api_photo['dateupload'])).replace(tzinfo=timezone.utc)
                 
-                photo, created = Photo.objects.get_or_create(photo_id = api_photo['id'])
-                
-                photo.photo_id = api_photo['id']
-                photo.secret = api_photo['secret']
-                photo.server = api_photo['server']
-                photo.farm = api_photo['farm']
-                photo.title = api_photo['title']
-                photo.license = api_photo['license']
-                photo.media = api_photo['media']
-                photo.owner_nsid = api_photo['owner']
-                photo.owner_name = api_photo['ownername']
-                photo.path_alias = api_photo['pathalias']
-                photo.date_taken = api_date_taken
-                photo.date_upload = api_date_upload
-                photo.comments_count = api_photo['count_comments']
-                photo.faves_count = api_photo['count_faves']
-            
-                if api_photo['latitude'] or api_photo['longitude'] and api_photo['geo_is_public']:
-                    photo.has_geo =  1
-                    photo.latitude = api_photo['latitude']
-                    photo.longitude = api_photo['longitude']
-                    photo.accuracy = api_photo['accuracy']
-                    photo.context = api_photo['context']
-                
-                    # try:
-                    #     flickr_place = FlickrPlace.objects.get(place_id = api_photo['place_id'])
-                    # except FlickrPlace.DoesNotExist:
-                    #     flickr_place = FlickrPlace(
-                    #         place_id = api_photo['place_id'],
-                    #     )
-                    #     flickr_place.save()
-                    #     
-                    #     if settings.DEBUG:
-                    #         print "Fetching data for Flickr place %s" % flickr_place.place_id
-                    #         process_flickr_place(flickr_place.place_id)
-                    #     else:
-                    #         process_flickr_place.delay(flickr_place.place_id)
-                    #     
-                    # photo.flickr_place = flickr_place
-                else:
-                    photo.has_geo = 0
-                
                 camera_slug = slugify(exif_make + " " + exif_model)
-            
+                
                 try:
                     camera = Camera.objects.get(slug = camera_slug)
-                    photo.camera_make = camera.make
-                
+                                    
                 except Camera.DoesNotExist:
                     make = None
                     if exif_make:
@@ -197,9 +153,7 @@ def process_flickr_photo(api_photo, nsid):
                             
                         except IntegrityError:
                             raise process_flickr_photo.retry()
-                            
-                    photo.camera_make = make
-                    
+                                                
                     if not exif_camera:
                         if exif_make:
                             exif_camera = exif_make + " " + exif_model
@@ -223,7 +177,7 @@ def process_flickr_photo(api_photo, nsid):
                     except IntegrityError:
                         logger.warning("Camera %s already exists, but we're trying to add it again. Rescheduling task." % (exif_camera))
                         raise process_flickr_photo.retry()
-                
+                        
                 # In case we need to create cache keys
                 id_digest = md5(str(camera.id)).hexdigest()
                 
@@ -250,9 +204,58 @@ def process_flickr_photo(api_photo, nsid):
                             
                         else:
                             logger.info("AWS image update for %s already scheculed, skipping." % (camera.name))
+                            
+                photo, created = Photo.objects.get_or_create(
+                    photo_id = api_photo['id'],
+                    defaults = {
+                        'secret': api_photo['secret'],
+                        'server': api_photo['server'],
+                        'farm': api_photo['farm'],
+                        'license': api_photo['license'],
+                        'media': api_photo['media'],
+                        'owner_nsid': api_photo['owner'],
+                        'owner_name': api_photo['ownername'],
+                        'date_taken': api_date_taken,
+                        'date_upload': api_date_upload,
+                        'camera': camera,
+                    }
+                )
+
+                photo.title = api_photo['title']
+                photo.path_alias = api_photo['pathalias']
+                photo.date_taken = api_date_taken
+                photo.date_upload = api_date_upload
+                photo.comments_count = api_photo['count_comments']
+                photo.faves_count = api_photo['count_faves']
                 
-                photo.camera = camera
-                
+                if camera.make:
+                    photo.camera_make = camera.make
+
+                if api_photo['latitude'] or api_photo['longitude'] and api_photo['geo_is_public']:
+                    photo.has_geo =  1
+                    photo.latitude = api_photo['latitude']
+                    photo.longitude = api_photo['longitude']
+                    photo.accuracy = api_photo['accuracy']
+                    photo.context = api_photo['context']
+
+                    # try:
+                    #     flickr_place = FlickrPlace.objects.get(place_id = api_photo['place_id'])
+                    # except FlickrPlace.DoesNotExist:
+                    #     flickr_place = FlickrPlace(
+                    #         place_id = api_photo['place_id'],
+                    #     )
+                    #     flickr_place.save()
+                    #     
+                    #     if settings.DEBUG:
+                    #         print "Fetching data for Flickr place %s" % flickr_place.place_id
+                    #         process_flickr_place(flickr_place.place_id)
+                    #     else:
+                    #         process_flickr_place.delay(flickr_place.place_id)
+                    #     
+                    # photo.flickr_place = flickr_place
+                else:
+                    photo.has_geo = 0
+                    
                 # Ok, save the photo.
                 logger.info("Saving photo %s for camera %s.\n" % (photo.photo_id, camera.name))
                 photo.save()
