@@ -298,8 +298,8 @@ def process_flickr_photo(api_photo, nsid):
             else:
                 return False
                         
-    except urllib2.URLError as e:
-        print "Problem talking to Flickr due to %s, re-scheduling task." % (e.reason)
+    except:
+        logger.error("Problem talking to Flickr, re-scheduling task.")
         raise fetch_photos_for_flickr_user.retry(countdown=10)
                     
 def clean_make(make):
