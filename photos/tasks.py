@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 LOCK_EXPIRE = 60 * 60 # Lock expires in 60 minutes
 
 @task()
-def fetch_photos_for_flickr_user(nsid):
+def fetch_photos_for_flickr_user(nsid, page=1):
     flickr_user = FlickrUser.objects.get(nsid = nsid)
     
     nsid_digest = md5(flickr_user.nsid).hexdigest()
@@ -49,11 +49,9 @@ def fetch_photos_for_flickr_user(nsid):
     # acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
     # 
     # if acquire_lock():
-    page = 1
     pages = 1
     photos_processed = 0
     update_time = time.time()
-    last_page = False
     
     photo_update_batches = []
     
@@ -81,7 +79,7 @@ def fetch_photos_for_flickr_user(nsid):
                         
             else:
                 logger.error("Flickr api query did not respond OK, re-scheduling task.")
-                raise fetch_photos_for_flickr_user.retry(countdown=10)
+                raise fetch_photos_for_flickr_user.retry(args=[nsid, page], countdown=10)
                 
             if page <= 15:
                 if page == pages:
