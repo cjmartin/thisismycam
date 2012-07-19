@@ -50,7 +50,7 @@ def fetch_photos_for_flickr_user(nsid, page=1):
     # 
     # if acquire_lock():
     pages = 1
-    per_page = 10
+    per_page = 100
     photos_processed = 0
     update_time = time.time()
     
@@ -71,7 +71,7 @@ def fetch_photos_for_flickr_user(nsid, page=1):
                     if int(photo['dateupload']) >= flickr_user.date_last_photo_update:
                         logger.info("Adding photo %s to task group, %s is after %s" % (photo['id'], photo['dateupload'], flickr_user.date_last_photo_update))
                         
-                        if page <= 10 and page != pages:
+                        if page <= 3 and page != pages:
                             process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))).delay()
                             
                         else:
