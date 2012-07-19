@@ -71,20 +71,19 @@ def fetch_photos_for_flickr_user(nsid, page=1):
                     if int(photo['dateupload']) >= flickr_user.date_last_photo_update:
                         logger.info("Adding photo %s to task group, %s is after %s" % (photo['id'], photo['dateupload'], flickr_user.date_last_photo_update))
                         
-                        photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))))
+                        if page <= 10 and page != pages:
+                            process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, )))
+                            
+                        else:
+                            photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))))
+                            
                         photos_processed+=1
                         
                     else:
                         page = pages
                         break
                         
-                if page <= 15:
-                    if page == pages:
-                        chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
-                    else:
-                        group(photo_updates).apply_async()
-
-                else:
+                if len(photo_updates):
                     logger.info("Adding page %s to batches" % (page))
                     photo_update_batches.append(photo_updates)
 
