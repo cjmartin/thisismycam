@@ -104,7 +104,8 @@ def fetch_photos_for_flickr_user(nsid):
         except urllib2.URLError as e:
             logger.error("Problem talking to Flickr due to %s, re-scheduling task." % (e.reason))
             raise fetch_photos_for_flickr_user.retry()
-            
+    
+    logger.info("%s batches (pages) in queue, executing first batch." % (len(photo_update_batches)))        
     return process_flickr_photos_batch.delay(None, photo_update_batches)
     # 
     # print "Photos for %s have already been fetched within the last hour." % (flickr_user.username)
@@ -115,8 +116,10 @@ def process_flickr_photos_batch(results, photo_update_batches):
     photo_updates = photo_update_batches.pop(0)
     
     if photo_update_batches:
+        logger.info("Executing batch with more to go.")
         return chord(photo_updates)(process_flickr_photos_batch.subtask((photo_update_batches, )))
     else:
+        logger.info("Executing last batch!")
         return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
 
 @task()
