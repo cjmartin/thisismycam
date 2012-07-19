@@ -17,9 +17,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         user = FlickrUser.objects.get(nsid=options.get('user'))
-        if settings.DEBUG:
-            fetch_photos_for_flickr_user(user.nsid)
-        else:
-            fetch_photos_for_flickr_user.delay(user.nsid)
+        fetch_photos_for_flickr_user.delay(nsid=user.nsid)
         
         self.stdout.write("All Done!\n")

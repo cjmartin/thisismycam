@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 LOCK_EXPIRE = 60 * 60 # Lock expires in 60 minutes
 
 @task()
-def fetch_photos_for_flickr_user(results, nsid, page=1):
+def fetch_photos_for_flickr_user(results=None, nsid, page=1):
     flickr_user = FlickrUser.objects.get(nsid = nsid)
     
     nsid_digest = md5(flickr_user.nsid).hexdigest()
