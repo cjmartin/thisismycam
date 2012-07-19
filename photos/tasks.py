@@ -13,6 +13,7 @@ from datetime import datetime
 
 from celery.task import task
 from celery import chord
+from celery import group
 
 from flickr_api.api import flickr
 
