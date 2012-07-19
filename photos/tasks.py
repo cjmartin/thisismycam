@@ -68,7 +68,7 @@ def fetch_photos_for_flickr_user(nsid):
                     if int(photo['dateupload']) >= flickr_user.date_last_photo_update:
                         logger.info("Adding photo %s to task group, %s is after %s" % (photo['id'], photo['dateupload'], flickr_user.date_last_photo_update))
                         
-                        photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((nsid=flickr_user.nsid))))
+                        photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))))
                         photos_processed+=1
                         
                     else:
@@ -87,7 +87,7 @@ def fetch_photos_for_flickr_user(nsid):
             raise fetch_photos_for_flickr_user.retry()
             
     logger.info("Tuna blaster engaged, FIRING!")
-    chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((nsid=nsid, update_time=update_time)))
+    chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((nsid, update_time, )))
     # 
     # print "Photos for %s have already been fetched within the last hour." % (flickr_user.username)
     # return
