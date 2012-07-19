@@ -128,23 +128,23 @@ def process_flickr_photo(api_photo, nsid):
                 api_date_taken = pytz.timezone("UTC").localize(naive)
             
                 api_date_upload = datetime.utcfromtimestamp(float(api_photo['dateupload'])).replace(tzinfo=timezone.utc)
-            
-                photo = Photo(
-                    photo_id = api_photo['id'],
-                    secret = api_photo['secret'],
-                    server = api_photo['server'],
-                    farm = api_photo['farm'],
-                    title = api_photo['title'],
-                    license = api_photo['license'],
-                    media = api_photo['media'],
-                    owner_nsid = api_photo['owner'],
-                    owner_name = api_photo['ownername'],
-                    path_alias = api_photo['pathalias'],
-                    date_taken = api_date_taken,
-                    date_upload = api_date_upload,
-                    comments_count = api_photo['count_comments'],
-                    faves_count = api_photo['count_faves'],
-                )
+                
+                photo, created = Photo.objects.get_or_create(photo_id = api_photo['id'])
+                
+                photo.photo_id = api_photo['id']
+                photo.secret = api_photo['secret']
+                photo.server = api_photo['server']
+                photo.farm = api_photo['farm']
+                photo.title = api_photo['title']
+                photo.license = api_photo['license']
+                photo.media = api_photo['media']
+                photo.owner_nsid = api_photo['owner']
+                photo.owner_name = api_photo['ownername']
+                photo.path_alias = api_photo['pathalias']
+                photo.date_taken = api_date_taken
+                photo.date_upload = api_date_upload
+                photo.comments_count = api_photo['count_comments']
+                photo.faves_count = api_photo['count_faves']
             
                 if api_photo['latitude'] or api_photo['longitude'] and api_photo['geo_is_public']:
                     photo.has_geo =  1
@@ -254,13 +254,12 @@ def process_flickr_photo(api_photo, nsid):
                 photo.camera = camera
                 
                 # Ok, save the photo.
-                try:
-                    logger.info("Saving photo %s for camera %s.\n" % (photo.photo_id, camera.name))
-                    photo.save()
+                logger.info("Saving photo %s for camera %s.\n" % (photo.photo_id, camera.name))
+                photo.save()
+                
+                if created:
                     return photo.photo_id
-
-                except IntegrityError:
-                    logger.error("Photo %s already exists and we just tried to add it? This shouldn't have happened.")
+                else:
                     return False
                     
             # The photo doesn't have camera info
