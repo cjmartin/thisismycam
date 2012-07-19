@@ -87,7 +87,8 @@ def fetch_photos_for_flickr_user(nsid):
                 if pages == 1:
                     chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
                 else:
-                    group(photo_updates).apply_async()
+                    # group(photo_updates).apply_async()
+                    chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
                     return
                     
             else:
