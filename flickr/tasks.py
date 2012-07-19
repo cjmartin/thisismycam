@@ -37,61 +37,62 @@ def flickr_user_fetch_photos_complete(photos_processed, nsid, update_time):
 
 @task()
 def update_flickr_user_camera(photo_id, nsid):
-    flickr_user = FlickrUser.objects.get(pk = nsid)
-    photo = Photo.objects.get(pk = photo_id)
-    camera = photo.camera
+    if photo_id:
+        flickr_user = FlickrUser.objects.get(pk = nsid)
+        photo = Photo.objects.get(pk = photo_id)
+        camera = photo.camera
     
-    print "Updating flickr_user (%s) with camera (%s)." % (flickr_user, camera)
-    try:
-        with transaction.commit_on_success():
-            flickr_user_camera = FlickrUserCamera.objects.select_for_update().get(flickr_user=flickr_user, camera=camera)
-    
-            if photo.date_taken > flickr_user_camera.date_last_taken:
-                flickr_user_camera.date_last_taken = photo.date_taken
-                flickr_user_camera.last_taken_id = photo.photo_id
-            elif photo.date_taken < flickr_user_camera.date_first_taken:
-                flickr_user_camera.date_first_taken = photo.date_taken
-                flickr_user_camera.first_taken_id = photo.photo_id
-        
-            if photo.date_upload > flickr_user_camera.date_last_upload:
-                flickr_user_camera.date_last_upload = photo.date_upload
-                flickr_user_camera.last_upload_id = photo.photo_id
-            elif photo.date_upload < flickr_user_camera.date_first_upload:
-                flickr_user_camera.date_first_upload = photo.date_upload
-                flickr_user_camera.first_upload_id = photo.photo_id
-        
-            flickr_user_camera.count_photos = flickr_user_camera.count_photos + 1
-            flickr_user_camera.comments_count = flickr_user_camera.comments_count + int(photo.comments_count)
-            flickr_user_camera.faves_count = flickr_user_camera.faves_count + int(photo.faves_count)
-        
-            flickr_user_camera.save()
-            print "We've already seen this camera for this user, updating the count."
-            return
-
-    except FlickrUserCamera.DoesNotExist:
+        print "Updating flickr_user (%s) with camera (%s)." % (flickr_user, camera)
         try:
-            flickr_user_camera = FlickrUserCamera.objects.create(
-                camera = camera,
-                flickr_user = flickr_user,
-                count_photos = 1,
-                date_first_taken = photo.date_taken,
-                date_last_taken = photo.date_taken,
-                date_first_upload = photo.date_upload,
-                date_last_upload = photo.date_upload,
-                first_taken_id = photo.photo_id,
-                last_taken_id = photo.photo_id,
-                first_upload_id = photo.photo_id,
-                last_upload_id = photo.photo_id,
-                comments_count = photo.comments_count,
-                faves_count = photo.faves_count,
-            )
-            camera.count = camera.count + 1
-            camera.save()
-            print "We've never seen this camera for this user, lets add it."
+            with transaction.commit_on_success():
+                flickr_user_camera = FlickrUserCamera.objects.select_for_update().get(flickr_user=flickr_user, camera=camera)
+    
+                if photo.date_taken > flickr_user_camera.date_last_taken:
+                    flickr_user_camera.date_last_taken = photo.date_taken
+                    flickr_user_camera.last_taken_id = photo.photo_id
+                elif photo.date_taken < flickr_user_camera.date_first_taken:
+                    flickr_user_camera.date_first_taken = photo.date_taken
+                    flickr_user_camera.first_taken_id = photo.photo_id
+        
+                if photo.date_upload > flickr_user_camera.date_last_upload:
+                    flickr_user_camera.date_last_upload = photo.date_upload
+                    flickr_user_camera.last_upload_id = photo.photo_id
+                elif photo.date_upload < flickr_user_camera.date_first_upload:
+                    flickr_user_camera.date_first_upload = photo.date_upload
+                    flickr_user_camera.first_upload_id = photo.photo_id
+        
+                flickr_user_camera.count_photos = flickr_user_camera.count_photos + 1
+                flickr_user_camera.comments_count = flickr_user_camera.comments_count + int(photo.comments_count)
+                flickr_user_camera.faves_count = flickr_user_camera.faves_count + int(photo.faves_count)
+        
+                flickr_user_camera.save()
+                print "We've already seen this camera for this user, updating the count."
+                return
+
+        except FlickrUserCamera.DoesNotExist:
+            try:
+                flickr_user_camera = FlickrUserCamera.objects.create(
+                    camera = camera,
+                    flickr_user = flickr_user,
+                    count_photos = 1,
+                    date_first_taken = photo.date_taken,
+                    date_last_taken = photo.date_taken,
+                    date_first_upload = photo.date_upload,
+                    date_last_upload = photo.date_upload,
+                    first_taken_id = photo.photo_id,
+                    last_taken_id = photo.photo_id,
+                    first_upload_id = photo.photo_id,
+                    last_upload_id = photo.photo_id,
+                    comments_count = photo.comments_count,
+                    faves_count = photo.faves_count,
+                )
+                camera.count = camera.count + 1
+                camera.save()
+                print "We've never seen this camera for this user, lets add it."
             
-        except IntegrityError:
-            raise update_flickr_user_camera.retry()
-            
+            except IntegrityError:
+                raise update_flickr_user_camera.retry()
+                
     return
     
 # @task(ignore_result=True)
