@@ -62,7 +62,7 @@ def fetch_photos_for_flickr_user(nsid):
         photo_updates = []
         
         try:
-            photos_rsp = flickr.people.getPublicPhotos(user_id=flickr_user.nsid,extras="date_taken,date_upload,license,owner_name,media,path_alias,count_comments,count_faves,geo",page=page,format="json",nojsoncallback="true")
+            photos_rsp = flickr.people.getPublicPhotos(user_id=flickr_user.nsid,extras="date_taken,date_upload,license,owner_name,media,path_alias,count_comments,count_faves,geo",per_page=10,page=page,format="json",nojsoncallback="true")
             json = simplejson.loads(photos_rsp)
 
             if json and json['stat'] == 'ok':
@@ -81,29 +81,24 @@ def fetch_photos_for_flickr_user(nsid):
                         
             else:
                 logger.error("Flickr api query did not respond OK, re-scheduling task.")
-                raise fetch_photos_for_flickr_user.retry()
+                raise fetch_photos_for_flickr_user.retry(countdown=10)
                 
-            if page == 0:
-                if pages == 1:
+            if page <= 15:
+                if page == pages:
                     chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
                 else:
                     group(photo_updates).apply_async()
-                    # chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
-                    # return
                     
             else:
                 logger.info("Adding page %s to batches" % (page))
                 photo_update_batches.append(photo_updates)
                 
-            # logger.info("Tuna blaster engaged, FIRING!")
-            # chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((nsid, update_time, last_page, )))
-            
-            # page+=1
-            page = pages+1
+            page+=1
+            # page = pages+1
             
         except urllib2.URLError as e:
             logger.error("Problem talking to Flickr due to %s, re-scheduling task." % (e.reason))
-            raise fetch_photos_for_flickr_user.retry()
+            raise fetch_photos_for_flickr_user.retry(countdown=10)
     
     logger.info("%s batches (pages) in queue, executing first batch." % (len(photo_update_batches)))        
     process_flickr_photos_batch.delay(None, photo_update_batches)
@@ -186,7 +181,7 @@ def process_flickr_photo(api_photo, nsid):
                             make.save()
                             
                         except IntegrityError:
-                            raise process_flickr_photo.retry()
+                            raise process_flickr_photo.retry(countdown=5)
                                                 
                     if not exif_camera:
                         if exif_make:
@@ -210,7 +205,7 @@ def process_flickr_photo(api_photo, nsid):
                         
                     except IntegrityError:
                         logger.warning("Camera %s already exists, but we're trying to add it again. Rescheduling task." % (exif_camera))
-                        raise process_flickr_photo.retry()
+                        raise process_flickr_photo.retry(countdown=5)
                         
                 # In case we need to create cache keys
                 id_digest = md5(str(camera.id)).hexdigest()
@@ -305,7 +300,7 @@ def process_flickr_photo(api_photo, nsid):
                         
     except urllib2.URLError as e:
         print "Problem talking to Flickr due to %s, re-scheduling task." % (e.reason)
-        raise fetch_photos_for_flickr_user.retry()
+        raise fetch_photos_for_flickr_user.retry(countdown=30)
                     
 def clean_make(make):
     crap_words = [

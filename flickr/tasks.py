@@ -96,7 +96,7 @@ def update_flickr_user_camera(photo_id, nsid):
             
             except IntegrityError:
                 logger.warning("FlickrUserCamera %s + %s already exists, but we're trying to add it again. Rescheduling task." % (flickr_user, camera))
-                raise update_flickr_user_camera.retry()
+                raise update_flickr_user_camera.retry(countdown=5)
                 
     return
     
