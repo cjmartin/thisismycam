@@ -87,7 +87,7 @@ def fetch_photos_for_flickr_user(nsid):
                 if pages == 1:
                     return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
                 else:
-                    return group(photo_updates)
+                    return group(photo_updates).delay()
                     
             else:
                 logger.info("Adding page %s to batches" % (page))
