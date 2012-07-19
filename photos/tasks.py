@@ -72,7 +72,7 @@ def fetch_photos_for_flickr_user(nsid, page=1):
                         logger.info("Adding photo %s to task group, %s is after %s" % (photo['id'], photo['dateupload'], flickr_user.date_last_photo_update))
                         
                         if page <= 10 and page != pages:
-                            process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, )))
+                            process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))).delay()
                             
                         else:
                             photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))))
