@@ -50,6 +50,7 @@ def fetch_photos_for_flickr_user(nsid, page=1):
     # 
     # if acquire_lock():
     pages = 1
+    per_page = 10
     photos_processed = 0
     update_time = time.time()
     
@@ -60,7 +61,7 @@ def fetch_photos_for_flickr_user(nsid, page=1):
         photo_updates = []
         
         try:
-            photos_rsp = flickr.people.getPublicPhotos(user_id=flickr_user.nsid,extras="date_taken,date_upload,license,owner_name,media,path_alias,count_comments,count_faves,geo",per_page=10,page=page,format="json",nojsoncallback="true")
+            photos_rsp = flickr.people.getPublicPhotos(user_id=flickr_user.nsid,extras="date_taken,date_upload,license,owner_name,media,path_alias,count_comments,count_faves,geo",per_page=per_page,page=page,format="json",nojsoncallback="true")
             json = simplejson.loads(photos_rsp)
 
             if json and json['stat'] == 'ok':
@@ -96,7 +97,7 @@ def fetch_photos_for_flickr_user(nsid, page=1):
             
         except:
             logger.error("Problem talking to Flickr, re-scheduling task.")
-            raise fetch_photos_for_flickr_user.retry(countdown=10)
+            raise fetch_photos_for_flickr_user.retry(args=[nsid, page], countdown=10)
     
     logger.info("%s batches (pages) in queue, executing first batch." % (len(photo_update_batches)))        
     process_flickr_photos_batch.delay(None, photo_update_batches)
