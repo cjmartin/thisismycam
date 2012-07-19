@@ -17,6 +17,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         user = FlickrUser.objects.get(nsid=options.get('user'))
-        fetch_photos_for_flickr_user.delay(nsid=user.nsid)
+        fetch_photos_for_flickr_user.delay(None, user.nsid)
         
         self.stdout.write("All Done!\n")
