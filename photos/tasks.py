@@ -80,7 +80,8 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
                 
             else:
                 logger.info("Firing tasks for page %s of %s for %s" % (page, pages, flickr_user.username))
-                return chord(photo_updates)(fetch_photos_for_flickr_user.subtask((flickr_user.nsid, page+=1, )))
+                next_page = page + 1
+                return chord(photo_updates)(fetch_photos_for_flickr_user.subtask((flickr_user.nsid, next_page, )))
                 
         else:
             logger.error("Flickr api query did not respond OK, will try again.")
