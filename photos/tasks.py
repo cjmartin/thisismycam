@@ -83,7 +83,7 @@ def fetch_photos_for_flickr_user(nsid):
                 logger.error("Flickr api query did not respond OK, re-scheduling task.")
                 raise fetch_photos_for_flickr_user.retry()
                 
-            if page == 1:
+            if page == 0:
                 if pages == 1:
                     chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
                 else:
@@ -98,8 +98,8 @@ def fetch_photos_for_flickr_user(nsid):
             # logger.info("Tuna blaster engaged, FIRING!")
             # chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((nsid, update_time, last_page, )))
             
-            page+=1
-            # page = pages+1
+            # page+=1
+            page = pages+1
             
         except urllib2.URLError as e:
             logger.error("Problem talking to Flickr due to %s, re-scheduling task." % (e.reason))
