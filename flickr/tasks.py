@@ -27,7 +27,7 @@ def flickr_user_fetch_photos_complete(results, nsid):
     last_photo = Photo.objects.latest('date_upload')
     flickr_user.date_last_photo_update = calendar.timegm(last_photo.date_upload.timetuple())
     
-    cameras = flickr_user.cameras
+    cameras = flickr_user.cameras.all()
     
     for camera in cameras:
         photos = Photo.objects.filter(camera=camera, owner_nsid=flickr_user.nsid)
