@@ -40,9 +40,7 @@ LOCK_EXPIRE = 60 * 60 # Lock expires in 60 minutes
 
 @task()
 def fetch_photos_for_flickr_user(results, nsid, page=1):
-    flickr_user = FlickrUser.objects.get(nsid = nsid)
-    
-    nsid_digest = md5(flickr_user.nsid).hexdigest()
+    nsid_digest = md5(nsid).hexdigest()
     lock_id = "%s-lock-%s" % ("fetch_photos", nsid_digest)
     
     ## When it's all working, re-enable this.
@@ -50,6 +48,8 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
     # acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
     # 
     # if acquire_lock():
+    
+    flickr_user = FlickrUser.objects.get(nsid = nsid)
     
     per_page = 20
     
@@ -156,7 +156,8 @@ def process_flickr_photo(api_photo, nsid):
                             make.save()
                             
                         except IntegrityError:
-                            raise process_flickr_photo.retry(countdown=5)
+                            logger.warning("Rerunning process photo because of make collision.")
+                            raise process_flickr_photo.retry(countdown=1)
                                                 
                     if not exif_camera:
                         if exif_make:
@@ -275,7 +276,7 @@ def process_flickr_photo(api_photo, nsid):
                     
     except:
         logger.error("Problem talking to Flickr, re-scheduling task.")
-        raise fetch_photos_for_flickr_user.retry(countdown=10)
+        raise fetch_photos_for_flickr_user.retry(countdown=1)
                     
 def clean_make(make):
     crap_words = [
