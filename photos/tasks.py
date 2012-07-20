@@ -194,8 +194,6 @@ def process_flickr_photo(api_photo, nsid):
                             
                         camera.make = make
                         camera.save()
-                        
-                Camera.objects.filter(slug=camera_slug).update(count=F('count')+1)
                 
                 # In case we need to create cache keys
                 id_digest = md5(str(camera.id)).hexdigest()
@@ -265,7 +263,9 @@ def process_flickr_photo(api_photo, nsid):
                 photo.save()
                 
                 if created:
+                    Camera.objects.filter(slug=camera_slug).update(count=F('count')+1)
                     return photo.photo_id
+                    
                 else:
                     return False
                     
