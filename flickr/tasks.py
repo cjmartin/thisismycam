@@ -3,7 +3,7 @@ from django.utils import simplejson
 from django.db import IntegrityError
 from django.db.models import F
 
-import time
+import calendar
 
 from celery.task import task
 from flickr_api.api import flickr
@@ -24,7 +24,7 @@ def flickr_user_fetch_photos_complete(results, nsid):
 
     last_photo = Photo.objects.latest('date_upload')
     logger.info("Last upload: %s" % (last_photo.date_upload))
-    flickr_user.date_last_photo_update = time.mktime(last_photo.date_upload.timetuple())
+    flickr_user.date_last_photo_update = calendar.gmtime(last_photo.date_upload.timetuple())
     
     # logger.info("Processed %s photos for %s" % (len(photos_processed), flickr_user.username))
     # if flickr_user.count_photos_processed:
