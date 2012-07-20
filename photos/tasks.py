@@ -101,9 +101,11 @@ def process_flickr_photo(api_photo, nsid):
     logger.info("Processing photo %s for user %s.\n" % (api_photo['id'], nsid))
     
     try:
+        # Query Flickr for this photo's Exif data
         exif_rsp = flickr.photos.getExif(photo_id=api_photo['id'],format="json",nojsoncallback="true")
         exif = simplejson.loads(exif_rsp)
-    
+        
+        # If it exists, process it
         if exif and exif['stat'] == 'ok':
             exif_camera = ""
             raw_exif_make = ""
@@ -123,65 +125,77 @@ def process_flickr_photo(api_photo, nsid):
                 
                 if tag['label'] == "Software" :
                     exif_software = tag['raw']['_content']
-                
+                    
+            # This is the "name" that Flickr uses, it's usually nice
             if exif['photo']['camera']:
                 exif_camera = exif['photo']['camera']
-            
+                
+            # If there's a model (camera) we'll carry on
             if exif_model:
+                
+                # Process the date taken and date upload into nice time objecs
+                
+                # Date taken is a time string of the local time when the photo was taken,
+                # we don't know the time zone, so we'll store it as UTC and always display it as UTC
                 naive = parse_datetime(api_photo['datetaken'])
                 api_date_taken = pytz.timezone("UTC").localize(naive)
+                
+                # Date upload is a unix timestamp, so we can store it as UTC and convert to whatever tz we want.
                 api_date_upload = datetime.utcfromtimestamp(float(api_photo['dateupload'])).replace(tzinfo=timezone.utc)
                 
+                # Create the camera slug with things that should never change
+                # I would use exif_camera, but I'm afraid those might change on Flickr's side
                 camera_slug = slugify(exif_make + " " + exif_model)
                 
+                # If the nice name doesn't exist, create one
+                if not exif_camera:
+                    if exif_make:
+                        exif_camera = exif_make + " " + exif_model
+                    else:
+                        exif_camera = exif_model
+                        
+                # Try to create the camera, or get it if it exists
                 try:
-                    camera = Camera.objects.get(slug = camera_slug)
-                                    
-                except Camera.DoesNotExist:
-                    make = None
+                    camera, created = Camera.objects.get_or_create(
+                        slug = camera_slug,
+                        defaults = {
+                            'name': exif_camera,
+                            'model': exif_model,
+                            'exif_model': raw_exif_model,
+                            'exif_make': raw_exif_make,
+                            'count': 1,
+                        }
+                    )
+                    
+                except IntegrityError:
+                    logger.warning("Camera %s already exists, but we're trying to add it again. Rescheduling task." % (exif_camera))
+                    raise process_flickr_photo.retry(countdown=1)
+                    
+                if created:
                     if exif_make:
                         make_slug = slugify(exif_make)
+                        
                         try:
-                            make = Make.objects.get(slug = make_slug)
-                            make.count = make.count + 1
-                            
-                        except Make.DoesNotExist:
-                            make = Make(
+                            make, created = Make.objects.get_or_create(
                                 slug = make_slug,
-                                name = exif_make,
-                                count = 1
+                                defaults = {
+                                    'name': exif_make,
+                                    'count': 1,
+                                }
                             )
                             
-                        try:
-                            make.save()
-                            
                         except IntegrityError:
-                            logger.warning("Rerunning process photo because of make collision.")
+                            logger.warning("Make %s already exists, but we're trying to add it again. Rescheduling task." % (exif_make))
                             raise process_flickr_photo.retry(countdown=1)
-                                                
-                    if not exif_camera:
-                        if exif_make:
-                            exif_camera = exif_make + " " + exif_model
-                        else:
-                            exif_camera = exif_model
                             
-                    args = {
-                        'slug' : camera_slug,
-                        'name' : exif_camera,
-                        'make' : make,
-                        'exif_make' : raw_exif_make,
-                        'model' : exif_model,
-                        'exif_model' : raw_exif_model,
-                        'count' : 0,
-                    }
-                    
-                    try:
-                        logger.info("Adding new camera %s" % (exif_camera))
-                        camera = Camera.objects.create(**args)
+                        if not created:
+                            Make.objects.filter(slug=make_slug).update(count=F('count')+1)
+                            
+                        camera.make = make
+                        camera.save()
                         
-                    except IntegrityError:
-                        logger.warning("Camera %s already exists, but we're trying to add it again. Rescheduling task." % (exif_camera))
-                        raise process_flickr_photo.retry(countdown=5)
+                else:
+                    Camera.objects.filter(slug=camera_slug).update(count=F('count')+1)
                         
                 # In case we need to create cache keys
                 id_digest = md5(str(camera.id)).hexdigest()
