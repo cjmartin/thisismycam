@@ -37,26 +37,23 @@ def flickr_user_fetch_photos_complete(results, nsid):
         photos = Photo.objects.filter(camera=camera, owner_nsid=flickr_user.nsid)
 
         first_taken = photos.order_by('-date_taken')[:1].get()
-        logger.info("O Hai: %s" % (first_taken.photo_id))
+        last_taken = photos.latest('date_taken')
+        first_upload = photos.order_by('-date_upload')[:1].get()
+        last_upload = photos.latest('date_upload')
         
-        # last_taken = photos.latest('date_taken')
-        # first_upload = photos.order_by('-date_upload')[:1]
-        # last_upload = photos.latest('date_upload')
         FlickrUserCamera.objects.filter(camera=camera, flickr_user=flickr_user).update(
             count_photos = photos.count(),
             date_first_taken = first_taken.date_taken,
             first_taken_id = first_taken.photo_id,
+            date_first_upload = first_upload.date_upload,
+            first_upload_id = first_upload.photo_id,
+            date_last_taken = last_taken.date_taken,
+            last_taken_id = last_taken.photo_id
+            date_last_upload = last_upload.date_upload,
+            last_upload_id = last_upload.photo_id,
+            
         )
         
-        # camera.count_photos = photos.count()
-        # camera.date_first_taken = first_taken.date_taken
-        # date_last_taken = last_taken.date_taken
-        # date_first_upload = first_upload.date_upload
-        # date_last_upload = last_upload.date_upload
-        # camera.first_taken_id = first_taken.photo_id
-        # last_taken_id = last_taken.photo_id
-        # first_upload_id = first_upload.photo_id
-        # last_upload_id = last_upload.photo_id
         # comments_count = photos.sum()
         # faves_count = models.IntegerField(null=True, blank=True)
             
