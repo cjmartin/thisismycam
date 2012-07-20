@@ -6,6 +6,7 @@ from django.utils.hashcompat import md5_constructor as md5
 
 from django.core.cache import cache
 from django.db import IntegrityError
+from django.db.models import F
 
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -154,7 +155,7 @@ def process_flickr_photo(api_photo, nsid):
                     else:
                         exif_camera = exif_model
                         
-                # Try to create the camera, or get it if it exists
+                # Try to create the camera, or get it if it existsg
                 try:
                     camera, created = Camera.objects.get_or_create(
                         slug = camera_slug,
