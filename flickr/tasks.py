@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.utils import simplejson
 from django.db import IntegrityError
-from django.db import transaction
 from django.db.models import F
 
 from celery.task import task
@@ -55,8 +54,6 @@ def update_flickr_user_camera(photo_id, nsid):
                     'faves_count': photo.faves_count,
                 }
             )
-        
-            flickr_user_camera.save()
             
         except IntegrityError:
             logger.warning("FlickrUserCamera %s + %s already exists, but we're trying to add it again. Rescheduling task." % (flickr_user, camera))

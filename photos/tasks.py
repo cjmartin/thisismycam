@@ -14,7 +14,6 @@ from datetime import datetime
 
 from celery.task import task
 from celery import chord
-from celery import group
 
 from flickr_api.api import flickr
 
@@ -258,21 +257,6 @@ def process_flickr_photo(api_photo, nsid):
                     photo.accuracy = api_photo['accuracy']
                     photo.context = api_photo['context']
                     
-                    # try:
-                    #     flickr_place = FlickrPlace.objects.get(place_id = api_photo['place_id'])
-                    # except FlickrPlace.DoesNotExist:
-                    #     flickr_place = FlickrPlace(
-                    #         place_id = api_photo['place_id'],
-                    #     )
-                    #     flickr_place.save()
-                    #     
-                    #     if settings.DEBUG:
-                    #         print "Fetching data for Flickr place %s" % flickr_place.place_id
-                    #         process_flickr_place(flickr_place.place_id)
-                    #     else:
-                    #         process_flickr_place.delay(flickr_place.place_id)
-                    #     
-                    # photo.flickr_place = flickr_place
                 else:
                     photo.has_geo = 0
                     
@@ -288,7 +272,7 @@ def process_flickr_photo(api_photo, nsid):
             # The photo doesn't have camera info
             else:
                 return False
-                    
+                
     except:
         logger.error("Problem talking to Flickr, re-scheduling task.")
         raise fetch_photos_for_flickr_user.retry(countdown=1)
