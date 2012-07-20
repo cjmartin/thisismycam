@@ -46,7 +46,7 @@ def update_flickr_user_camera(photo_id, nsid):
         logger.info("Updating flickr_user (%s) with camera (%s)." % (flickr_user, camera))
         
         try:
-            flickr_user_camera, create = FlickrUserCamera.get_or_create(
+            flickr_user_camera, create = FlickrUserCamera.objects.get_or_create(
                 camera = camera,
                 flickr_user = flickr_user,
                 defaults = {
