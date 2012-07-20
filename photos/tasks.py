@@ -77,7 +77,7 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
                 
             if page == pages:
                 logger.info("This is the last page (%s) for %s!" % (pages, flickr_user.username))
-                return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask())
+                return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask(flickr_user.nsid, ))
                 
             else:
                 logger.info("Firing tasks for page %s of %s for %s" % (page, pages, flickr_user.username))

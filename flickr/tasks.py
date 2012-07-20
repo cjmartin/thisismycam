@@ -17,19 +17,19 @@ import logging
 logger = logging.getLogger(__name__)
 
 @task()
-def flickr_user_fetch_photos_complete(results):
-    # flickr_user = FlickrUser.objects.get(nsid = nsid)
-    # 
-    # if last_page:
-    #     logger.info("Setting last photo update to %s for %s" % (update_time, flickr_user.username))
-    #     flickr_user.date_last_photo_update = update_time
-    # 
+def flickr_user_fetch_photos_complete(results, nsid):
+    flickr_user = FlickrUser.objects.get(nsid = nsid)
+
+    last_photo = Photo.objects.latest('date_upload')
+    flickr_user.date_last_photo_update = last_photo.date_upload
+    
     # logger.info("Processed %s photos for %s" % (len(photos_processed), flickr_user.username))
     # if flickr_user.count_photos_processed:
     #     photos_processed = len(photos_processed) + flickr_user.count_photos_processed
     # 
     # flickr_user.count_photos_processed = photos_processed
-    # flickr_user.save()
+    
+    flickr_user.save()
     
     # logger.info("Fetch for %s complete. That was fun!" % (flickr_user.username))
     logger.info("Fetch complete. That was fun!")
