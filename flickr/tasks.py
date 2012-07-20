@@ -30,7 +30,12 @@ def flickr_user_fetch_photos_complete(results, nsid):
     cameras = flickr_user.cameras.all()
     
     for camera in cameras:
+        logger.info("Updating camera %s for %s" % (camera, flickr_user))
+        
         photos = Photo.objects.filter(camera=camera, owner_nsid=flickr_user.nsid)
+        for photo in photos:
+            logger.info("photo %s" % (photo.photo_id))
+            
         first_taken = photos.order_by('-date_taken')[:1].get()
         # last_taken = photos.latest('date_taken')
         # first_upload = photos.order_by('-date_upload')[:1]
