@@ -74,10 +74,11 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
             
             for photo in json['photos']['photo']:
                 photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))))
-                
+            
+            page = pages    
             if page == pages:
                 logger.info("This is the last page (%s) for %s!" % (pages, flickr_user.username))
-                return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask(flickr_user.nsid, ))
+                return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((flickr_user.nsid, )))
                 
             else:
                 logger.info("Firing tasks for page %s of %s for %s" % (page, pages, flickr_user.username))
