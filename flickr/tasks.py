@@ -42,9 +42,7 @@ def flickr_user_fetch_photos_complete(results, nsid):
         last_upload = photos.latest('date_upload')
         comments_count = photos.aggregate(Sum('comments_count'))
         faves_count = photos.aggregate(Sum('faves_count'))
-        
-        logger.info("Coms: %s | Faves: %s" % (comments_count, faves_count))
-        
+                
         FlickrUserCamera.objects.filter(camera=camera, flickr_user=flickr_user).update(
             count_photos = photos.count(),
             date_first_taken = first_taken.date_taken,
@@ -55,8 +53,8 @@ def flickr_user_fetch_photos_complete(results, nsid):
             last_taken_id = last_taken.photo_id,
             date_last_upload = last_upload.date_upload,
             last_upload_id = last_upload.photo_id,
-            # comments_count = comments_count,
-            # faves_count = faves_count,
+            comments_count = comments_count.comments_count__sum,
+            faves_count = faves_count.faves_count__sum,
         )
         
         # comments_count = photos.sum()
