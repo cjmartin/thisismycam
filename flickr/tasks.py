@@ -3,7 +3,7 @@ from django.utils import simplejson
 from django.db import IntegrityError
 
 from django.db.models import F
-from django.db.models import Count
+from django.db.models import Sum
 
 import calendar
 
@@ -40,6 +40,8 @@ def flickr_user_fetch_photos_complete(results, nsid):
         last_taken = photos.latest('date_taken')
         first_upload = photos.order_by('-date_upload')[:1].get()
         last_upload = photos.latest('date_upload')
+        comments_count = photos.aggregate(Sum('comments_count'))
+        faves_count = photos.aggregate(Sum('faves_count'))
         
         FlickrUserCamera.objects.filter(camera=camera, flickr_user=flickr_user).update(
             count_photos = photos.count(),
@@ -51,6 +53,8 @@ def flickr_user_fetch_photos_complete(results, nsid):
             last_taken_id = last_taken.photo_id,
             date_last_upload = last_upload.date_upload,
             last_upload_id = last_upload.photo_id,
+            comments_count = comments_count,
+            faves_count = faves_count,
         )
         
         # comments_count = photos.sum()
