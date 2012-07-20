@@ -27,6 +27,8 @@ def flickr_user_fetch_photos_complete(results, nsid):
     last_photo = Photo.objects.latest('date_upload')
     flickr_user.date_last_photo_update = calendar.timegm(last_photo.date_upload.timetuple())
     
+    flickr_user.save()
+    
     cameras = flickr_user.cameras.all()
     
     for camera in cameras:
@@ -35,31 +37,34 @@ def flickr_user_fetch_photos_complete(results, nsid):
         photos = Photo.objects.filter(camera=camera, owner_nsid=flickr_user.nsid)
 
         first_taken = photos.order_by('-date_taken')[:1].get()
+        logger.info("O Hai: %s" % (first_taken.photo_id))
+        
         # last_taken = photos.latest('date_taken')
         # first_upload = photos.order_by('-date_upload')[:1]
         # last_upload = photos.latest('date_upload')
+        FlickrUserCamera.objects.filter(camera=camera, flickr_user=flickr_user).update(
+            count_photos = photos.count(),
+            date_first_taken = first_taken.date_taken,
+            first_taken_id = first_taken.photo_id,
+        )
         
-        camera.count_photos = photos.count()
-        camera.date_first_taken = first_taken.date_taken
+        # camera.count_photos = photos.count()
+        # camera.date_first_taken = first_taken.date_taken
         # date_last_taken = last_taken.date_taken
         # date_first_upload = first_upload.date_upload
         # date_last_upload = last_upload.date_upload
-        camera.first_taken_id = first_taken.photo_id
+        # camera.first_taken_id = first_taken.photo_id
         # last_taken_id = last_taken.photo_id
         # first_upload_id = first_upload.photo_id
         # last_upload_id = last_upload.photo_id
         # comments_count = photos.sum()
         # faves_count = models.IntegerField(null=True, blank=True)
-        
-        camera.save()
             
     # logger.info("Processed %s photos for %s" % (len(photos_processed), flickr_user.username))
     # if flickr_user.count_photos_processed:
     #     photos_processed = len(photos_processed) + flickr_user.count_photos_processed
     # 
     # flickr_user.count_photos_processed = photos_processed
-    
-    flickr_user.save()
     
     # logger.info("Fetch for %s complete. That was fun!" % (flickr_user.username))
     logger.info("Fetch complete. That was fun!")
