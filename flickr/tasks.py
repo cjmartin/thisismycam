@@ -1,7 +1,9 @@
 from django.conf import settings
 from django.utils import simplejson
 from django.db import IntegrityError
+
 from django.db.models import F
+from django.db.models import Count
 
 import calendar
 
@@ -23,9 +25,31 @@ def flickr_user_fetch_photos_complete(results, nsid):
     flickr_user = FlickrUser.objects.get(nsid = nsid)
 
     last_photo = Photo.objects.latest('date_upload')
-    logger.info("Last upload: %s" % (last_photo.date_upload))
     flickr_user.date_last_photo_update = calendar.timegm(last_photo.date_upload.timetuple())
     
+    cameras = flickr_user.cameras
+    
+    for camera in cameras:
+        photos = Photo.objects.filter(camera=camera, owner_nsid=flickr_user.nsid)
+            first_taken = photos.order_by('-date_taken')[:1]
+            last_taken = photos.latest('date_taken')
+            first_upload = photos.order_by('-date_upload')[:1]
+            last_upload = photos.latest('date_upload')
+            
+            #camera.count_photos = photos.count(photo_id)
+            date_first_taken = first_taken.date_taken
+            date_last_taken = last_taken.date_taken
+            date_first_upload = first_upload.date_upload
+            date_last_upload = last_upload.date_upload
+            first_taken_id = first_taken.photo_id
+            last_taken_id = last_taken.photo_id
+            first_upload_id = first_upload.photo_id
+            last_upload_id = last_upload.photo_id
+            #comments_count = photos.sum()
+            #faves_count = models.IntegerField(null=True, blank=True)
+            
+            camera.save()
+            
     # logger.info("Processed %s photos for %s" % (len(photos_processed), flickr_user.username))
     # if flickr_user.count_photos_processed:
     #     photos_processed = len(photos_processed) + flickr_user.count_photos_processed
