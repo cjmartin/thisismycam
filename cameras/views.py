@@ -34,7 +34,6 @@ def index(request):
             cameras_and_photos.append({'user_camera':user_camera, 'photos':photos})
         
         primary_camera = user_cameras[0]
-        first_taken_photo = Photo.objects.get(photo_id = primary_camera.first_taken_id)
         
         photos = Photo.objects.filter(camera = primary_camera.camera, owner_nsid = user.flickr_nsid).order_by('-date_taken')[:18]
         
@@ -42,7 +41,6 @@ def index(request):
             'user': user,
             'user_cameras': cameras_and_photos,
             'primary_camera': primary_camera,
-            'first_taken_photo': first_taken_photo,
             'photos': photos,
         }
     
