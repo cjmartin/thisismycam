@@ -53,8 +53,8 @@ def flickr_user_fetch_photos_complete(results, nsid):
             last_taken_id = last_taken.photo_id,
             date_last_upload = last_upload.date_upload,
             last_upload_id = last_upload.photo_id,
-            comments_count = comments_count.comments_count__sum,
-            faves_count = faves_count.faves_count__sum,
+            comments_count = comments_count['comments_count__sum'],
+            faves_count = faves_count['faves_count__sum'],
         )
         
         # comments_count = photos.sum()
