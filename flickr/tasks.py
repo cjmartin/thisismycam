@@ -3,7 +3,7 @@ from django.utils import simplejson
 from django.db import IntegrityError
 from django.db.models import F
 
-import calendar
+from calendar import timegm
 
 from celery.task import task
 from flickr_api.api import flickr
