@@ -52,6 +52,8 @@ def update_flickr_user_camera(photo_id, nsid):
                     'count_photos': 1,
                     'comments_count': photo.comments_count,
                     'faves_count': photo.faves_count,
+                    'date_last_taken': photo.date_taken,
+                    'date_last_upload': photo.date_upload,
                 }
             )
             
