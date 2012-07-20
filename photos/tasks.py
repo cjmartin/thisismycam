@@ -21,6 +21,7 @@ import re
 import time
 import pytz
 import urllib2
+from urllib2 import URLError
 
 from cameras.models import Make
 from cameras.models import Camera
@@ -87,7 +88,7 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
             logger.error("Flickr api query did not respond OK, will try again.")
             return fetch_photos_for_flickr_user.delay(None, user.nsid, page)
             
-    except:
+    except URLError:
         logger.error("Problem talking to Flickr, will try again.")
         return fetch_photos_for_flickr_user.delay(None, user.nsid, page)
         
@@ -194,9 +195,8 @@ def process_flickr_photo(api_photo, nsid):
                         camera.make = make
                         camera.save()
                         
-                else:
-                    Camera.objects.filter(slug=camera_slug).update(count=F('count')+1)
-                        
+                Camera.objects.filter(slug=camera_slug).update(count=F('count')+1)
+                
                 # In case we need to create cache keys
                 id_digest = md5(str(camera.id)).hexdigest()
                 
@@ -204,19 +204,19 @@ def process_flickr_photo(api_photo, nsid):
                 if not camera.amazon_item_response:
                     lock_id = "%s-lock-%s" % ("aws_update", id_digest)
                     acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
-                
+                    
                     if acquire_lock():
                         logger.info("Fetching aws info for %s." % (camera.name))
                         add_aws_item_to_camera.delay(camera.id)
                         
                     else:
                         logger.info("AWS item update for %s already scheduled, skipping." % (camera.name))
-                    
+                        
                 else:
                     if not camera.amazon_image_response:
                         lock_id = "%s-lock-%s" % ("aws_image_update", id_digest)
                         acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
-                    
+                        
                         if acquire_lock():
                             logger.info("%s already has aws info, but no photos, will fetch." % (camera.name))
                             add_aws_photos_to_camera.delay(camera.id)
@@ -273,7 +273,7 @@ def process_flickr_photo(api_photo, nsid):
             else:
                 return False
                 
-    except:
+    except URLError:
         logger.error("Problem talking to Flickr, re-scheduling task.")
         raise fetch_photos_for_flickr_user.retry(countdown=1)
                     
