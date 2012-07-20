@@ -32,9 +32,9 @@ def flickr_user_fetch_photos_complete(results, nsid):
         
         photos = Photo.objects.filter(camera=camera, owner_nsid=flickr_user.nsid)
 
-        first_taken = photos.order_by('-date_taken')[:1].get()
+        first_taken = photos.order_by('date_taken')[:1].get()
         last_taken = photos.latest('date_taken')
-        first_upload = photos.order_by('-date_upload')[:1].get()
+        first_upload = photos.order_by('date_upload')[:1].get()
         last_upload = photos.latest('date_upload')
         comments_count = photos.aggregate(Sum('comments_count'))
         faves_count = photos.aggregate(Sum('faves_count'))
