@@ -344,6 +344,8 @@ def clean_make(make):
     make = re.sub(r'(?i)(tmobile)', "T-Mobile", make)
     make = re.sub(r'(?i)(^Motorola.+)', "Motorola", make)
     make = re.sub(r'(?i)(virgin_mobile)', "Virgin Mobile", make)
+    make = re.sub(r'(?i)(^htc_)', "HTC", make)
+    make = re_sub(r'(?i)(^verizon_)', "Verizon", make)
 
     make = re.sub("[<>]", "", make)
     make = re.sub(" +", " ", make)
@@ -354,12 +356,6 @@ def clean_make(make):
 
     if make == "LGE" or make == "lge" or make == "LG Electronics" or make == "lg" or make == "LG ELEC" or make == "LG_Electronics":
         make = "LG"
-
-    if make == "htc_asia_india" or make == "htc_asia_tw" or make == "htc_wwe" or make == "htc_asia_wwe" or make == "htc_europe":
-        make = "HTC"
-
-    if make == "verizon_wwe":
-        make = "Verizon"
 
     if make == "made by Polaroid":
         make = "Polaroid"
