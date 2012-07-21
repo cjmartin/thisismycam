@@ -347,7 +347,7 @@ def clean_make(make):
 
     make = re.sub("[<>]", "", make)
     make = re.sub(" +", " ", make)
-    make = make.strip()
+    make = make.strip('.-+<>{}[] ')
 
     if make == "KONICA" or make == "MINOLTA" or make == "Konica Minolta Photo Imaging":
         make = "Konica Minolta"
@@ -400,7 +400,7 @@ def clean_model(model, make):
     # Strip some nasty characters, and extra spaces
     model = re.sub("[<>]", "", model)
     model = re.sub(" +", " ", model)
-    model = model.strip()
+    model = model.strip('.-+<>{}[] ')
 
     # More Motorola
     if model == "DROIDX":
