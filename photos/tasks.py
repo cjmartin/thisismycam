@@ -406,7 +406,7 @@ def clean_model(model, make):
         model = "DROID 2"
         
     # Special case for custom LG Android Rom
-    if make == "InferiorHumanOrgans":
+    if make == "LG":
         if model == "thunderc":
             model = "Optimus"
             
