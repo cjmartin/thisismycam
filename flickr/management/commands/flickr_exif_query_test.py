@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         
-        self.stdout.write("Processing photo %s" % (api_photo['id']))
+        self.stdout.write("Processing photo %s" % (options.get('photo')))
 
         try:
             # Query Flickr for this photo's Exif data
