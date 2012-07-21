@@ -352,8 +352,8 @@ def clean_make(make):
     if make == "KONICA" or make == "MINOLTA" or make == "Konica Minolta Photo Imaging":
         make = "Konica Minolta"
 
-    if make == "LGE" or make == "lge" or make == "LG" or make == "lg" or make == "LG ELEC" or make == "LG_Electronics":
-        make = "LG Electronics"
+    if make == "LGE" or make == "lge" or make == "LG Electronics" or make == "lg" or make == "LG ELEC" or make == "LG_Electronics":
+        make = "LG"
 
     if make == "htc_asia_india" or make == "htc_asia_tw" or make == "htc_wwe" or make == "htc_asia_wwe" or make == "htc_europe":
         make = "HTC"
@@ -366,7 +366,11 @@ def clean_make(make):
 
     if make == "FUJI":
         make = "Fujifilm"
-
+        
+    # Special case for custom LG Android Rom
+    if make == "InferiorHumanOrgans":
+        make = "LG"
+        
     return make
 
 def clean_model(model, make):
@@ -404,5 +408,16 @@ def clean_model(model, make):
 
     if model == "DROID2":
         model = "DROID 2"
-
+        
+    # Special case for custom LG Android Rom
+    if make == "InferiorHumanOrgans":
+        if model == "thunderc":
+            model = "Optimus"
+            
+        if model == "thunderg" or model == "p500":
+            model = "Optimus One"
+            
+        if model == "P350":
+            model = "Optimus Me"
+            
     return model
