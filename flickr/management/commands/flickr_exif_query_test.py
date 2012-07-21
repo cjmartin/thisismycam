@@ -45,6 +45,10 @@ class Command(BaseCommand):
                         
                         exif_make = clean_make(tag['raw']['_content'])
                         self.stdout.write("Clean make: '%s'\n" % (exif_make))
+                        
+                        stripped_exif_make = raw_exif_make.strip()
+                        stripped_clean_make = exif_make.strip()
+                        self.stdout.write("Extra stripped raw: '%s' clean: '%s'" % (stripped_exif_make, stripped_clean_make))
 
                     if tag['label'] == "Model":
                         raw_exif_model = tag['raw']['_content']
@@ -59,7 +63,7 @@ class Command(BaseCommand):
                 # This is the "name" that Flickr uses, it's usually nice
                 if exif['photo']['camera']:
                     exif_camera = exif['photo']['camera']
-                    self.stdout.write("Flickr name: %s\n" % (exif_camera))
+                    self.stdout.write("Flickr name: '%s'\n" % (exif_camera))
 
                 # If there's a model (camera) we'll carry on
                 if exif_model:
@@ -67,7 +71,7 @@ class Command(BaseCommand):
                     # Create the camera slug with things that should never change
                     # I would use exif_camera, but I'm afraid those might change on Flickr's side
                     camera_slug = slugify(exif_make + " " + exif_model)
-                    self.stdout.write("Camera slug: %s created using make: %s and model: %s\n" % (camera_slug, exif_make, exif_model))
+                    self.stdout.write("Camera slug: '%s' created using make: '%s' and model: '%s'\n" % (camera_slug, exif_make, exif_model))
 
                     # If the nice name doesn't exist, create one
                     if not exif_camera:
@@ -76,11 +80,11 @@ class Command(BaseCommand):
                         else:
                             exif_camera = exif_model
                             
-                        self.stdout.write("There was no Flickr name, so one was created: %s\n" % (exif_camera))
+                        self.stdout.write("There was no Flickr name, so one was created: '%s'\n" % (exif_camera))
                             
                     if exif_make:
                         make_slug = slugify(exif_make)
-                        self.stdout.write("Make slug: %s\n" % (make_slug))
+                        self.stdout.write("Make slug: '%s'\n" % (make_slug))
 
                 # The photo doesn't have camera info
                 else:
