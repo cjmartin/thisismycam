@@ -42,24 +42,20 @@ class Command(BaseCommand):
                     if tag['label'] == "Make":
                         raw_exif_make = tag['raw']['_content']
                         self.stdout.write("Raw make: '%s'\n" % (raw_exif_make))
-                        
-                        exif_make = clean_make(tag['raw']['_content'])
-                        self.stdout.write("Clean make: '%s'\n" % (exif_make))
-                        
-                        stripped_exif_make = raw_exif_make.strip()
-                        stripped_clean_make = exif_make.strip()
-                        self.stdout.write("Extra stripped raw: '%s' clean: '%s'" % (stripped_exif_make, stripped_clean_make))
 
                     if tag['label'] == "Model":
                         raw_exif_model = tag['raw']['_content']
                         self.stdout.write("Raw model: '%s'\n" % (raw_exif_model))
                         
-                        exif_model = clean_model(tag['raw']['_content'], exif_make)
-                        self.stdout.write("Clean model: '%s'\n" % (exif_model))
-                        
                     if tag['label'] == "Software" :
                         exif_software = tag['raw']['_content']
-                        
+                
+                exif_make = clean_make(raw_exif_make)
+                self.stdout.write("Clean make: '%s'\n" % (exif_make))
+                
+                exif_model = clean_model(raw_exif_model, exif_make)
+                self.stdout.write("Clean model: '%s'\n" % (exif_model))
+                
                 # This is the "name" that Flickr uses, it's usually nice
                 if exif['photo']['camera']:
                     exif_camera = exif['photo']['camera']
