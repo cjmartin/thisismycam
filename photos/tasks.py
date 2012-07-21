@@ -16,6 +16,7 @@ from celery.task import task
 from celery import chord
 
 from flickr_api.api import flickr
+from flickr_api.base import FlickrError
 
 import re
 import time
