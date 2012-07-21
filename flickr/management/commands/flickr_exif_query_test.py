@@ -2,6 +2,8 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 
+from django.template.defaultfilters import slugify
+
 from django.utils import simplejson
 from flickr_api.api import flickr
 from flickr_api.base import FlickrError
