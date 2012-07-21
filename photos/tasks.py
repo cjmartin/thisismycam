@@ -123,18 +123,22 @@ def process_flickr_photo(api_photo, nsid):
             for tag in exif['photo']['exif'] :
                 if tag['label'] == "Make" :
                     raw_exif_make = tag['raw']['_content']
-                    exif_make = clean_make(tag['raw']['_content'])
-                
+                                    
                 if tag['label'] == "Model" :
                     raw_exif_model = tag['raw']['_content']
-                    exif_model = clean_model(tag['raw']['_content'], exif_make)
-                
+                                    
                 if tag['label'] == "Software" :
                     exif_software = tag['raw']['_content']
                     
             # This is the "name" that Flickr uses, it's usually nice
             if exif['photo']['camera']:
                 exif_camera = exif['photo']['camera']
+            
+            # Create a clean version of the raw Exif make
+            exif_make = clean_make(raw_exif_make)
+            
+            # Create a clean version of the raw Exif model, and remove the make if it's duplicated
+            exif_model = clean_model(raw_exif_model, exif_make)
                 
             # If there's a model (camera) we'll carry on
             if exif_model:
