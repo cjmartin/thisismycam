@@ -345,7 +345,7 @@ def clean_make(make):
     make = re.sub(r'(?i)(^Motorola.+)', "Motorola", make)
     make = re.sub(r'(?i)(virgin_mobile)', "Virgin Mobile", make)
     make = re.sub(r'(?i)(^htc_)', "HTC", make)
-    make = re_sub(r'(?i)(^verizon_)', "Verizon", make)
+    make = re.sub(r'(?i)(^verizon_)', "Verizon", make)
 
     make = re.sub("[<>]", "", make)
     make = re.sub(" +", " ", make)
