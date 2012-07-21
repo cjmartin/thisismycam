@@ -131,8 +131,8 @@ def process_flickr_photo(api_photo, nsid):
                     exif_software = tag['raw']['_content']
                     
             # This is the "name" that Flickr uses, it's usually nice
-            if exif['photo']['camera']:
-                exif_camera = exif['photo']['camera']
+            # if exif['photo']['camera']:
+            #    exif_camera = exif['photo']['camera']
             
             # Create a clean version of the raw Exif make
             exif_make = clean_make(raw_exif_make)
@@ -157,19 +157,18 @@ def process_flickr_photo(api_photo, nsid):
                 # I would use exif_camera, but I'm afraid those might change on Flickr's side
                 camera_slug = slugify(exif_make + " " + exif_model)
                 
-                # If the nice name doesn't exist, create one
-                if not exif_camera:
-                    if exif_make:
-                        exif_camera = exif_make + " " + exif_model
-                    else:
-                        exif_camera = exif_model
+                # Create a name for the camera
+                if exif_make:
+                    camera_name = exif_make + " " + exif_model
+                else:
+                    camera_name = exif_model
                         
                 # Try to create the camera, or get it if it existsg
                 try:
                     camera, created = Camera.objects.get_or_create(
                         slug = camera_slug,
                         defaults = {
-                            'name': exif_camera,
+                            'name': camera_name,
                             'model': exif_model,
                             'exif_model': raw_exif_model,
                             'exif_make': raw_exif_make,
