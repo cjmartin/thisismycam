@@ -89,8 +89,12 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
             return fetch_photos_for_flickr_user.delay(None, user.nsid, page)
             
     except URLError:
-        logger.error("Problem talking to Flickr, will try again.")
+        logger.error("Problem talking to Flickr (URLError), will try again.")
         return fetch_photos_for_flickr_user.delay(None, user.nsid, page)
+        
+    except FlickrError, e:
+        logger.error("Problem talking to Flickr (FlickrError), re-scheduling task.\n Error: %s" % (e))
+        raise fetch_photos_for_flickr_user.retry(countdown=1)
         
     ## When it's all working, re-enable this.
     # 
@@ -274,7 +278,11 @@ def process_flickr_photo(api_photo, nsid):
                 return False
                 
     except URLError:
-        logger.error("Problem talking to Flickr, re-scheduling task.")
+        logger.error("Problem talking to Flickr (URLError), re-scheduling task.")
+        raise fetch_photos_for_flickr_user.retry(countdown=1)
+        
+    except FlickrError, e:
+        logger.error("Problem talking to Flickr (FlickrError), re-scheduling task.\n Error: %s" % (e))
         raise fetch_photos_for_flickr_user.retry(countdown=1)
                     
 def clean_make(make):
