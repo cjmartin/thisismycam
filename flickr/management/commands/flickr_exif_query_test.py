@@ -16,7 +16,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         exif_rsp = flickr.photos.getExif(photo_id=options.get('photo'),format="json",nojsoncallback="true")
-        exif = simplejson.loads(exif_rsp)
-        self.stdout.write(exif)
+        
+        self.stdout.write(exif_rsp)
         
         self.stdout.write("All Done!\n")
