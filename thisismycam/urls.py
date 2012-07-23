@@ -5,8 +5,12 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    # Index
     url(r'^$', 'cameras.views.index', name='index'),
-    url(r'^cameras/', include('cameras.urls')),
+    
+    # User and User Camera Pages
+    # url(r'^cameras/', include('cameras.urls')),
+    url(r'^([\w@]+)', 'flickr.views.user', name='user'),
     
     # Examples:
     # url(r'^$', 'thisismycam.views.home', name='home'),

@@ -6,7 +6,7 @@ class FlickrUser(models.Model):
     nsid = models.CharField(max_length=255, unique=True, primary_key=True)
     username = models.CharField(max_length=255)
     realname = models.CharField(max_length=255, null=True, blank=True)
-    path_alias = models.CharField(max_length=255, null=True, blank=True)
+    path_alias = models.CharField(max_length=255, unique=True, null=True, blank=True)
     iconserver = models.IntegerField()
     iconfarm = models.IntegerField()
     count_photos_processed = models.IntegerField(null=True, blank=True)

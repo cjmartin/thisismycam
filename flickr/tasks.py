@@ -56,7 +56,7 @@ def flickr_user_fetch_photos_complete(results, nsid):
         
         total_photos = total_photos + photos_count
         
-    last_photo = Photo.objects.latest('date_upload')
+    last_photo = Photo.objects.filter(owner_nsid=flickr_user.nsid).latest('date_upload')
     
     flickr_user.date_last_photo_update = calendar.timegm(last_photo.date_upload.timetuple())
     flickr_user.count_photos_processed = total_photos
