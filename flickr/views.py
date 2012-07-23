@@ -6,7 +6,7 @@ from flickr.models import FlickrUser
 from cameras.models import Camera
 from photos.models import Photo
 
-def camera(request, user_slug):
+def user(request, user_slug):
     flickr_user = get_user_by_slug(user_slug)
     
     if not request.user.is_authenticated():
