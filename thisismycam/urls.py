@@ -8,10 +8,6 @@ urlpatterns = patterns('',
     # Index
     url(r'^$', 'cameras.views.index', name='index'),
     
-    # User and User Camera Pages
-    # url(r'^cameras/', include('cameras.urls')),
-    url(r'^([\w@]+)', 'flickr.views.user', name='user'),
-    
     # Examples:
     # url(r'^$', 'thisismycam.views.home', name='home'),
     # url(r'^thisismycam/', include('thisismycam.foo.urls')),
@@ -24,5 +20,9 @@ urlpatterns = patterns('',
     
     # Authentication
     url(r'', include('social_auth.urls')),
-    url(r'^logout/', 'accounts.views.logout_view', name='logout'),
+    url(r'^logout', 'accounts.views.logout_view', name='logout'),
+    
+    # User and User Camera Pages
+    url(r'^([\w@]+)', 'flickr.views.user', name='user'),
+    url(r'^([\w@]+)/cameras/', include('cameras.urls')),
 )
