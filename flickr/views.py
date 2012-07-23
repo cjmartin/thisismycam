@@ -35,12 +35,12 @@ def user(request, user_slug):
                     pretty_url = split_url[0] + "?tag=" + settings.AWS_ASSOCIATE_TAG
                     user_camera.camera.amazon_url = pretty_url
                     
-            photos = Photo.objects.filter(camera = user_camera.camera, owner_nsid = user.flickr_nsid).order_by('-date_taken')[:6]
+            photos = Photo.objects.filter(camera = user_camera.camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:6]
             cameras_and_photos.append({'user_camera':user_camera, 'photos':photos})
         
         primary_camera = user_cameras[0]
         
-        photos = Photo.objects.filter(camera = primary_camera.camera, owner_nsid = user.flickr_nsid).order_by('-date_taken')[:18]
+        photos = Photo.objects.filter(camera = primary_camera.camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:18]
         
         data = {
             'user': user,
