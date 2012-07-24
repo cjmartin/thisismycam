@@ -51,6 +51,8 @@ def user(request, user_slug):
         }
     
         return render_to_response('cameras/user_index.html', data)
+
+# def user_camera
                 
 def get_user_by_slug(user_slug):
     # NSID
