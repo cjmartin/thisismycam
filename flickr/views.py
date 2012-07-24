@@ -58,7 +58,7 @@ def user_camera(request, user_slug, camera_slug):
 
     return render_to_response('cameras/user_index.html', data)
     
-def load_photos_for_cameras(cameras):
+def load_photos_for_cameras(user_cameras):
     cameras_and_photos = []
     for user_camera in user_cameras:
         if user_camera.camera.amazon_image_response:
