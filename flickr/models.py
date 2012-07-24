@@ -20,13 +20,14 @@ class FlickrUser(models.Model):
     def __unicode__(self):
         return self.username
         
-    def photos_url(self):
+    def slug(self):
         if self.path_alias:
-            identifier = self.path_alias
+            return self.path_alias
         else:
-            identifier = self.nsid
+            return self.nsid
             
-        return "http://flickr.com/photos/%s/" % identifier
+    def photos_url(self):
+        return "http://flickr.com/photos/%s/" % self.slug
         
 class FlickrUserCamera(models.Model):
     flickr_user = models.ForeignKey(FlickrUser)

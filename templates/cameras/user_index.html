@@ -61,7 +61,7 @@
                         <div class="collection-camera">
                             <div class="image camera-image collection-camera-image" style="background-image: url('{{ camera.user_camera.camera.medium_photo_url }}');">
                                 <img src="{{ camera.user_camera.camera.medium_photo_url }}">
-                                <a href="/cameras/{{ camera.user_camera.camera.slug }}">
+                                <a href="{% url 'flickr:user_camera' flickr_user.slug camera.user_camera.camera.slug }">
                             </div>
                             <h3 class="title collection-camera-title">{{ camera.user_camera.camera.name }}</h3>
                             <p>{{ camera.user_camera.count_photos }} Photos</p>
