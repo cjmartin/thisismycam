@@ -40,7 +40,7 @@
                 <ul class="thumbnails">
                     {% for photo in photos %}
                         <li class="span2">
-                            <a href="#" class="thumbnail">
+                            <a href="{{ photo.flickr_photo_page }}" target="_blank" class="thumbnail">
                                 <img src="{{ photo.square_150_url }}" alt="{{ photo.title|safe }}">
                             </a>
                         </li>
@@ -67,7 +67,7 @@
                             <p>{{ camera.user_camera.count_photos }} Photos</p>
                             <div class="collection-camera-thumbnails">
                                 {% for photo in camera.photos %}
-                                    <a href="#" class="collection-camera-thumbnail">
+                                    <a href="{{ photo.flickr_photo_page }}" target="_blank" class="collection-camera-thumbnail">
                                         <img src="{{ photo.square_150_url }}" alt="{{ photo.title|safe }}">
                                     </a>
                                 {% endfor %}
