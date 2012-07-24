@@ -23,6 +23,6 @@ urlpatterns = patterns('',
     url(r'^logout', 'accounts.views.logout_view', name='logout'),
     
     # User and User Camera Pages
-    url(r'^([\w@]+)', 'flickr.views.user', name='user'),
+    url(r'^([\w@]+)', 'flickr.views.user', name='flickr-user'),
     url(r'^([\w@]+)/', include('flickr.urls')),
 )
