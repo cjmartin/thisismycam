@@ -43,7 +43,7 @@ def user_camera(request, user_slug, camera_slug):
     user_cameras = flickr_user.flickrusercamera_set.order_by('-date_last_taken', '-count_photos')
     cameras_and_photos = load_photos_for_cameras(user_cameras, flickr_user.nsid)
     
-    primary_camera = flickr_user.cameras.get(camera = camera)
+    primary_camera = flickr_user.flickrusercamera_set.get(camera = camera)
     first_taken_photo = Photo.objects.get(photo_id = primary_camera.first_taken_id)
     
     photos = Photo.objects.filter(camera = primary_camera.camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:18]
