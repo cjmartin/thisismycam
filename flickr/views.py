@@ -76,7 +76,7 @@ def load_photos_for_cameras(cameras):
         photos = Photo.objects.filter(camera = user_camera.camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:6]
         cameras_and_photos.append({'user_camera':user_camera, 'photos':photos})
         
-    return cameras_and_photos:
+    return cameras_and_photos
     
 def get_user_by_slug(user_slug):
     # NSID
