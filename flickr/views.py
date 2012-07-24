@@ -20,7 +20,7 @@ def user(request, user_slug):
         user = request.user.get_profile()
         
         user_cameras = flickr_user.flickrusercamera_set.order_by('-date_last_taken', '-count_photos')
-        cameras_and_photos = load_photos_for_cameras(user_cameras)
+        cameras_and_photos = load_photos_for_cameras(user_cameras, flickr_user.nsid)
         primary_camera = user_cameras[0]
         
         photos = Photo.objects.filter(camera = primary_camera.camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:18]
@@ -41,7 +41,7 @@ def user_camera(request, user_slug, camera_slug):
     camera = get_object_or_404(Camera, slug=camera_slug)
     
     user_cameras = flickr_user.flickrusercamera_set.order_by('-date_last_taken', '-count_photos')
-    cameras_and_photos = load_photos_for_cameras(user_cameras)
+    cameras_and_photos = load_photos_for_cameras(user_cameras, flickr_user.nsid)
     
     primary_camera = flickr_user.cameras.get(camera = camera)
     first_taken_photo = Photo.objects.get(photo_id = primary_camera.first_taken_id)
@@ -58,7 +58,7 @@ def user_camera(request, user_slug, camera_slug):
 
     return render_to_response('cameras/user_index.html', data)
     
-def load_photos_for_cameras(user_cameras):
+def load_photos_for_cameras(user_cameras, nsid):
     cameras_and_photos = []
     for user_camera in user_cameras:
         if user_camera.camera.amazon_image_response:
@@ -73,7 +73,7 @@ def load_photos_for_cameras(user_cameras):
                 pretty_url = split_url[0] + "?tag=" + settings.AWS_ASSOCIATE_TAG
                 user_camera.camera.amazon_url = pretty_url
                 
-        photos = Photo.objects.filter(camera = user_camera.camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:6]
+        photos = Photo.objects.filter(camera = user_camera.camera, owner_nsid = nsid).order_by('-date_taken')[:6]
         cameras_and_photos.append({'user_camera':user_camera, 'photos':photos})
         
     return cameras_and_photos
