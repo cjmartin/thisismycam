@@ -16,4 +16,4 @@ def index(request):
         user = request.user.get_profile()
         flickr_user = user.flickr_user
         
-        return redirect('flickr-user', user_slug=flickr_user.slug)
+        return redirect('flickr-user', flickr_user.slug)
