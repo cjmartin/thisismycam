@@ -11,34 +11,35 @@ from photos.models import Photo
 def user(request, user_slug):
     flickr_user = get_user_by_slug(user_slug)
     
-    if not request.user.is_authenticated():
-        data = {
-            'user': None,
-        }
-        return render_to_response('cameras/index.html', data)
-    else:
+    if request.user.is_authenticated():
         user = request.user.get_profile()
-        
-        user_cameras = flickr_user.flickrusercamera_set.order_by('-date_last_taken', '-count_photos')
-        cameras_and_photos = load_photos_for_cameras(user_cameras, flickr_user.nsid)
-        primary_camera = user_cameras[0]
-        
-        photos = Photo.objects.filter(camera = primary_camera.camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:18]
-        
-        data = {
-            'user': user,
-            'flickr_user': flickr_user,
-            'user_cameras': cameras_and_photos,
-            'primary_camera': primary_camera,
-            'photos': photos,
-        }
+    else:
+        user = None
     
-        return render_to_response('cameras/user_index.html', data)
+    user_cameras = flickr_user.flickrusercamera_set.order_by('-date_last_taken', '-count_photos')
+    cameras_and_photos = load_photos_for_cameras(user_cameras, flickr_user.nsid)
+    primary_camera = user_cameras[0]
+    
+    photos = Photo.objects.filter(camera = primary_camera.camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:18]
+    
+    data = {
+        'user': user,
+        'flickr_user': flickr_user,
+        'user_cameras': cameras_and_photos,
+        'primary_camera': primary_camera,
+        'photos': photos,
+    }
+
+    return render_to_response('cameras/user_index.html', data)
         
 def user_camera(request, user_slug, camera_slug):
-    user = request.user.get_profile()
     flickr_user = get_user_by_slug(user_slug)
     camera = get_object_or_404(Camera, slug=camera_slug)
+    
+    if request.user.is_authenticated():
+        user = request.user.get_profile()
+    else:
+        user = None
     
     user_cameras = flickr_user.flickrusercamera_set.order_by('-date_last_taken', '-count_photos')
     cameras_and_photos = load_photos_for_cameras(user_cameras, flickr_user.nsid)
