@@ -17,4 +17,4 @@ def index(request):
         flickr_user = user.flickr_user
         user_slug = flickr_user.slug
         
-        return redirect('flickr-user', user_slug)
+        return redirect('flickr-user', flickr_user.path_alias)
