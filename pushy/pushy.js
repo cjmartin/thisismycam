@@ -3,10 +3,14 @@ var crypto = require('crypto');
 var pushy_secret = "super secret secret";
 var pushy_salt = "super salty salt";
 
-var app = require('express').createServer()
-  , io = require('socket.io').listen(app);
+var express = require('express')
+  , http = require('http');
 
-app.listen(8888);
+var app = express();
+var server = http.createServer(app);
+var io = require('socket.io').listen(server);
+
+server.listen(8888);
 
 app.get('/', function (req, res) {
     res.send("I'm a teapot", 418);
