@@ -6,7 +6,7 @@ var pushy_salt = "super salty salt";
 var app = require('express').createServer()
   , io = require('socket.io').listen(app);
 
-app.listen(8080);
+app.listen(8888);
 
 app.get('/', function (req, res) {
     res.send("I'm a teapot", 418);
