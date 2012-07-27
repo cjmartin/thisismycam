@@ -1,0 +1,9 @@
+Hello World.
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io.connect('http://pushy.thisismycam.com:8888');
+  socket.on('test', function (data) {
+    console.log(data);
+  });
+</script>

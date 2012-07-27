@@ -34,3 +34,11 @@ app.post('/', function (req, res) {
     }
 
 });
+
+app.get('/test', function (req, res) {
+  res.sendfile(__dirname + '/test.html');
+});
+
+io.sockets.on('connection', function (socket) {
+  socket.emit('test', { hello: 'world' });
+});
