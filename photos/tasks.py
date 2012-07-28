@@ -86,7 +86,7 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
                 next_page = page + 1
                 
                 logger.info("Push it.")
-                pushy_url = 'http://localhost:8888'
+                pushy_url = 'http://127.0.0.1:8888/'
                 values = {
                     'secret': 'super secret secret',
                     'user_id': flickr_user.nsid,
@@ -100,11 +100,11 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
                 
         else:
             logger.error("Flickr api query did not respond OK, will try again.")
-            return fetch_photos_for_flickr_user.delay(None, user.nsid, page)
+            return fetch_photos_for_flickr_user.delay(None, flickr_user.nsid, page)
             
     except URLError:
         logger.error("Problem talking to Flickr (URLError), will try again.")
-        return fetch_photos_for_flickr_user.delay(None, user.nsid, page)
+        return fetch_photos_for_flickr_user.delay(None, flickr_user.nsid, page)
         
     except FlickrError, e:
         logger.error("Problem talking to Flickr (FlickrError), re-scheduling task.\n Error: %s" % (e))
