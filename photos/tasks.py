@@ -21,6 +21,7 @@ from flickr_api.base import FlickrError
 import re
 import time
 import pytz
+import urllib
 import urllib2
 from urllib2 import URLError
 
@@ -84,6 +85,15 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
                 logger.info("Firing tasks for page %s of %s for %s" % (page, pages, flickr_user.username))
                 next_page = page + 1
                 return chord(photo_updates)(fetch_photos_for_flickr_user.subtask((flickr_user.nsid, next_page, )))
+                
+                pushy_url = 'http://localhost:8888'
+                values = {
+                    'secret': 'super secret secret',
+                    'user_id': flickr_user.nsid,
+                    'message': simplejson.dumps({'type': 'fetch_photos.update_progress_bar', 'data': {'pct': 'foo'}}),
+                }
+                data = urllib.urlencode(values)
+                req = urllib2.Request(url, data)
                 
         else:
             logger.error("Flickr api query did not respond OK, will try again.")

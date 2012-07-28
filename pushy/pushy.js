@@ -1,7 +1,7 @@
 var crypto = require('crypto');
 
-var pushy_secret = "super secret secret";
-var pushy_salt = "super salty salt";
+var pushy_secret = 'super secret secret';
+var pushy_salt = 'super salty salt';
 
 var express = require('express')
   , http = require('http');
@@ -25,7 +25,8 @@ app.post('/', function (req, res) {
         var shasum = crypto.createHash('sha1');
         shasum.update(user_id + pushy_salt);
         
-        var channel = user_id + '_' + shasum.digest('hex');
+        //var channel = user_id + '_' + shasum.digest('hex');
+        var channel = 'test';
         
         io.sockets.emit(channel, { msg: req.body.message });
 
