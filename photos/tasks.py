@@ -102,7 +102,7 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
             logger.error("Flickr api query did not respond OK, will try again.")
             return fetch_photos_for_flickr_user.delay(None, flickr_user.nsid, page)
             
-    except URLError e:
+    except URLError, e:
         logger.error("Problem talking to Flickr (URLError), will try again. Reason: %s" % (e.reason))
         return fetch_photos_for_flickr_user.delay(None, flickr_user.nsid, page)
         
