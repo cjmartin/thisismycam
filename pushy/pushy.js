@@ -12,6 +12,8 @@ var io = require('socket.io').listen(server);
 
 server.listen(8888);
 
+app.use(express.bodyParser());
+
 app.get('/', function (req, res) {
     res.send("I'm a teapot", 418);
 });
