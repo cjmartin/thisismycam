@@ -84,7 +84,6 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
             else:
                 logger.info("Firing tasks for page %s of %s for %s" % (page, pages, flickr_user.username))
                 next_page = page + 1
-                return chord(photo_updates)(fetch_photos_for_flickr_user.subtask((flickr_user.nsid, next_page, )))
                 
                 logger.info("Push it.")
                 pushy_url = 'http://localhost:8888'
@@ -96,6 +95,8 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
                 data = urllib.urlencode(values)
                 req = urllib2.Request(url, data)
                 response = urllib2.urlopen(req)
+                
+                return chord(photo_updates)(fetch_photos_for_flickr_user.subtask((flickr_user.nsid, next_page, )))
                 
         else:
             logger.error("Flickr api query did not respond OK, will try again.")
