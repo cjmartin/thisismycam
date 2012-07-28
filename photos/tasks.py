@@ -93,7 +93,7 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
                     'message': simplejson.dumps({'type': 'fetch_photos.update_progress_bar', 'data': {'pct': 'foo'}}),
                 }
                 data = urllib.urlencode(values)
-                req = urllib2.Request(url, data)
+                req = urllib2.Request(pushy_url, data)
                 response = urllib2.urlopen(req)
                 
                 return chord(photo_updates)(fetch_photos_for_flickr_user.subtask((flickr_user.nsid, next_page, )))
