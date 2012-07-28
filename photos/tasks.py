@@ -103,7 +103,7 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
             return fetch_photos_for_flickr_user.delay(None, flickr_user.nsid, page)
             
     except URLError, e:
-        logger.error("Problem talking to Flickr (URLError), will try again. Reason: %s" % (e.reason))
+        logger.error("Problem talking to Flickr (URLError), will try again. Reason: %s | %s" % (e.reason, e.read()))
         return fetch_photos_for_flickr_user.delay(None, flickr_user.nsid, page)
         
     except FlickrError, e:
