@@ -87,6 +87,7 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
                 
                 
                 pct = (page / pages) * 100
+                logger.info("pct should be: %s/%s * 100 = %s" % (page, pages, pct))
                 
                 logger.info("Push it.")
                 pushy_url = 'http://127.0.0.1:8888'
