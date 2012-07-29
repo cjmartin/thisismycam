@@ -23,6 +23,7 @@ class Camera(models.Model):
     name = models.CharField(max_length=255)
     category = models.ManyToManyField('Category')
     count = models.IntegerField()
+    count_photos = models.IntegerField()
     amazon_url = models.CharField(max_length=255, null=True, blank=True)
     amazon_item_response = models.TextField(null=True, blank=True)
     amazon_image_response = models.TextField(null=True, blank=True)

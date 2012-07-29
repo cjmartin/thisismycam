@@ -1,7 +1,7 @@
 var crypto = require('crypto');
 
-var pushy_secret = 'super secret secret';
-var pushy_salt = 'super salty salt';
+var pushy_secret = '6c2a8e2cd82e4d7c9bd3fc72385e482d';
+var pushy_salt = 'e9529b576ce446539478e5b15a6c054c';
 
 var express = require('express')
   , http = require('http');

@@ -106,3 +106,12 @@ def update_flickr_user_camera(photo_id, nsid):
         return
         
     return
+    
+@task
+def delete_flickr_user(nsid):
+    flickr_user = FlickrUser.objects.get(pk = nsid)
+    user_cameras = flickr_user.flickrusercamera_set.all()
+    
+    for user_camera in user_cameras:
+        camera = user_camera.camera
+        
