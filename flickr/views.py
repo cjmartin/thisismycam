@@ -8,6 +8,19 @@ from flickr.models import FlickrUser
 from cameras.models import Camera
 from photos.models import Photo
 
+def index(request):
+    if not request.user.is_authenticated():
+        data = {
+            'user': None,
+        }
+        return render_to_response('flickr/index.html', data)
+
+    else:
+        user = request.user.get_profile()
+        flickr_user = user.flickr_user
+
+        return redirect('flickr-user', flickr_user.slug)
+
 def user(request, user_slug):
     flickr_user = get_user_by_slug(user_slug)
     
@@ -30,7 +43,7 @@ def user(request, user_slug):
         'photos': photos,
     }
 
-    return render_to_response('cameras/user_index.html', data)
+    return render_to_response('flickr/user_index.html', data)
         
 def user_camera(request, user_slug, camera_slug):
     flickr_user = get_user_by_slug(user_slug)
@@ -57,7 +70,7 @@ def user_camera(request, user_slug, camera_slug):
         'photos': photos,
     }
 
-    return render_to_response('cameras/user_index.html', data)
+    return render_to_response('flickr/user_index.html', data)
     
 def load_photos_for_cameras(user_cameras, nsid):
     cameras_and_photos = []
