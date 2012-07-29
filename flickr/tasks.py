@@ -125,6 +125,10 @@ def delete_flickr_user(nsid, reset=False):
     photos = Photo.objects.filter(owner_nsid = flickr_user.nsid).all()
     photos.delete()
     
-    if not reset:
+    if reset:
+        flickr_user.count_photos_processed = None
+        flickr_user.date_last_photo_update = None
+        flickr_user.save()
+    else:
         logger.info("Deleting Flickr user %s" % (nsid))
         flickr_user.delete()
