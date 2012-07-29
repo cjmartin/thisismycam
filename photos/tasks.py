@@ -85,12 +85,14 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
                 logger.info("Firing tasks for page %s of %s for %s" % (page, pages, flickr_user.username))
                 next_page = page + 1
                 
+                pct = (int(page)/int(pages)) * 100
+                
                 logger.info("Push it.")
                 pushy_url = 'http://127.0.0.1:8888'
                 values = {
                     'secret': 'super secret secret',
                     'user_id': flickr_user.nsid,
-                    'message': simplejson.dumps({'type': 'fetch_photos.update_progress_bar', 'data': {'pct': 'foo'}}),
+                    'message': simplejson.dumps({'type': 'fetch_photos.update_progress_bar', 'data': {'pct': pct}}),
                 }
                 data = urllib.urlencode(values)
                 req = urllib2.Request(pushy_url, data)
