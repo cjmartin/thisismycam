@@ -108,10 +108,23 @@ def update_flickr_user_camera(photo_id, nsid):
     return
     
 @task
-def delete_flickr_user(nsid):
+def delete_flickr_user(nsid, reset=False):
+    logger.info("Clearing cameras and photos for Flickr user %s." % (nsid))
     flickr_user = FlickrUser.objects.get(pk = nsid)
     user_cameras = flickr_user.flickrusercamera_set.all()
     
     for user_camera in user_cameras:
-        camera = user_camera.camera
+        logger.info("Updating camera %s to remove this user's photos from counts." % (user_camera.camera.name))
+        Camera.objects.filter(pk=user_camera.camera.pk).update(count=F('count')-1)
+        Camera.objects.filter(pk=user_camera.camera.pk).update(count_photos=F('count_photos')-int(user_camera.count_photos))
         
+        logger.info("Removing Flickr user camera.")
+        user_camera.delete()
+        
+    logger.info("Pulling and deleting photos for %s." % (nsid))
+    photos = Photo.objects.filter(owner_nsid = flickr_user.nsid).all()
+    photos.delete()
+    
+    if not reset:
+        logger.info("Deleting Flickr user %s" % (nsid))
+        flickr_user.delete()
