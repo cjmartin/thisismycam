@@ -85,7 +85,8 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
                 logger.info("Firing tasks for page %s of %s for %s" % (page, pages, flickr_user.username))
                 next_page = page + 1
                 
-                pct = (int(page)/int(pages)) * 100
+                
+                pct = (page / pages) * 100
                 
                 logger.info("Push it.")
                 pushy_url = 'http://127.0.0.1:8888'
