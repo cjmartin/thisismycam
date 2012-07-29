@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 
-from photos.tasks import delete_flickr_user
+from flickr.tasks import delete_flickr_user
 
 class Command(BaseCommand):
     help = 'Clears all cameras and photos stored for a Flickr user.'
