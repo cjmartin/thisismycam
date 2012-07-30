@@ -111,8 +111,24 @@ def update_flickr_user_camera(photo_id, nsid):
     return
     
 @task
-def fetch_flickr_contacts(nsid):
+def fetch_contacts_for_flickr_user(nsid):
     logger.info("Fetching contacts for Flickr user %s." % (nsid))
+    flickr_user = FlickrUser.objects.get(pk = nsid)
+    
+    try:
+        # Query Flickr for this user's contacts
+        contacts_rsp = flickr.contacts.getPublicList(user_id=flickr_user.nsid,format="json",nojsoncallback="true")
+        json = simplejson.loads(contacts_rsp)
+        
+        if json and json['stat'] == 'ok':
+            contacts = json['contacts']
+            
+            for contact in contacts:
+                logger.info("Contact! %s" % (contact['username']))
+                
+    except URLError, e:
+        logger.error("Problem talking to Flickr (URLError), will try again. Reason: %s" % (e.reason))
+        return fetch_contacts_for_flickr_user.delay(flickr_user.nsid)
     
 @task
 def delete_flickr_user(nsid, reset=False):
