@@ -122,7 +122,7 @@ def fetch_contacts_for_flickr_user(nsid):
         json = simplejson.loads(contacts_rsp)
         
         if json and json['stat'] == 'ok':
-            contacts = json['contacts']
+            contacts = json['contacts']['contact']
             
             for contact in contacts:
                 logger.info("Contact! %s" % (contact['username']))
