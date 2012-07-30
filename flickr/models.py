@@ -13,7 +13,7 @@ class FlickrUser(models.Model):
     date_last_photo_update = models.IntegerField(null=True, blank=True)
     
     cameras = models.ManyToManyField(Camera, through='FlickrUserCamera')
-    contacts = models.ManyToManyField(FlickrUser, through='FlickrUserContact')
+    contacts = models.ManyToManyField('self', through='FlickrUserContact', symmetrical=False)
     
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
