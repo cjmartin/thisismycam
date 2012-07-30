@@ -189,7 +189,8 @@ def process_flickr_photo(api_photo, nsid):
                             'model': exif_model,
                             'exif_model': raw_exif_model,
                             'exif_make': raw_exif_make,
-                            'count': 1,
+                            'count': 0,
+                            'count_photos': 0,
                         }
                     )
                     
@@ -288,7 +289,7 @@ def process_flickr_photo(api_photo, nsid):
                 photo.save()
                 
                 if created:
-                    Camera.objects.filter(slug=camera_slug).update(count=F('count')+1)
+                    Camera.objects.filter(slug=camera_slug).update(count=F('count_photos')+1)
                     return photo.photo_id
                     
                 else:
