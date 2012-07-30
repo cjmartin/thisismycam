@@ -93,6 +93,7 @@
 {% endblock %}
 
 {% block javascripts %}
+    {{ block.super }}
     {% if not flickr_user.date_last_photo_update %}
         <script src="{{ pushy_url }}/socket.io/socket.io.js"></script>
         <script>
