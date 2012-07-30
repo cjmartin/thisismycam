@@ -111,6 +111,10 @@ def update_flickr_user_camera(photo_id, nsid):
     return
     
 @task
+def fetch_flickr_contacts(nsid):
+    logger.info("Fetching contacts for Flickr user %s." % (nsid))
+    
+@task
 def delete_flickr_user(nsid, reset=False):
     logger.info("Clearing cameras and photos for Flickr user %s." % (nsid))
     flickr_user = FlickrUser.objects.get(pk = nsid)

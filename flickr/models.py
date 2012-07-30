@@ -13,6 +13,7 @@ class FlickrUser(models.Model):
     date_last_photo_update = models.IntegerField(null=True, blank=True)
     
     cameras = models.ManyToManyField(Camera, through='FlickrUserCamera')
+    contacts = models.ManyToManyField(FlickrUser, through='FlickrUserContact')
     
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
@@ -51,7 +52,30 @@ class FlickrUserCamera(models.Model):
     date_update = models.DateTimeField(auto_now=True)
     
     class Meta:
-        unique_together = ("flickr_user", "camera")
+        unique_together = ('flickr_user', 'camera')
         
     def __unicode__(self):
         return "%s + %s" % (self.flickr_user.username, self.camera.name)
+        
+class FlickrUserContact(models.Model):
+    flickr_user = models.ForeignKey(FlickrUser)
+    contact = models.ForeignKey(FlickrUser)
+    
+    class Meta:
+        unique_together = ('flickr_user', 'contact')
+        
+    def __unicode__(self):
+        return "%s + %s" % (self.flickr_user.username, self.contact.username)
+        
+class FlickrContactLookup(models.Model):
+    flickr_user = models.ForeignKey(FlickrUser)
+    nsid = models.CharField(max_length=255)
+    username = models.CharField(max_length=255)
+    iconserver = models.IntegerField()
+    iconfarm = models.IntegerField()
+    
+    class Meta:
+        unique_together = ('flickr_user', 'nsid')
+        
+    def __unicode__(self):
+        return "%s + %s" % (self.flickr_user.username, self.username)
