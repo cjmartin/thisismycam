@@ -58,7 +58,7 @@ class FlickrUserCamera(models.Model):
         return "%s + %s" % (self.flickr_user.username, self.camera.name)
         
 class FlickrUserContact(models.Model):
-    flickr_user = models.ForeignKey(FlickrUser)
+    flickr_user = models.ForeignKey(FlickrUser, related_name='+')
     contact = models.ForeignKey(FlickrUser)
     
     class Meta:
