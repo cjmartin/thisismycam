@@ -32,6 +32,10 @@ def user(request, user_slug):
     
     user_cameras = flickr_user.flickrusercamera_set.order_by('-date_last_taken', '-count_photos')
     
+    shasum = hashlib.sha1()
+    shasum.update(flickr_user.nsid + settings.PUSHY_SALT)
+    pushy_channel = "%s_%s" % (flickr_user.nsid, shasum.hexdigest())
+    
     if user_cameras:
         cameras_and_photos = load_photos_for_cameras(user_cameras, flickr_user.nsid)
         primary_camera = user_cameras[0]
@@ -44,13 +48,11 @@ def user(request, user_slug):
             'user_cameras': cameras_and_photos,
             'primary_camera': primary_camera,
             'photos': photos,
+            'pushy_url': settings.PUSHY_URL,
+            'pushy_channel': pushy_channel,
         }
         
-    else:
-        shasum = hashlib.sha1()
-        shasum.update(flickr_user.nsid + settings.PUSHY_SALT)
-        pushy_channel = "%s_%s" % (flickr_user.nsid, shasum.hexdigest())
-        
+    else:        
         data = {
             'user': user,
             'pushy_url': settings.PUSHY_URL,
