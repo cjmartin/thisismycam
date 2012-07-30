@@ -236,6 +236,11 @@ h3.title {
 
 /* Cameras */
 
+.photo-update-bar {
+    width: 600px;
+    margin: 30px auto 0;
+}
+
 .the-camera {
     padding: 10px;
     
