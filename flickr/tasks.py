@@ -9,7 +9,11 @@ import calendar
 from urllib2 import URLError
 
 from celery.task import task
+
+import flickr_api
 from flickr_api.api import flickr
+
+from accounts.models import UserProfile
 
 from flickr.models import FlickrUser
 from flickr.models import FlickrUserCamera
@@ -114,12 +118,16 @@ def update_flickr_user_camera(photo_id, nsid):
 @task
 def fetch_contacts_for_flickr_user(nsid):
     logger.info("Fetching contacts for Flickr user %s." % (nsid))
-    flickr_user = FlickrUser.objects.get(pk = nsid)
+    user = UserProfile.objects.get(flickr_nsid = nsid)
+    flickr_user = user.flickr_user
     
     try:
         # Query Flickr for this user's contacts
-        contacts_rsp = flickr.contacts.getPublicList(user_id=flickr_user.nsid,format="json",nojsoncallback="true")
-        json = simplejson.loads(contacts_rsp)
+        a = flickr_api.AuthHandler(access_token_key = str(user.flickr_oauth_token), access_token_secret = str(user.flickr_oauth_token_secret))
+        flickr_api.set_auth_handler(a)
+
+        rsp = flickr.contacts.getList(sort="time", format="json",nojsoncallback="true")
+        json = simplejson.loads(rsp)
         
         if json and json['stat'] == 'ok':
             contacts = json['contacts']['contact']
