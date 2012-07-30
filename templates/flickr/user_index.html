@@ -50,7 +50,7 @@
             </div>
         </div>
     {% else %}
-        <div class="progress progress-striped active">
+        <div id="js-progress-bar" class="progress progress-striped active">
           <div class="bar"></div>
         </div>
     {% endif %}
@@ -96,10 +96,33 @@
     {% if not flickr_user.date_last_photo_update %}
         <script src="{{ pushy_url }}/socket.io/socket.io.js"></script>
         <script>
-          var socket = io.connect('{{ pushy_url }}');
-          socket.on('{{ pushy_channel }}', function (data) {
-            console.log(data);
-          });
+            $(document).ready(function(){
+                socket.on('{{ pushy_channel }}', function (data) {
+
+                    var message = jQuery.parseJSON(data.msg);
+                    
+                    if (message.type) {
+                        
+                        switch (message.type) {
+                                
+                            case 'fetch_photos.update_progress_bar':
+                            
+                                var progress_bar = $('#js-progress-bar');
+                            
+                                if (progress_bar && progress_bar.css('display') == 'none') {
+                                    progress_bar.fadeIn('slow');
+                                }
+                            
+                                $('#js-progress-bar .bar').css('width', message.data.pct + '%');
+                                
+                                break;
+                                
+                        }
+                        
+                    }
+                    
+                });
+            });
         </script>
     {% endif %}
 {% endblock %}
