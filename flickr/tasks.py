@@ -6,6 +6,7 @@ from django.db.models import F
 from django.db.models import Sum
 
 import calendar
+from urllib2 import URLError
 
 from celery.task import task
 from flickr_api.api import flickr
