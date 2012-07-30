@@ -75,7 +75,7 @@ def update_flickr_user_camera(photo_id, nsid):
         logger.info("Updating flickr_user (%s) with camera (%s)." % (flickr_user, camera))
         
         try:
-            flickr_user_camera, create = FlickrUserCamera.objects.get_or_create(
+            flickr_user_camera, created = FlickrUserCamera.objects.get_or_create(
                 camera = camera,
                 flickr_user = flickr_user,
                 defaults = {
@@ -91,7 +91,10 @@ def update_flickr_user_camera(photo_id, nsid):
             logger.warning("FlickrUserCamera %s + %s already exists, but we're trying to add it again. Rescheduling task." % (flickr_user, camera))
             raise update_flickr_user_camera.retry(countdown=5)
             
-        if not create:
+        if created:
+            Camera.objects.filter(pk=camera.pk).update(count=F('count')+1)
+            
+        else:
             logger.info("We've seen this camera (%s) for this user before, updating counts." % (camera))
             
             # Update counts
