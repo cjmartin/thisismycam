@@ -90,9 +90,9 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
                 logger.info("pct should be: %s/%s * 100 = %s" % (page, pages, pct))
                 
                 logger.info("Push it.")
-                pushy_url = 'http://127.0.0.1:8888'
+                pushy_url = settings.PUSHY_URL_LOCAL
                 values = {
-                    'secret': '6c2a8e2cd82e4d7c9bd3fc72385e482d',
+                    'secret': settings.PUSHY_SECRET,
                     'user_id': flickr_user.nsid,
                     'message': simplejson.dumps({'type': 'fetch_photos.update_progress_bar', 'data': {'pct': pct}}),
                 }

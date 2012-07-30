@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.utils import simplejson
 
 import re
+import hashlib
 
 from flickr.models import FlickrUser
 from cameras.models import Camera
@@ -46,7 +47,15 @@ def user(request, user_slug):
         }
         
     else:
-        data = {'user': user}
+        shasum = hashlib.sha1()
+        shasum.update(flickr_user.nsid + settings.PUSHY_SALT)
+        pushy_channel = "%s_%s" % (flickr_user.nsid, shasum.hexdigest())
+        
+        data = {
+            'user': user,
+            'pushy_url': settings.PUSHY_URL,
+            'pushy_channel': pushy_channel,
+        }
 
     return render_to_response('flickr/user_index.html', data)
         

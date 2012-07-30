@@ -93,11 +93,11 @@
 {% endblock %}
 
 {% block javascripts %}
-    {% if flickr_user.date_last_photo_update %}
-        <script src="http://pushy.thisismycam.com:8888/socket.io/socket.io.js"></script>
+    {% if not flickr_user.date_last_photo_update %}
+        <script src="{{ pushy_url }}/socket.io/socket.io.js"></script>
         <script>
-          var socket = io.connect('http://pushy.thisismycam.com:8888');
-          socket.on('test', function (data) {
+          var socket = io.connect('{{ pushy_url }}');
+          socket.on('{{ pushy_channel }}', function (data) {
             console.log(data);
           });
         </script>

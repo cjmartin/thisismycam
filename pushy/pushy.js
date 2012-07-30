@@ -27,8 +27,8 @@ app.post('/', function (req, res) {
         var shasum = crypto.createHash('sha1');
         shasum.update(user_id + pushy_salt);
         
-        //var channel = user_id + '_' + shasum.digest('hex');
-        var channel = 'test';
+        var channel = user_id + '_' + shasum.digest('hex');
+        // var channel = 'test';
         
         io.sockets.emit(channel, { msg: req.body.message });
 
