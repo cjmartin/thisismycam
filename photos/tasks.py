@@ -289,7 +289,7 @@ def process_flickr_photo(api_photo, nsid):
                 photo.save()
                 
                 if created:
-                    Camera.objects.filter(slug=camera_slug).update(count=F('count_photos')+1)
+                    Camera.objects.filter(slug=camera_slug).update(count_photos=F('count_photos')+1)
                     return photo.photo_id
                     
                 else:
