@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.utils import simplejson
 from django.db import IntegrityError
+from django.db import ObjectDoesNotExist
 
 from django.db.models import F
 from django.db.models import Sum
