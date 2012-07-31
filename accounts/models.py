@@ -30,15 +30,6 @@ class UserProfile(models.Model):
     def __unicode__(self):
         return self.user.username
         
-class FlickrContact(models.Model):
-    user = models.ForeignKey(UserProfile)
-    flickr_user = models.ForeignKey(FlickrUser)
-    friend = models.BooleanField()
-    family = models.BooleanField()
-
-    def __unicode__(self):
-        return "%s + %s" % (self.user.flickr_username, self.flickr_user.username)
-        
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
