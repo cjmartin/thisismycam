@@ -135,9 +135,28 @@ def fetch_contacts_for_flickr_user(nsid):
             for contact in contacts:
                 logger.info("Contact! %s" % (contact['username']))
                 
+                contact_flickr_user = FlickrUser.objects.get(pk = contact['nsid'])
+                
+                # try:
+                #     flickr_user_camera, created = FlickrUserCamera.objects.get_or_create(
+                #         camera = camera,
+                #         flickr_user = flickr_user,
+                #         defaults = {
+                #             'count_photos': 1,
+                #             'comments_count': photo.comments_count,
+                #             'faves_count': photo.faves_count,
+                #             'date_last_taken': photo.date_taken,
+                #             'date_last_upload': photo.date_upload,
+                #         }
+                #     )
+                # 
+                # except IntegrityError:
+                #     logger.warning("FlickrUserCamera %s + %s already exists, but we're trying to add it again. Rescheduling task." % (flickr_user, camera))
+                #     raise update_flickr_user_camera.retry(countdown=5)
+                
     except URLError, e:
         logger.error("Problem talking to Flickr (URLError), will try again. Reason: %s" % (e.reason))
-        return fetch_contacts_for_flickr_user.delay(flickr_user.nsid)
+        return fetch_contacts_for_flickr_user.retry(countdown=5)
     
 @task
 def delete_flickr_user(nsid, reset=False):
