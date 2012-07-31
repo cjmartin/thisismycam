@@ -138,10 +138,10 @@ def fetch_contacts_for_flickr_user(nsid):
                 logger.info("Contact! %s" % (contact['username']))
                 
                 try:
-                    contact_flickr_user = FlickrUser.objects.get(pk = contact['nsid'])
+                    contact = FlickrUser.objects.get(pk = contact['nsid'])
                     logger.info("Sweet, they're already here!")
                     
-                    flickr_user_contact, created = FlickrUserContact.objects.get_or_create(flickr_user = flickr_user, contact = flickr_user_contact)
+                    flickr_user_contact, created = FlickrUserContact.objects.get_or_create(flickr_user = flickr_user, contact = contact)
                     
                 except FlickrUser.DoesNotExist:
                     logger.info("Bummer, they haven't been here yet.")
