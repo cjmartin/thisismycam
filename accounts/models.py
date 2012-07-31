@@ -11,6 +11,8 @@ from flickr_api.api import flickr
 from django.contrib.auth.models import User
 from flickr.models import FlickrUser
 
+from flickr.tasks import process_new_flickr_user
+
 class UserProfile(models.Model):
     # This field is required.
     user = models.OneToOneField(User)
@@ -48,18 +50,28 @@ def flickr_extra_values(sender, user, response, details, **kwargs):
     if json and json['stat'] == "ok":
         api_user = json['person']
         
-        try:
-            flickr_user = FlickrUser.objects.get(pk = response['id'])
-        except FlickrUser.DoesNotExist:
-            flickr_user = FlickrUser(nsid = response['id'])
-
-        flickr_user.username = api_user['username']['_content']
-        flickr_user.realname = api_user['realname']['_content']
-        flickr_user.path_alias = api_user['path_alias']
-        flickr_user.iconserver = api_user['iconserver']
-        flickr_user.iconfarm = api_user['iconfarm']
+        flickr_user, created = FlickrUser.objects.get_or_create(
+            nsid = response['id'],
+            defaults = {
+                'username': api_user['username']['_content'],
+                'realname': api_user['realname']['_content'],
+                'path_alias': api_user['path_alias'],
+                'iconserver': api_user['iconserver'],
+                'iconfarm': api_user['iconfarm'],
+            }
+        )
+        
+        if created:
+            process_new_flickr_user.delay(flickr_user.nsid)
+            
+        else:
+            flickr_user.username = api_user['username']['_content']
+            flickr_user.realname = api_user['realname']['_content']
+            flickr_user.path_alias = api_user['path_alias']
+            flickr_user.iconserver = api_user['iconserver']
+            flickr_user.iconfarm = api_user['iconfarm']
     
-        flickr_user.save()
+            flickr_user.save()
     
     try:
       profile = user.get_profile()

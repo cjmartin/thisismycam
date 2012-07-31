@@ -161,6 +161,20 @@ def fetch_contacts_for_flickr_user(nsid):
         return fetch_contacts_for_flickr_user.retry(countdown=5)
     
 @task
+def process_new_flickr_user(nsid):
+    logger.info("Sweet, a new user, lets update stuff!")
+    flickr_user = FlickrUser.objects.get(pk = nsid)
+    
+    # Update other people's contacts if they're waiting for this person
+    contact_lookups = FlickrContactLookup.objects.filter(nsid = flickr_user.nsid)
+    
+    for contact_lookup in contact_lookups:
+        logger.info("Hooray, %s will be so happy %s is here!" % (contact_lookup.flickr_user.username, flickr_user.username))
+        flickr_user_contact, created = FlickrUserContact.objects.get_or_create(flickr_user = contact_lookup.flickr_user, contact = flickr_user)
+        
+        contact_lookup.delete()
+        
+@task
 def delete_flickr_user(nsid, reset=False):
     logger.info("Clearing cameras and photos for Flickr user %s." % (nsid))
     flickr_user = FlickrUser.objects.get(pk = nsid)
