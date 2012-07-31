@@ -17,6 +17,8 @@ from accounts.models import UserProfile
 
 from flickr.models import FlickrUser
 from flickr.models import FlickrUserCamera
+from flickr.models import FlickrUserContact
+from flickr.models import FlickrContactLoookup
 
 from cameras.models import Camera
 
@@ -139,25 +141,20 @@ def fetch_contacts_for_flickr_user(nsid):
                     contact_flickr_user = FlickrUser.objects.get(pk = contact['nsid'])
                     logger.info("Sweet, they're already here!")
                     
+                    flickr_user_contact, created = FlickrUserContact.object.get_or_create(flickr_user = flickr_user, contact = flickr_user_contact)
+                    
                 except FlickrUser.DoesNotExist:
                     logger.info("Bummer, they haven't been here yet.")
                     
-                # try:
-                #     flickr_user_camera, created = FlickrUserCamera.objects.get_or_create(
-                #         camera = camera,
-                #         flickr_user = flickr_user,
-                #         defaults = {
-                #             'count_photos': 1,
-                #             'comments_count': photo.comments_count,
-                #             'faves_count': photo.faves_count,
-                #             'date_last_taken': photo.date_taken,
-                #             'date_last_upload': photo.date_upload,
-                #         }
-                #     )
-                # 
-                # except IntegrityError:
-                #     logger.warning("FlickrUserCamera %s + %s already exists, but we're trying to add it again. Rescheduling task." % (flickr_user, camera))
-                #     raise update_flickr_user_camera.retry(countdown=5)
+                    flickr_contact_lookup, created = FlickrContactLookup.object.get_or_create(
+                        flickr_user = flickr_user,
+                        nsid = contact['nsid'],
+                        defaults = {
+                            'username': contact['username'],
+                            'iconserver': contact['iconserver'],
+                            'iconfarm': contact['iconfarm'],
+                        }
+                    )
                 
     except URLError, e:
         logger.error("Problem talking to Flickr (URLError), will try again. Reason: %s" % (e.reason))
