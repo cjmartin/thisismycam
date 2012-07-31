@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.utils import simplejson
 from django.db import IntegrityError
-from django.db import ObjectDoesNotExist
 
 from django.db.models import F
 from django.db.models import Sum
@@ -140,7 +139,7 @@ def fetch_contacts_for_flickr_user(nsid):
                     contact_flickr_user = FlickrUser.objects.get(pk = contact['nsid'])
                     logger.info("Sweet, they're already here!")
                     
-                except ObjectDoesNotExist:
+                except FlickrUser.DoesNotExist:
                     logger.info("Bummer, they haven't been here yet.")
                     
                 # try:
