@@ -135,8 +135,13 @@ def fetch_contacts_for_flickr_user(nsid):
             for contact in contacts:
                 logger.info("Contact! %s" % (contact['username']))
                 
-                contact_flickr_user = FlickrUser.objects.get(pk = contact['nsid'])
-                
+                try:
+                    contact_flickr_user = FlickrUser.objects.get(pk = contact['nsid'])
+                    logger.info("Sweet, they're already here!")
+                    
+                except ObjectDoesNotExist:
+                    logger.info("Bummer, they haven't been here yet.")
+                    
                 # try:
                 #     flickr_user_camera, created = FlickrUserCamera.objects.get_or_create(
                 #         camera = camera,
