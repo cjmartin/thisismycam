@@ -21,7 +21,6 @@ class UserProfile(models.Model):
     flickr_fullname = models.CharField(max_length=255, null=True, blank=True)
     flickr_oauth_token = models.CharField(max_length=255, null=True, blank=True)
     flickr_oauth_token_secret = models.CharField(max_length=255, null=True, blank=True)
-    flickr_contacts = models.ManyToManyField(FlickrUser, through='FlickrContact', related_name='flickr_contact')
     flickr_user = models.OneToOneField(FlickrUser, null=True, blank=True)
     
     date_create = models.DateTimeField(auto_now_add=True)
