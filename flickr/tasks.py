@@ -18,7 +18,7 @@ from accounts.models import UserProfile
 from flickr.models import FlickrUser
 from flickr.models import FlickrUserCamera
 from flickr.models import FlickrUserContact
-from flickr.models import FlickrContactLoookup
+from flickr.models import FlickrContactLookup
 
 from cameras.models import Camera
 
