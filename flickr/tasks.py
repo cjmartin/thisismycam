@@ -163,7 +163,7 @@ def fetch_contacts_for_flickr_user(nsid):
 @task
 def process_new_flickr_user(nsid):
     logger.info("Sweet, a new user, lets update stuff!")
-    flickr_user = FlickrUser.objects.get(pk = nsid)
+    flickr_user = FlickrUser.objects.get(nsid = nsid)
     
     # Update other people's contacts if they're waiting for this person
     contact_lookups = FlickrContactLookup.objects.filter(nsid = flickr_user.nsid)

@@ -11,8 +11,6 @@ from flickr_api.api import flickr
 from django.contrib.auth.models import User
 from flickr.models import FlickrUser
 
-#from flickr.tasks import process_new_flickr_user
-
 class UserProfile(models.Model):
     # This field is required.
     user = models.OneToOneField(User)
@@ -62,8 +60,8 @@ def flickr_extra_values(sender, user, response, details, **kwargs):
         )
         
         if created:
-            something = True
-            #process_new_flickr_user.delay(flickr_user.nsid)
+            from flickr.tasks import process_new_flickr_user
+            process_new_flickr_user.delay(flickr_user.nsid)
             
         else:
             flickr_user.username = api_user['username']['_content']
