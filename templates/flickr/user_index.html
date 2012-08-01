@@ -72,7 +72,6 @@
                                 <a href="{% url flickr-user-camera flickr_user.slug camera.user_camera.camera.slug %}">
                             </div>
                             <h3 class="title collection-camera-title">{{ camera.user_camera.camera.name }}</h3>
-                            <p>{{ camera.user_camera.count_photos }} Photos</p>
                             <div class="collection-camera-thumbnails">
                                 {% for photo in camera.photos %}
                                     <a href="{{ photo.flickr_photo_page }}" target="_blank" class="collection-camera-thumbnail">
@@ -80,6 +79,7 @@
                                     </a>
                                 {% endfor %}
                             </div>
+                            <p>{{ camera.user_camera.count_photos }} Photos</p>
                         </div>
                     </div>
                     {% if forloop.counter|divisibleby:"4" %}

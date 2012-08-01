@@ -280,6 +280,7 @@ h3.title {
 
 .collection-camera .title {
     margin-bottom: 10px;
+    min-height: 70px;
 }
 
 .collection-camera-thumbnails {
