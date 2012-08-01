@@ -6,6 +6,8 @@ from django.db.models import F
 from django.db.models import Sum
 
 import calendar
+import urllib
+import urllib2
 from urllib2 import URLError
 
 from celery.task import task
