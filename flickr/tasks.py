@@ -101,6 +101,16 @@ def update_flickr_user_camera(photo_id, nsid):
         if created:
             Camera.objects.filter(pk=camera.pk).update(count=F('count')+1)
             
+            logger.info("Push new camera.")
+            values = {
+                'secret': settings.PUSHY_SECRET,
+                'user_id': flickr_user.nsid,
+                'message': simplejson.dumps({'type': 'fetch_photos.new_camera', 'data': {'name': camera.name, 'count_photos': flickr_user_camera.count_photos}}),
+            }
+            data = urllib.urlencode(values)
+            req = urllib2.Request(settings.PUSHY_URL_LOCAL, data)
+            response = urllib2.urlopen(req)
+            
         else:
             logger.info("We've seen this camera (%s) for this user before, updating counts." % (camera))
             

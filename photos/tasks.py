@@ -90,14 +90,13 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
                 logger.info("pct should be: %s/%s * 100 = %s" % (page, pages, pct))
                 
                 logger.info("Push it.")
-                pushy_url = settings.PUSHY_URL_LOCAL
                 values = {
                     'secret': settings.PUSHY_SECRET,
                     'user_id': flickr_user.nsid,
                     'message': simplejson.dumps({'type': 'fetch_photos.update_progress_bar', 'data': {'pct': pct}}),
                 }
                 data = urllib.urlencode(values)
-                req = urllib2.Request(pushy_url, data)
+                req = urllib2.Request(settings.PUSHY_URL_LOCAL, data)
                 response = urllib2.urlopen(req)
                 
                 return chord(photo_updates)(fetch_photos_for_flickr_user.subtask((flickr_user.nsid, next_page, )))
