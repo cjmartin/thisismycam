@@ -63,7 +63,7 @@
     <h1 class="title section-title">Your Camera Collection</h1>
     <div class="section-content inset">
         <div class="container">
-            <div class="row">
+            <!-- <div class="row"> -->
                 {% for camera in user_cameras %}
                     <div class="span3">
                         <div class="collection-camera">
@@ -83,12 +83,12 @@
                         </div>
                     </div>
                     {% if forloop.counter|divisibleby:"4" %}
-                        </div>
+                        <!-- </div>
                         <hr />
-                        <div class="row">
+                        <div class="row"> -->
                     {% endif %}
                 {% endfor %}
-            </div>
+            <!-- </div> -->
         </div>
     </div>
 </div>
@@ -122,7 +122,13 @@
                                 break;
                                 
                             case 'fetch_photos.new_camera':
-                            
+                                
+                                $.ajax({
+                                    url: message.data.user + "/cameras/" + message.data.camera,
+                                }).done(function( html ) {
+                                    //$("#results").append(html);
+                                });
+                                
                                 console.log(message.data);
                                 
                                 break;
