@@ -111,7 +111,8 @@
                                 $.ajax({
                                     url: "/" + message.data.user + "/cameras/" + message.data.camera,
                                 }).done(function(html) {
-                                    $("#js-camera-collection > .container > .row").last().prepend(html).fadeIn();
+                                    var targetRow = $("#js-camera-collection > .container > .row").last();
+                                    $(html).hide().prependTo(targetRow).fadeIn();
                                 });
                                 
                                 console.log(message.data.camera);
