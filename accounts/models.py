@@ -39,8 +39,8 @@ def flickr_extra_values(sender, user, response, details, **kwargs):
     from urlparse import parse_qs
     access_token = parse_qs(response['access_token'])
     
-    a = flickr_api.AuthHandler(access_token_key = str(access_token['oauth_token'][0]), access_token_secret = str(access_token['oauth_token_secret'][0]))
-    flickr_api.set_auth_handler(a)
+    #a = flickr_api.AuthHandler(access_token_key = str(access_token['oauth_token'][0]), access_token_secret = str(access_token['oauth_token_secret'][0]))
+    #flickr_api.set_auth_handler(a)
 
     rsp = flickr.people.getInfo(user_id=response['id'],format="json",nojsoncallback="true")
     json = simplejson.loads(rsp)
@@ -56,6 +56,7 @@ def flickr_extra_values(sender, user, response, details, **kwargs):
                 'path_alias': api_user['path_alias'],
                 'iconserver': api_user['iconserver'],
                 'iconfarm': api_user['iconfarm'],
+                'count_photos': api_user['photos']['count']['_content'],
             }
         )
         

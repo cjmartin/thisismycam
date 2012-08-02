@@ -11,6 +11,7 @@ class FlickrUser(models.Model):
     iconfarm = models.IntegerField()
     count_photos_processed = models.IntegerField(null=True, blank=True)
     date_last_photo_update = models.IntegerField(null=True, blank=True)
+    count_photos = models.IntegerField()
     
     cameras = models.ManyToManyField(Camera, through='FlickrUserCamera')
     contacts = models.ManyToManyField('self', through='FlickrUserContact', symmetrical=False)
