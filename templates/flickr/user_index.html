@@ -112,7 +112,7 @@
                                     url: "/" + message.data.user + "/cameras/" + message.data.camera,
                                 }).done(function(html) {
                                     var targetRow = $("#js-camera-collection > .container > .row").last();
-                                    $(html).hide().prependTo(targetRow).fadeIn();
+                                    $(html).hide().prependTo(targetRow).fadeIn('slow');
                                 });
                                 
                                 console.log(message.data.camera);
