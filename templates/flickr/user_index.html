@@ -125,10 +125,10 @@
                                 $.ajax({
                                     url: "/" + message.data.user + "/cameras/" + message.data.camera,
                                 }).done(function(html) {
-                                    $("#js-camera-collection > .container > .row").last().append(html);
+                                    $("#js-camera-collection > .container > .row").last().prepend(html);
                                 });
                                 
-                                console.log(message.data);
+                                //console.log(message.data);
                                 
                                 break;
                             
