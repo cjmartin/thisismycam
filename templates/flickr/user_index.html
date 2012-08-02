@@ -136,6 +136,12 @@
                                 
                             case 'fetch_photos.camera_photo_count':
                                 
+                                var countSpan = $('#js-' + message.data.camera).find('.count_photos');
+                                
+                                if (countSpan.text() != message.data.count) {
+                                    countSpan.text(message.data.count);
+                                }
+                                
                                 console.log(message.data);
                                 
                                 break;
