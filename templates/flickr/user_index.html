@@ -125,7 +125,7 @@
                                 $.ajax({
                                     url: "/" + message.data.user + "/cameras/" + message.data.camera,
                                 }).done(function(html) {
-                                    $("#js-camera-collection > .row").last().append(html);
+                                    $("#js-camera-collection > .container > .row").last().append(html);
                                 });
                                 
                                 console.log(message.data);
