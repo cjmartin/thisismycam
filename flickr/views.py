@@ -79,10 +79,11 @@ def user_camera(request, user_slug, camera_slug):
     else:
         data['user'] = None
     
+    data['photos'] = Photo.objects.filter(camera = camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:18]
+    
     user_cameras = flickr_user.flickrusercamera_set.order_by('-date_last_taken', '-count_photos')
     data['user_cameras'] = load_photos_for_cameras(user_cameras, flickr_user.nsid)
-    data['photos'] = Photo.objects.filter(camera = primary_camera.camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:18]
-
+    
     return render_to_response('flickr/user_index.html', data)
     
 def load_photos_for_cameras(user_cameras, nsid):
