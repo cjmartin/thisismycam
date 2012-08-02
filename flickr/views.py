@@ -72,7 +72,10 @@ def user_camera(request, user_slug, camera_slug):
     }
     
     if request.is_ajax():
-        yes = True
+        photos = Photo.objects.filter(camera = user_camera.camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:6]
+        data['camera'] = {'user_camera': user_camera, 'photos': photos}
+        
+        return render_to_response('flickr/fragment_user_camera.html', data)
     
     if request.user.is_authenticated():
         data['user'] = request.user.get_profile()
@@ -102,7 +105,7 @@ def load_photos_for_cameras(user_cameras, nsid):
                 user_camera.camera.amazon_url = pretty_url
                 
         photos = Photo.objects.filter(camera = user_camera.camera, owner_nsid = nsid).order_by('-date_taken')[:6]
-        cameras_and_photos.append({'user_camera':user_camera, 'photos':photos})
+        cameras_and_photos.append({'user_camera': user_camera, 'photos': photos})
         
     return cameras_and_photos
     
