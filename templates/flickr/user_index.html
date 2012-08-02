@@ -65,7 +65,7 @@
         <div class="container">
             <div class="row">
                 {% for camera in user_cameras %}
-                    {% include "fragment_user_camera.html" %}
+                    {% include 'flickr/fragment_user_camera.html' %}
                     {% if forloop.counter|divisibleby:"4" and flickr_user.date_last_photo_update %}
                         </div>
                         <div class="row">
