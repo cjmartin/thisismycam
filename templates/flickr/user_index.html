@@ -82,7 +82,7 @@
                             <p>{{ camera.user_camera.count_photos }} Photos</p>
                         </div>
                     </div>
-                    {% if forloop.counter|divisibleby:"4" %}
+                    {% if forloop.counter|divisibleby:"4" and flickr_user.date_last_photo_update %}
                         </div>
                         <div class="row">
                     {% endif %}
