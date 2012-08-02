@@ -268,7 +268,8 @@ h3.title {
 }
 
 .collection-camera {
-    min-height: 474px;
+    min-height: 462px;
+    margin: 10px 0;
     text-align: center;
     background-color: #FFFFFF;
 }
@@ -281,6 +282,8 @@ h3.title {
 .collection-camera .title {
     margin-bottom: 10px;
     min-height: 70px;
+    max-height: 70px;
+    overflow: hidden;
 }
 
 .collection-camera-thumbnails {
