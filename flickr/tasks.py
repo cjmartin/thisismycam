@@ -125,6 +125,18 @@ def update_flickr_user_camera(photo_id, nsid):
             if photo.faves_count:
                 FlickrUserCamera.objects.filter(pk=flickr_user_camera.pk).update(faves_count=F('faves_count')+int(photo.faves_count))
                 
+            fuzzy_count = flickr_user_camera.count_photos + 1
+            
+            logger.info("Push camera photo count (fuzzy).")
+            values = {
+                'secret': settings.PUSHY_SECRET,
+                'user_id': flickr_user.nsid,
+                'message': simplejson.dumps({'type': 'fetch_photos.camera_photo_count', 'data': {'camera': camera.slug, 'count': fuzzy_count}}),
+            }
+            data = urllib.urlencode(values)
+            req = urllib2.Request(settings.PUSHY_URL_LOCAL, data)
+            response = urllib2.urlopen(req)
+            
         return
         
     return

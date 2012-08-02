@@ -1,5 +1,5 @@
 <div class="span3">
-    <div class="collection-camera">
+    <div class="collection-camera" id="js-{{ camera.user_camera.camera.slug }}">
         <div class="image camera-image collection-camera-image" style="background-image: url('{{ camera.user_camera.camera.medium_photo_url }}');">
             <img src="{{ camera.user_camera.camera.medium_photo_url }}">
             <a href="{% url flickr-user-camera flickr_user.slug camera.user_camera.camera.slug %}">
