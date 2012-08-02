@@ -64,27 +64,24 @@ def user(request, user_slug):
 def user_camera(request, user_slug, camera_slug):
     flickr_user = get_user_by_slug(user_slug)
     camera = get_object_or_404(Camera, slug=camera_slug)
-    
-    if request.user.is_authenticated():
-        user = request.user.get_profile()
-    else:
-        user = None
-    
-    user_cameras = flickr_user.flickrusercamera_set.order_by('-date_last_taken', '-count_photos')
-    cameras_and_photos = load_photos_for_cameras(user_cameras, flickr_user.nsid)
-    
-    primary_camera = flickr_user.flickrusercamera_set.get(camera = camera)
-    first_taken_photo = Photo.objects.get(photo_id = primary_camera.first_taken_id)
-    
-    photos = Photo.objects.filter(camera = primary_camera.camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:18]
+    user_camera = flickr_user.flickrusercamera_set.get(camera = camera)
     
     data = {
-        'user': user,
         'flickr_user': flickr_user,
-        'user_cameras': cameras_and_photos,
-        'primary_camera': primary_camera,
-        'photos': photos,
+        'primary_camera': user_camera,
     }
+    
+    if request.is_ajax():
+        yes = True
+    
+    if request.user.is_authenticated():
+        data['user'] = request.user.get_profile()
+    else:
+        data['user'] = None
+    
+    user_cameras = flickr_user.flickrusercamera_set.order_by('-date_last_taken', '-count_photos')
+    data['user_cameras'] = load_photos_for_cameras(user_cameras, flickr_user.nsid)
+    data['photos'] = Photo.objects.filter(camera = primary_camera.camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:18]
 
     return render_to_response('flickr/user_index.html', data)
     

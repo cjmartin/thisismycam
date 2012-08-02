@@ -107,7 +107,7 @@ def update_flickr_user_camera(photo_id, nsid):
             values = {
                 'secret': settings.PUSHY_SECRET,
                 'user_id': flickr_user.nsid,
-                'message': simplejson.dumps({'type': 'fetch_photos.new_camera', 'data': {'name': camera.name, 'count_photos': flickr_user_camera.count_photos}}),
+                'message': simplejson.dumps({'type': 'fetch_photos.new_camera', 'data': {'name': camera.name, 'user':flickr_user.slug 'camera': camera.slug}}),
             }
             data = urllib.urlencode(values)
             req = urllib2.Request(settings.PUSHY_URL_LOCAL, data)
