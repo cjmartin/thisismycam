@@ -118,6 +118,8 @@
                             
                                 $('#js-progress-bar .bar').css('width', message.data.pct + '%');
                                 
+                                console.log(message.data.pct);
+                                
                                 break;
                                 
                             case 'fetch_photos.new_camera':
@@ -128,7 +130,7 @@
                                     $("#js-camera-collection > .container > .row").last().prepend(html);
                                 });
                                 
-                                //console.log(message.data);
+                                console.log(message.data.camera);
                                 
                                 break;
                             

@@ -18,6 +18,7 @@ from celery import chord
 from flickr_api.api import flickr
 from flickr_api.base import FlickrError
 
+import math
 import re
 import time
 import pytz
@@ -42,7 +43,7 @@ logger = logging.getLogger(__name__)
 LOCK_EXPIRE = 60 * 60 # Lock expires in 60 minutes
 
 @task()
-def fetch_photos_for_flickr_user(results, nsid, page=1):
+def fetch_photos_for_flickr_user(results, nsid, page=None):
     nsid_digest = md5(nsid).hexdigest()
     lock_id = "%s-lock-%s" % ("fetch_photos", nsid_digest)
     
@@ -53,6 +54,9 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
     # if acquire_lock():
     
     flickr_user = FlickrUser.objects.get(nsid = nsid)
+    
+    if not page:
+        page = math.ceil(float(flickr_user.count_photos) / float(20))
     
     per_page = 20
     
@@ -77,16 +81,16 @@ def fetch_photos_for_flickr_user(results, nsid, page=1):
             for photo in json['photos']['photo']:
                 photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))))
                 
-            if page == pages:
+            if page == 1:
                 logger.info("This is the last page (%s) for %s!" % (pages, flickr_user.username))
                 return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((flickr_user.nsid, )))
                 
             else:
                 logger.info("Firing tasks for page %s of %s for %s" % (page, pages, flickr_user.username))
-                next_page = page + 1
+                next_page = page - 1
                 
                 
-                pct = (float(page) / float(pages)) * 100
+                pct = 100 - ((float(page) / float(pages)) * 100)
                 logger.info("pct should be: %s/%s * 100 = %s" % (page, pages, pct))
                 
                 logger.info("Push it.")
