@@ -29,6 +29,8 @@ def user(request, user_slug):
         user = request.user.get_profile()
         if user.flickr_nsid == flickr_user.nsid:
             is_owner = True
+        else:
+            is_owner = False
     else:
         user = None
         is_owner = False
