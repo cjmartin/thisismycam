@@ -90,6 +90,12 @@
                     rotateX: '180deg'
                 });
             });
+            $('.flippy-container').mouseout(function(){
+                $(this).transition({
+                    perspective: '100px',
+                    rotateX: '180deg'
+                });
+            });
         });
     </script>
     {% if not flickr_user.date_last_photo_update %}
