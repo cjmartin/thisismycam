@@ -1,6 +1,10 @@
 <div class="span3">
     <div class="collection-camera" id="js-{{ camera.user_camera.camera.slug }}">
-        <div class="image camera-image collection-camera-image {{ camera.user_camera.camera.medium_orientation }}" style="background-image: url('{{ camera.user_camera.camera.medium_photo_url }}');">
+        <div class="image camera-image collection-camera-image
+        {% if camera.user_camera.camera.medium_width >= 200 or camera.user_camera.camera.medium_height >= 200 %}
+        {{ camera.user_camera.camera.medium_orientation }}
+        {% endif %}
+        " style="background-image: url('{{ camera.user_camera.camera.medium_photo_url }}');">
             <img src="{{ camera.user_camera.camera.medium_photo_url }}">
             <a href="{% url flickr-user-camera flickr_user.slug camera.user_camera.camera.slug %}">
         </div>
