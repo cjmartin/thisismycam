@@ -42,7 +42,7 @@ class Camera(models.Model):
     def __unicode__(self):
         return self.name
         
-    def _get_orientation(self):
+    def _get_large_orientation(self):
         if self.large_photo_width == self.large_photo_height:
             return "square"
         elif self.large_photo_width > self.large_photo_height:
@@ -50,4 +50,24 @@ class Camera(models.Model):
         else:
             return "portrait"
 
-    orientation = property(_get_orientation)
+    large_orientation = property(_get_large_orientation)
+    
+    def _get_medium_orientation(self):
+        if self.medium_photo_width == self.medium_photo_height:
+            return "square"
+        elif self.medium_photo_width > self.medium_photo_height:
+            return "landscape"
+        else:
+            return "portrait"
+
+    medium_orientation = property(_get_medium_orientation)
+    
+    def _get_small_orientation(self):
+        if self.small_photo_width == self.small_photo_height:
+            return "square"
+        elif self.small_photo_width > self.small_photo_height:
+            return "landscape"
+        else:
+            return "portrait"
+
+    small_orientation = property(_get_small_orientation)
