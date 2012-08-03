@@ -27,38 +27,31 @@ def user(request, user_slug):
     
     if request.user.is_authenticated():
         user = request.user.get_profile()
+        if user.flickr_nsid == flickr_user.nsid:
+            is_owner = True
     else:
         user = None
-    
-    user_cameras = flickr_user.flickrusercamera_set.order_by('-date_last_taken', '-count_photos')
+        is_owner = False
     
     shasum = hashlib.sha1()
     shasum.update(flickr_user.nsid + settings.PUSHY_SALT)
     pushy_channel = "%s_%s" % (flickr_user.nsid, shasum.hexdigest())
     
-    if user_cameras:
-        cameras_and_photos = load_photos_for_cameras(user_cameras, flickr_user.nsid)
-        primary_camera = user_cameras[0]
-        
-        photos = Photo.objects.filter(camera = primary_camera.camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:18]
+    data = {
+        'user': user,
+        'flickr_user': flickr_user,
+        'is_owner': is_owner,
+        'pushy_url': settings.PUSHY_URL,
+        'pushy_channel': pushy_channel,
+    }
     
-        data = {
-            'user': user,
-            'flickr_user': flickr_user,
-            'user_cameras': cameras_and_photos,
-            'primary_camera': primary_camera,
-            'photos': photos,
-            'pushy_url': settings.PUSHY_URL,
-            'pushy_channel': pushy_channel,
-        }
+    user_cameras = flickr_user.flickrusercamera_set.order_by('-date_last_taken', '-count_photos')
+    
+    if user_cameras:        
+        data['user_cameras'] = load_photos_for_cameras(user_cameras, flickr_user.nsid)
+        data['primary_camera'] = user_cameras[0]
+        data['photos'] = Photo.objects.filter(camera = user_cameras[0].camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:18]
         
-    else:        
-        data = {
-            'user': user,
-            'pushy_url': settings.PUSHY_URL,
-            'pushy_channel': pushy_channel,
-        }
-
     return render_to_response('flickr/user_index.html', data)
         
 def user_camera(request, user_slug, camera_slug):
