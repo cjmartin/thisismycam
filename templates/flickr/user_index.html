@@ -83,6 +83,7 @@
     {{ block.super }}
     <script src="{% get_static_prefix %}js/jquery/jquery.transit.min.js"></script>
     <script>
+    /*
         $(document).ready(function(){
             $('.flippy-container').mouseover(function(){
                 $(this).transition({
@@ -92,6 +93,7 @@
                 $(this).addClass('rotated');
             });
         });
+    */
     </script>
     {% if not flickr_user.date_last_photo_update %}
         <script src="{{ pushy_url }}/socket.io/socket.io.js"></script>
