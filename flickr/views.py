@@ -53,7 +53,7 @@ def user(request, user_slug):
     
     #Temp, add widths and heights to cameras if they don't exist
     for user_camera in user_cameras:
-        if not user_camera.camera.large_image_width:
+        if not user_camera.camera.large_photo_width:
             add_aws_item_to_camera.delay(user_camera.camera.id)
     
     if user_cameras:        
