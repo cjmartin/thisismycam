@@ -399,6 +399,7 @@ def clean_model(model, make):
     model = re.sub(r"(?i)(^DROIDX\s[0-9][0-9a-z]+)", "DROID X", model)
     model = re.sub(r"(?i)(^DROID2\s[0-9][0-9a-z]+)", "DROID 2", model)
     model = re.sub(r"(?i)(^MB525\s[0-9][0-9a-z]+)", "MB525", model)
+    model = re.sub(r"(?i)(^DROID PRO\s[0-9][0-9a-z]+)", "DROID PRO", model)
 
     # Strip some nasty characters, and extra spaces
     model = re.sub("[<>]", "", model)
