@@ -1,0 +1,54 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+	<style type="text/css">
+		#content-main {
+			float: left;
+			width: 50%;
+		}
+		#content-right {
+			float: right;
+			width: 50%;
+		}
+		.vLargeTextField {
+			width: 400px !important;
+		}
+		.imageset {
+			overflow-x: scroll;
+		}
+		.imageset div {
+			width: 800px;
+		}
+		.imageset div img{
+			float: left;
+		}
+	</style>
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<div id="content-right">
+	<div class="module">
+		<h2>Amazon Stuff!</h2>
+		{% if aws_items %}
+			{% for item in aws_items %}
+			<div class="form-row" style="clear:both;">
+				<a href="{{ item.DetailPageURL }}">{{ item.ItemAttributes.Title }}</a><br />
+				{% for set in item.image_sets %}
+				<div class="imageset">
+					<div>
+					<img src="{{ set.LargeImage.URL }}" />
+					<img src="{{ set.MediumImage.URL }}" />
+					<img src="{{ set.SmallImage.URL }}" />
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+			{% endfor %}
+		{% endif %}
+	</div>
+</div>
+{% endblock %}
