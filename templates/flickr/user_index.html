@@ -147,6 +147,13 @@
                                 
                                 break;
                                 
+                            case 'fetch_photos.complete':
+                                
+                                $('#js-progress-bar .bar').css('width', '100%');
+                                
+                                // Quick hack to reload page for now.
+                                location.reload();
+                                
                         }
                         
                     }

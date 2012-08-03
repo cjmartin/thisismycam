@@ -72,6 +72,17 @@ def flickr_user_fetch_photos_complete(results, nsid):
     flickr_user.save()
     
     logger.info("Fetch for %s complete. That was fun!" % (flickr_user.username))
+    
+    logger.info("Dude, we're done here.")
+    values = {
+        'secret': settings.PUSHY_SECRET,
+        'user_id': flickr_user.nsid,
+        'message': simplejson.dumps({'type': 'fetch_photos.complete'}),
+    }
+    data = urllib.urlencode(values)
+    req = urllib2.Request(settings.PUSHY_URL_LOCAL, data)
+    response = urllib2.urlopen(req)
+    
     return
 
 @task()
