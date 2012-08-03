@@ -80,6 +80,7 @@
 
 {% block javascripts %}
     {{ block.super }}
+    <script src="{% get_static_prefix %}js/jquery/jquery.transit.min.js"></script>
     {% if not flickr_user.date_last_photo_update %}
         <script src="{{ pushy_url }}/socket.io/socket.io.js"></script>
         <script>
