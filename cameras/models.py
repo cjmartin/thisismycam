@@ -30,8 +30,24 @@ class Camera(models.Model):
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
     large_photo_url = models.CharField(max_length=255, null=True, blank=True)
+    large_photo_width = models.IntegerField()
+    large_photo_height = models.IntegerField()
     medium_photo_url = models.CharField(max_length=255, null=True, blank=True)
+    medium_photo_width = models.IntegerField()
+    medium_photo_height = models.IntegerField()
     small_photo_url = models.CharField(max_length=255, null=True, blank=True)
+    small_photo_width = models.IntegerField()
+    small_photo_height = models.IntegerField()
     
     def __unicode__(self):
         return self.name
+        
+    def _get_orientation(self):
+        if self.large_photo_width == self.large_photo_height:
+            return "square"
+        elif self.large_photo_width > self.large_photo_height:
+            return "landscape"
+        else:
+            return "portrait"
+
+    orientation = property(_get_orientation)

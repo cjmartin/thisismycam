@@ -31,29 +31,23 @@ def add_aws_item_to_camera(camera_id):
     
             if aws_photos[0]['LargeImage']['URL']:
                 camera.large_photo_url = aws_photos[0]['LargeImage']['URL']
+                camera.large_photo_width = aws_photos[0]['LargeImage']['Width']
+                camera.large_photo_height = aws_photos[0]['LargeImage']['Height']
         
             if aws_photos[0]['MediumImage']['URL']:
                 camera.medium_photo_url = aws_photos[0]['MediumImage']['URL']
+                camera.medium_photo_width = aws_photos[0]['MediumImage']['Width']
+                camera.medium_photo_height = aws_photos[0]['MediumImage']['Height']
         
             if aws_photos[0]['SmallImage']['URL']:
                 camera.small_photo_url = aws_photos[0]['SmallImage']['URL']
+                camera.small_photo_width = aws_photos[0]['SmallImage']['Width']
+                camera.small_photo_height = aws_photos[0]['SmallImage']['Height']
 
         camera.save()
             
     return
-        
-@task(ignore_result=True)
-def add_aws_photos_to_camera(camera_id):
-    camera = Camera.opjects.get(pk = camera_id)
-    aws_item = simplejson.loads(camera.amazon_item_response)
-
-    if aws_item:
-        aws_photos = get_aws_photos_for_item(aws_item)
-
-        if aws_photos:
-            camera.amazon_image_response = simplejson.dumps(aws_photos)
-            camera.save()
-            
+    
 def get_aws_items(camera):
     #print "Fetching Amazon items for camera %s.\n" % camera.name
     amazon = bottlenose.Amazon(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY, settings.AWS_ASSOCIATE_TAG)

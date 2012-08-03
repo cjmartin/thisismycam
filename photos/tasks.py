@@ -29,7 +29,6 @@ from urllib2 import URLError
 from cameras.models import Make
 from cameras.models import Camera
 from cameras.tasks import add_aws_item_to_camera
-from cameras.tasks import add_aws_photos_to_camera
 
 from flickr.models import FlickrUser
 from flickr.tasks import update_flickr_user_camera
@@ -238,18 +237,6 @@ def process_flickr_photo(api_photo, nsid):
                         
                     else:
                         logger.info("AWS item update for %s already scheduled, skipping." % (camera.name))
-                        
-                else:
-                    if not camera.amazon_image_response:
-                        lock_id = "%s-lock-%s" % ("aws_image_update", id_digest)
-                        acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
-                        
-                        if acquire_lock():
-                            logger.info("%s already has aws info, but no photos, will fetch." % (camera.name))
-                            add_aws_photos_to_camera.delay(camera.id)
-                            
-                        else:
-                            logger.info("AWS image update for %s already scheculed, skipping." % (camera.name))
                             
                 photo, created = Photo.objects.get_or_create(
                     photo_id = api_photo['id'],
