@@ -4,6 +4,8 @@ from cameras.models import Camera
 from cameras.models import Make
 from cameras.models import Category
 
+from cameras.tasks import get_aws_info
+
 class CameraAdmin(admin.ModelAdmin):
     search_fields = ['name']
     
