@@ -85,13 +85,11 @@
     <script>
         $(document).ready(function(){
             $('.flippy-container').mouseover(function(){
-                if ($(this).hasClass('rotated')) {
-                    $(this).transition({
-                        perspective: '100px',
-                        rotateX: '0deg'
-                    });
-                    $(this).removeClass('rotated');
-                }
+                $(this).transition({
+                    perspective: '100px',
+                    rotateX: '180deg'
+                });
+                $(this).addClass('rotated');
             });
         });
     </script>
