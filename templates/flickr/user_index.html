@@ -85,16 +85,19 @@
     <script>
         $(document).ready(function(){
             $('.flippy-container').mouseover(function(){
-                $(this).transition({
-                    perspective: '100px',
-                    rotateX: '180deg'
-                });
-            });
-            $('.flippy-container').mouseout(function(){
-                $(this).transition({
-                    perspective: '100px',
-                    rotateX: '180deg'
-                });
+                if ($(this).hasClass('rotated')) {
+                    $(this).transition({
+                        perspective: '100px',
+                        rotateX: '0deg'
+                    });
+                    $(this).removeClass('rotated');
+                } else {
+                    $(this).transition({
+                        perspective: '100px',
+                        rotateX: '180deg'
+                    });
+                    $(this).addClass('rotated');
+                }
             });
         });
     </script>
