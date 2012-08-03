@@ -61,6 +61,11 @@ a:hover {
     height: 100%;
 }
 
+.flippy-container {
+    position: relative;
+    display: inline-block;
+}
+
 #header {
     position: fixed;
     top: 0px;
