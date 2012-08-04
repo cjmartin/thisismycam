@@ -49,7 +49,9 @@
         $(function() {
             $('#js-log-out').css('width', $('#js-log-out').width());
             
-            setTimeout($('#js-log-out').addClass('hide'), 5000);
+            setTimeout(function(){
+                $('#js-log-out').addClass('hide');
+            }, 5000);
             
             $("#js-header-login").hover(
                 function () {
