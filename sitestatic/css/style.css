@@ -126,21 +126,6 @@ a.header-login:hover {
     border-radius: 3px;
 }
 
-.log-out {
-    display: inline-block;
-    height: 30px;
-    overflow: hidden;
-    
-    -webkit-transition: width 1s ease-in-out;
-	-moz-transition: width 1s ease-in-out;
-	-o-transition: width 1s ease-in-out;
-	transition: width 1s ease-in-out;
-}
-
-.log-out.hidden {
-    width: 0px;
-}
-
 .brand {
     font-family: 'Lobster Two', cursive;
 	font-style: italic;
