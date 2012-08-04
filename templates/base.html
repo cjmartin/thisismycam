@@ -46,9 +46,18 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
     <script type="text/javascript">
         $(function() {
-            $('#js-log-out')
-                .css('width', $('#js-log-out').width())
-                .addClass('hide');
+            $('#js-log-out').css('width', $('#js-log-out').width());
+            
+            setTimeout($('#js-log-out').addClass('hide'), 1000);
+            
+            $("#js-log-out").hover(
+                function () {
+                    $(this).removeClass("hide");
+                },
+                function () {
+                    $(this).addClass("hide");
+                }
+            );
         });
     </script>
     {% endblock %}
