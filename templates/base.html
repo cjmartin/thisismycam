@@ -46,7 +46,9 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
     <script type="text/javascript">
         $(function() {
-            $('#js-log-out').addClass('hidden');
+            $('#js-log-out')
+                .css('width', $(this).width())
+                .addClass('hidden');
         });
     </script>
     {% endblock %}

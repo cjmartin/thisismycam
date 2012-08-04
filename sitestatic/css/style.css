@@ -142,8 +142,8 @@ a.header-login:hover {
 	transition: width 1s ease-in-out;
 }
 
-.log-out.hidden {
-    width: 0px;
+.log-out.hide {
+    width: 0px !important;
 }
 
 .brand {
