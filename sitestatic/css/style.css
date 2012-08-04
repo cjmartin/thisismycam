@@ -17,6 +17,10 @@ a:hover {
     border-bottom: 1px dotted #7BC0D6;
 }
 
+.bullet {
+    margin: 0 10px;
+}
+
 .image {
     position: relative;
     display: inline-block;
@@ -124,6 +128,22 @@ a.header-login:hover {
     margin-top: 5px;
     
     border-radius: 3px;
+}
+
+.log-out {
+    display: inline-block;
+    height: 30px;
+    float: right;
+    overflow: hidden;
+    
+    -webkit-transition: width 1s ease-in-out;
+	-moz-transition: width 1s ease-in-out;
+	-o-transition: width 1s ease-in-out;
+	transition: width 1s ease-in-out;
+}
+
+.log-out.hidden {
+    width: 0px;
 }
 
 .brand {
