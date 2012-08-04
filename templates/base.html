@@ -26,7 +26,7 @@
                 <h2 class="brand">This is my Cam!</h2>
                 {% if user %}
                     <div class="header-login">
-                        <span class="image cover header-buddyicon" style="background-image: url('http://flickr.com/buddyicons/{{ user.flickr_nsid }}.jpg');"></span>Hi, {{ user.flickr_username }}!
+                        <span class="image cover header-buddyicon" style="background-image: url('http://flickr.com/buddyicons/{{ user.flickr_nsid }}.jpg');"></span>Hi, {{ user.flickr_username }}! | <a href="/logout">Log out &rarr;</a>
                     </div>
                 {% else %}
                     <a class="header-login" href="{% url socialauth_begin 'flickr' %}">Log in with Flickr</a>
