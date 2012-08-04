@@ -49,10 +49,11 @@
         $(function() {
             $('#js-log-out').css('width', $('#js-log-out').width());
             
-            /*
-            setTimeout(function(){
-                $('#js-log-out').addClass('hide');
-            }, 5000);
+            setTimeout(setupLogout, 5000);
+        });
+        
+        function setupLogout(){
+            $('#js-log-out').addClass('animated hide');
             
             $("#js-header-login").hover(
                 function () {
@@ -62,8 +63,7 @@
                     $('#js-log-out').addClass("hide");
                 }
             );
-            */
-        });
+        }
     </script>
     {% endif %}
     {% endblock %}

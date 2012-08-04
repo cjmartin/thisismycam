@@ -135,7 +135,9 @@ a.header-login:hover {
     height: 30px;
     float: right;
     overflow: hidden;
-    
+}
+
+.log-out.animated {
     -webkit-transition: width 1s ease-in-out;
 	-moz-transition: width 1s ease-in-out;
 	-o-transition: width 1s ease-in-out;
