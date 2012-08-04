@@ -6,6 +6,9 @@
         <div class="huge-welcome">
             <h1 class="brand">This is my Cam!</h1>
         </div>
+        {% for user_camera in example_cams %}
+            {{ user_camera.camera.name }}
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

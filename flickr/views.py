@@ -6,6 +6,7 @@ import re
 import hashlib
 
 from flickr.models import FlickrUser
+from flickr.models import FlickrUserCamera
 from cameras.models import Camera
 from photos.models import Photo
 
@@ -13,9 +14,14 @@ from cameras.tasks import add_aws_item_to_camera
 
 def index(request):
     if not request.user.is_authenticated():
+        example_cams = []
+        my_cam = FlickrUserCamera.objects.filter(flickr_user__nsid='42982698@N00').order_by('-date_last_taken', '-count_photos')[:6]
+        example_cams.append(my_cam)
+        
         data = {
-            'user': None,
+            'example_cams': example_cams,
         }
+        
         return render_to_response('flickr/index.html', data)
 
     else:
