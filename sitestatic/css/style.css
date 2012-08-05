@@ -156,19 +156,6 @@ a.header-login:hover {
 	text-shadow: 0px 1px 0px #ffffff !important;
 }
 
-/* Welcome Page */
-
-.huge-welcome {
-    padding: 30px 0;
-    text-align: center;
-}
-
-.huge-welcome h1 {
-    padding-bottom: .2em;
-    font-size: 140px;
-	line-height: 1em;
-}
-
 /* General Page Components */
 
 .inset-section {
@@ -261,6 +248,28 @@ h3.title {
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 
+/* Logged out index */
+
+.huge-welcome {
+    padding: 30px 0;
+    text-align: center;
+}
+
+.huge-welcome h1 {
+    padding-bottom: .2em;
+    font-size: 140px;
+	line-height: 1em;
+}
+
+.example-cam-image {
+    width: 300px;
+    height: 300px;
+    
+    background-color: #FFFFFF;
+    border: 10px solid #7BC0D6;
+    border-radius: 160px;
+}
+
 /* Cameras */
 
 .photo-update-bar {
@@ -272,7 +281,7 @@ h3.title {
     padding: 10px;
     
     text-align: center;
-    background: #FFFFFF;
+    background-color: #FFFFFF;
     
     border: 10px solid #7BC0D6;
     border-radius: 5px;

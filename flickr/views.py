@@ -16,6 +16,7 @@ def index(request):
     if not request.user.is_authenticated():
         example_cams = []
         my_cam = FlickrUserCamera.objects.filter(flickr_user__nsid__exact='42982698@N00').order_by('-date_last_taken', '-count_photos')[0]
+        example_cams.append(my_cam)
         
         data = {
             'example_cams': example_cams,

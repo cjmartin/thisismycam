@@ -6,9 +6,16 @@
         <div class="huge-welcome">
             <h1 class="brand">This is my Cam!</h1>
         </div>
-        {% for user_camera in example_cams %}
-            {{ user_camera.camera.name }}
-        {% endfor %}
+        <div class="example-cams">
+            {% for user_camera in example_cams %}
+            	<div class="example-cam">
+                    <div class="image camera-image example-cam-image {{ user_camera.camera.large_orientation }}" style="background-image: url('{{ user_camera.camera.large_photo_url }}');">
+                        <img src="{{ user_camera.camera.large_photo_url }}">
+                    </div>
+                    {{ user_camera.camera.name }}
+	        	</div>
+			{% endfor %}
+	    </div>
     </div>
 </div>
 {% endblock %}
