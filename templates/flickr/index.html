@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load thisismycam_extras %}
 
 {% block body %}
@@ -7,16 +8,70 @@
         <div class="huge-welcome">
             <h1 class="brand">This is my Cam!</h1>
         </div>
-        <div class="example-cams">
-            {% for user_camera in example_cams %}
-            	<div class="example-cam">
-                    <div class="image camera-image example-cam-image {{ user_camera.camera.large_orientation }}" style="background-image: url('{{ user_camera.camera.large_photo_url }}');">
-                        <img src="{{ user_camera.camera.large_photo_url }}">
-                    </div>
-                    {{ user_camera.camera.name }}
-	        	</div>
-			{% endfor %}
-	    </div>
+        <div class="row">
+            <div class="span6 offset1">
+                <div class="welcome-intro">
+                    <p>
+                        Lets be honest, we share a bunch of photos online, but our cameras really do most of the work. 
+                    </p>
+                    <p>
+                        Log in with Flickr, and this is my cam will scan your <strong>public photos</strong>, creating pages to let you show off your beloved cameras. Finally a place to show them the respect they deserve.
+                    </p>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="welcome-login">
+                    <a class="welcome-login-button" href="{% url socialauth_begin 'flickr' %}">Log in with Flickr</a>
+                    <p>&uarr; Log in to get started. &uarr;</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+<div class="section">
+    <h2 class="title section-title">Fancy a browse?</h2>
+    <div class="section-content inset">
+        <div class="container">
+        <div class="example-cams scrollable">
+        	<div class="items">
+        	    <div class="container">
+        	        <div class="row">
+                        {% for user_camera in example_cams %}
+                        {% if forloop.counter|divisibleby:"4" %}
+            	            </div>
+            	            </div>
+            	            <div class="container">
+            	            <div class="row">
+            	        {% endif %}
+                        <div class="span4">
+                        	<div class="example-cam">
+                                <div class="image camera-image example-cam-image {{ user_camera.camera.large_orientation }}" style="background-image: url('{{ user_camera.camera.large_photo_url }}');">
+                                    <img src="{{ user_camera.camera.large_photo_url }}">
+                                    <a href="{% url flickr-user user_camera.flickr_user.slug %}"></a>
+                                </div>
+                                <div class="example-cam-info">
+                                	<h4 class="title"><span class="image cover example-cam-buddyicon" style="background-image: url('http://flickr.com/buddyicons/{{ user_camera.flickr_user.nsid }}.jpg');"></span> {{ user_camera.flickr_user.username|possessive }} cam</h4>
+                                	<h3 class="title brand">{{ user_camera.camera.name }}</h3>
+                                </div>
+                        	</div>
+            	        </div>
+        	            {% endfor %}
+        	        </div>
+        	    </div>
+        	</div>
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ block.super }}
+    <script src="{% get_static_prefix %}js/jquery/jquery.tools.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+          // initialize scrollable
+          $(".scrollable").scrollable({circular: true}).autoscroll({interval:7500,autopause:false});
+        });
+    </script>
 {% endblock %}

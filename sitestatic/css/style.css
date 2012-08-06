@@ -159,7 +159,6 @@ a.header-login:hover {
 /* General Page Components */
 
 .inset-section {
-    padding: 0 0 30px;
     background: #F8F8F8;
     
     -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.2) inset;
@@ -204,7 +203,12 @@ h2.title {
 
 h3.title {
     font-size: 30px;
-    line-height: 35px;
+    line-height: 36px;
+}
+
+h4.title {
+    font-size: 20px;
+    line-height: 24px;
 }
 
 .the-camera-title {
@@ -261,13 +265,114 @@ h3.title {
 	line-height: 1em;
 }
 
+.welcome-login {
+	margin-top: 20px;
+    text-align: center;
+}
+
+.welcome-login-button {
+    display: inline-block;
+    line-height: 65px;
+    padding: 0 30px;
+    margin-bottom: 10px;
+    
+    font-size: 25px;
+    
+    background: #FFFFFF;
+    border: none;
+
+    -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    border-radius: 3px;
+}
+
+a.welcome-login-button:hover {
+    color: #FFFFFF;
+    text-shadow: none;
+    
+    background: #7BC0D6;
+    border: none;
+}
+
+.welcome-login p {
+	color: #9F9F9F;
+}
+
+.welcome-intro {
+    font-size: 18px;
+    line-height: 30px;
+    
+    margin-bottom: 45px;
+}
+
+.example-cams {
+	position: relative;
+	width: 100%;
+	height: 386px;
+	overflow: hidden;
+}
+
+.items {
+	position: absolute;
+	width: 20000em;
+}
+
+.example-cams .container {
+	float: left;
+}
+
+.example-cam {
+    width: 100%;
+    text-align: center;
+}
+
 .example-cam-image {
     width: 300px;
     height: 300px;
     
     background-color: #FFFFFF;
     border: 10px solid #7BC0D6;
+    
+    -webkit-border-radius: 160px;
+    -moz-border-radius: 160px;
     border-radius: 160px;
+    
+    -webkit-box-shadow: 0 0 1px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0 0 1px rgba(0,0,0,0.2);
+    box-shadow: 0 0 1px rgba(0,0,0,0.2);
+}
+
+.example-cam-image.landscape {
+	-webkit-background-size: 90% auto;
+	-moz-background-size: 90% auto;
+	-o-background-size: 90% auto;
+	background-size: 90% auto;
+}
+
+.example-cam-image.square {
+	-webkit-background-size: 80% auto;
+	-moz-background-size: 80% auto;
+	-o-background-size: 80% auto;
+	background-size: 80% auto;
+}
+
+.example-cam-buddyicon {
+    position: relative;
+    top: 2px;
+    width: 25px;
+    height: 20px;
+	    
+    border-radius: 3px;
+}
+
+.example-cam-info .title{
+    /* essential */
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    -webkit-text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 /* Cameras */

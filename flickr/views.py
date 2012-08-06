@@ -14,9 +14,11 @@ from cameras.tasks import add_aws_item_to_camera
 
 def index(request):
     if not request.user.is_authenticated():
+    	example_users = ['42982698@N00','36521956509@N01','51035718466@N01','95769700@N00','61091860@N00','43813659@N03']
         example_cams = []
-        my_cam = FlickrUserCamera.objects.filter(flickr_user__nsid__exact='42982698@N00').order_by('-date_last_taken', '-count_photos')[0]
-        example_cams.append(my_cam)
+        for nsid in example_users:
+	        cam = FlickrUserCamera.objects.filter(flickr_user__nsid__exact=nsid).order_by('-date_last_taken', '-count_photos')[0]
+	        example_cams.append(cam)
         
         data = {
             'example_cams': example_cams,
