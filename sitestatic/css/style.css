@@ -17,6 +17,11 @@ a:hover {
     border-bottom: 1px dotted #7BC0D6;
 }
 
+p {
+    font-size: 18px;
+    line-height: 30px;
+}
+
 .bullet {
     margin: 0 5px;
 }
@@ -63,6 +68,13 @@ a:hover {
     display: block;
     width: 100%;
     height: 100%;
+}
+
+.buddyicon {
+    width: 50px;
+    height: 50px;
+    
+    border-radius: 3px;
 }
 
 .flippy-container {
@@ -309,7 +321,7 @@ a.welcome-login-button:hover {
 .example-cams {
 	position: relative;
 	width: 100%;
-	height: 386px;
+	height: 335px;
 	overflow: hidden;
 }
 
@@ -328,8 +340,8 @@ a.welcome-login-button:hover {
 }
 
 .example-cam-image {
-    width: 300px;
-    height: 300px;
+    width: 250px;
+    height: 250px;
     
     background-color: #FFFFFF;
     border: 10px solid #7BC0D6;
@@ -367,7 +379,6 @@ a.welcome-login-button:hover {
 }
 
 .example-cam-info .title{
-    /* essential */
     text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
     -webkit-text-overflow: ellipsis;
@@ -375,12 +386,32 @@ a.welcome-login-button:hover {
     overflow: hidden;
 }
 
-/* Cameras */
+/* Setup */
+
+.setup-welcome {
+    margin: 30px 0;
+}
+
+.setup-welcome .buddyicon {
+    float: left;
+    margin-right: 10px;
+}
+
+.setup-welcome h2 {
+    line-height: 1em;
+    
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    -webkit-text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
 
 .photo-update-bar {
-    width: 600px;
-    margin: 30px auto 0;
+    margin-top: 16px;
 }
+
+/* Cameras */
 
 .the-camera {
     padding: 10px;
@@ -458,6 +489,10 @@ a.collection-camera-thumbnail:hover {
 }
 
 @media (max-width: 767px) {
+    p {
+        padding: 0 10px;
+    }
+    
     .huge-welcome h1 {
         font-size: 80px;
     }
@@ -481,11 +516,24 @@ a.collection-camera-thumbnail:hover {
     .the-camera-image {
         max-width: 100%;
     }
+    
+    .example-cams {
+        height: 386px;
+    }
+    
+    .example-cam-image {
+        width: 300px;
+        height: 300px;
+    }
 }
 
 @media (min-width: 768px) and (max-width: 980px) {
     .huge-welcome h1 {
         font-size: 100px;
+    }
+    
+    .welcome-login-button {
+        font-size: 20px;
     }
     
     .section-title {
@@ -504,6 +552,15 @@ a.collection-camera-thumbnail:hover {
     .the-camera-image {
         height: 245px;
     }
+    
+    .example-cams {
+        height: 290px;
+    }
+    
+    .example-cam-image {
+        width: 200px;
+        height: 200px;
+    }
 }
 
 @media (min-width: 1200px) {
@@ -513,5 +570,18 @@ a.collection-camera-thumbnail:hover {
     
     .the-camera-image {
         height: 370px;
+    }
+    
+    .welcome-intro {
+        margin-left: 65px;
+    }
+    
+    .example-cams {
+        height: 386px;
+    }
+    
+    .example-cam-image {
+        width: 300px;
+        height: 300px;
     }
 }

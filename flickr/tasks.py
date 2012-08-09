@@ -227,6 +227,33 @@ def delete_flickr_user(nsid, reset=False):
     photos = Photo.objects.filter(owner_nsid = flickr_user.nsid).all()
     photos.delete()
     
+    logger.info("Cleaning up contacts.")
+    
+    logger.info("Removing their contact lookups.")
+    contact_lookups = FlickrContactLookup.objects.filter(flickr_user = flickr_user).all()
+    contact_lookups.delete()
+    
+    logger.info("Removing their contacts.")
+    contacts = FlickrUserContact.objects.filter(flickr_user = flickr_user).all()
+    contacts.delete()
+    
+    logger.info("Removing this user from other users contacts.")
+    reverse_contacts = FlickrUserContact.objects.filter(contact = flickr_user).all()
+    
+    for reverse_contact in reverse_contacts:
+        logger.info("Putting them back into contact_lookup.")
+        flickr_contact_lookup, created = FlickrContactLookup.objects.get_or_create(
+            flickr_user = reverse_contact.flickr_user,
+            nsid = flickr_user.nsid,
+            defaults = {
+                'username': flickr_user.username,
+                'iconserver': flickr_user.iconserver,
+                'iconfarm': flickr_user.iconfarm,
+            }
+        )
+        
+        reverse_contact.delete()
+    
     if reset:
         flickr_user.count_photos_processed = None
         flickr_user.date_last_photo_update = None

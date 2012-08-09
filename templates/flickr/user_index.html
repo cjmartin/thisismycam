@@ -52,11 +52,36 @@
             </div>
         </div>
     {% else %}
-        <div class="photo-update-bar">
-            <div id="js-progress-bar" class="progress progress-striped active">
-              <div class="bar"></div>
+    <div class="setup-welcome">
+        <div class="row">
+            <div class="span4 offset1">
+                <div class="image cover buddyicon" style="background-image: url('http://flickr.com/buddyicons/{{ user.flickr_nsid }}.jpg');">
+                    <img src="http://flickr.com/buddyicons/{{ flickr_user.nsid }}.jpg" />
+                </div>
+                <h2>Hi {{ flickr_user.username }}!</h2>
+                <p>
+                    Welcome to This is my Cam.
+                </p>
+            </div>
+            <div class="span6">
+                <div class="photo-update-bar">
+                    <div id="js-progress-bar" class="progress progress-striped active">
+                      <div class="bar"></div>
+                    </div>
+                </div>
             </div>
         </div>
+        <div class="row">
+            <span class="span10 offset1">
+                <p>
+                    Right now, your <strong>{{ flickr_user.count_photos }}</strong> public photos are being scanned to find your cameras. This could take awhile.
+                </p>
+                <p>
+                    As new cameras are found they'll appear below. The progress bar above will keep you informed of the overall progress, and there's no need to stay on this page, everything will be just fine if you leave and come back later.
+                </p>
+            </span>
+        </div>
+    </div>
     {% endif %}
     </div>
 </div>
