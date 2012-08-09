@@ -18,5 +18,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         user = FlickrUser.objects.get(nsid=options.get('user'))
         fetch_contacts_for_flickr_user.delay(user.nsid)
+        process_new_flickr_user.delay(user.nsid)
         
         self.stdout.write("All Done!\n")
