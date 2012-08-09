@@ -5,6 +5,7 @@ from optparse import make_option
 from flickr.models import FlickrUser
 
 from flickr.tasks import fetch_contacts_for_flickr_user
+from flickr.tasks import process_new_flickr_user
 
 class Command(BaseCommand):
     help = 'Fetch photos for a flickr user.'
