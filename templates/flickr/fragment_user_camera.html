@@ -2,7 +2,9 @@
     <div class="collection-camera" id="js-{{ camera.user_camera.camera.slug }}">
         <div class="image camera-image collection-camera-image{% if camera.user_camera.camera.medium_photo_width >= 200 or camera.user_camera.camera.medium_photo_height >= 200 %} {{ camera.user_camera.camera.medium_orientation }}{% endif %}" style="background-image: url('{{ camera.user_camera.camera.medium_photo_url }}');">
             <img src="{{ camera.user_camera.camera.medium_photo_url }}">
-            <a href="{% url flickr-user-camera flickr_user.slug camera.user_camera.camera.slug %}"></a>
+            {% if flickr_user.date_last_photo_update %}
+                <a href="{% url flickr-user-camera flickr_user.slug camera.user_camera.camera.slug %}"></a>
+            {% endif %}
         </div>
         <h3 class="title collection-camera-title">{{ camera.user_camera.camera.name }}</h3>
         <div class="collection-camera-thumbnails">
