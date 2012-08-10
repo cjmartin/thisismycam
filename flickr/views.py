@@ -76,8 +76,20 @@ def user_camera(request, user_slug, camera_slug):
     camera = get_object_or_404(Camera, slug=camera_slug)
     user_camera = flickr_user.flickrusercamera_set.get(camera = camera)
     
+	if request.user.is_authenticated():
+        user = request.user.get_profile()
+        if user.flickr_nsid == flickr_user.nsid:
+            is_owner = True
+        else:
+            is_owner = False
+    else:
+        user = None
+        is_owner = False
+	
     data = {
+        'user': user,
         'flickr_user': flickr_user,
+        'is_owner': is_owner,
         'primary_camera': user_camera,
     }
     
@@ -97,7 +109,7 @@ def user_camera(request, user_slug, camera_slug):
     user_cameras = flickr_user.flickrusercamera_set.order_by('-date_last_taken', '-count_photos')
     data['user_cameras'] = load_photos_for_cameras(user_cameras, flickr_user.nsid)
     
-    return render_to_response('flickr/user_index.html', data)
+    return render_to_response('flickr/user_camera.html', data)
     
 def load_photos_for_cameras(user_cameras, nsid):
     cameras_and_photos = []

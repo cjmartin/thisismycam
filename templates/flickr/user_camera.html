@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thisismycam_extras %}
+{% load humanize %}
+
+{% block body %}
+<div class="inset-section">
+    <div class="container">
+    {% if flickr_user.date_last_photo_update %}
+        <div class="the-camera-title">
+            <h3 class="title">The fantastic</h3>
+            <h1 class="title section-title brand">{{ primary_camera.camera.name }}</h1>
+            <h3 class="title">is {% if is_owner %}your{% else %}{{ flickr_user.username|possessive }}{% endif %} camera of choice.</h3>
+        </div>
+        
+        <div class="row">
+            <div class="span5 offset1">
+                <div class="the-camera">
+                    <div class="image camera-image the-camera-image {{ primary_camera.camera.large_orientation }}" style="background-image: url('{{ primary_camera.camera.large_photo_url }}');">
+                        <img src="{{ primary_camera.camera.large_photo_url }}">
+                    </div>
+                </div>
+            </div>
+            <div class="span5">
+                <div class="the-camera-story">
+                    <p>
+                        <strong>{% if is_owner %}Your{% else %}{{ flickr_user.username|possessive }}{% endif %} journey</strong> with the <strong><a href="/{{ flickr_user.slug }}/cameras/{{ primary_camera.camera }}">{{ primary_camera.camera.model }}</a></strong> began on <strong>{{ primary_camera.date_first_taken|date:"l" }} the {{ primary_camera.date_first_taken|date:"jS" }} of {{ primary_camera.date_first_taken|date:"F, Y" }}</strong>, when {% if is_owner %}you{% else %}they{% endif %} took {% if is_owner %}your{% else %}their{% endif %} <strong><a href="{{ flickr_user.photos_url }}{{ primary_camera.first_taken_id }}" target="_blank">first photo</a></strong> together{% comment %}{% if first_taken_photo.has_geo and first_taken_photo.flickr_place.locality_name %} in <strong>{{ first_taken_photo.flickr_place.locality_name }}</strong>{% endif %}{% endcomment %}.
+                    </p>
+                    <p>
+                        Since then, {% if is_owner %}you've{% else %}they've{% endif %} posted <strong>{{ primary_camera.count_photos }} photos</strong> from {% if is_owner %}your{% else %}their{% endif %} {{ primary_camera.camera.model }} to Flickr{% if primary_camera.comments_count %} which have received <strong>{{ primary_camera.comments_count }} comments</strong>{% endif %}{% if primary_camera.faves_count %} and brought joy to those who've faved them <strong>{{ primary_camera.faves_count }} times</strong>{% endif %}. Just think of the good those photos have done for the world!
+                    </p>
+                    <p>
+                        The <strong><a href="{{ flickr_user.photos_url }}{{ primary_camera.last_taken_id }}" target="_blank">last photo</a></strong> {% if is_owner %}you{% else %}they{% endif %} took with {% if is_owner %}your{% else %}their{% endif %} {{ primary_camera.camera.model }} was <strong>{{ primary_camera.date_last_taken|naturaltime }}</strong>.{% if is_owner %} Maybe it's time to go outside and take a few more?{% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+		{% include 'flickr/fragment_camera_photos.html' %}
+    {% else %}
+    <div class="setup-welcome">
+        <div class="row">
+            <div class="span4 offset1">
+                <div class="image cover buddyicon" style="background-image: url('http://flickr.com/buddyicons/{{ user.flickr_nsid }}.jpg');">
+                    <img src="http://flickr.com/buddyicons/{{ flickr_user.nsid }}.jpg" />
+                </div>
+                <h2>Hi {{ flickr_user.username }}!</h2>
+                <p>
+                    Welcome to This is my Cam.
+                </p>
+            </div>
+            <div class="span6">
+                <div class="photo-update-bar">
+                    <div id="js-progress-bar" class="progress progress-striped active">
+                      <div class="bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <span class="span10 offset1">
+                <p>
+                    Right now, your <strong>{{ flickr_user.count_photos }}</strong> public photos are being scanned to find your cameras. This could take awhile.
+                </p>
+                <p>
+                    As new cameras are found they'll appear below. The progress bar above will keep you informed of the overall progress, and there's no need to stay on this page, everything will be just fine if you leave and come back later.
+                </p>
+            </span>
+        </div>
+    </div>
+    {% endif %}
+    </div>
+</div>
+
+{% include 'flickr/fragment_user_camera_collection.html' %}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ block.super }}
+    <script src="{% get_static_prefix %}js/jquery/jquery.transit.min.js"></script>
+    <script>
+    /*
+        $(document).ready(function(){
+            $('.flippy-container').mouseover(function(){
+                $(this).transition({
+                    perspective: '100px',
+                    rotateX: '180deg'
+                });
+                $(this).addClass('rotated');
+            });
+        });
+    */
+    </script>
+    {% if not flickr_user.date_last_photo_update %}
+        <script src="{{ pushy_url }}/socket.io/socket.io.js"></script>
+        <script>
+            $(document).ready(function(){
+                var socket = io.connect('{{ pushy_url }}');
+                socket.on('{{ pushy_channel }}', function (data) {
+
+                    var message = jQuery.parseJSON(data.msg);
+                    
+                    if (message.type) {
+                        
+                        switch (message.type) {
+                                
+                            case 'fetch_photos.update_progress_bar':
+                            
+                                var progress_bar = $('#js-progress-bar');
+                            
+                                if (progress_bar && progress_bar.css('display') == 'none') {
+                                    progress_bar.fadeIn('slow');
+                                }
+                            
+                                $('#js-progress-bar .bar').css('width', message.data.pct + '%');
+                                
+                                //console.log(message.data.pct);
+                                
+                                break;
+                                
+                            case 'fetch_photos.new_camera':
+                                
+                                $.ajax({
+                                    url: "/" + message.data.user + "/cameras/" + message.data.camera,
+                                }).done(function(html) {
+                                    var targetRow = $("#js-camera-collection > .container > .row").last();
+                                    $(html).hide().prependTo(targetRow).fadeIn('slow');
+                                });
+                                
+                                //console.log(message.data.camera);
+                                
+                                break;
+                                
+                            case 'fetch_photos.camera_photo_count':
+                                
+                                var countSpan = $('#js-' + message.data.camera).find('.count_photos');
+                                
+                                if (message.data.count > countSpan.text()) {
+                                    countSpan.text(message.data.count);
+                                }
+                                
+                                //console.log(message.data);
+                                
+                                break;
+                                
+                            case 'fetch_photos.complete':
+                                
+                                $('#js-progress-bar .bar').css('width', '100%');
+                                
+                                // Quick hack to reload page for now.
+                                location.reload();
+                                
+                        }
+                        
+                    }
+                    
+                });
+            });
+        </script>
+    {% endif %}
+{% endblock %}
