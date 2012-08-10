@@ -229,7 +229,7 @@ h4.title {
 }
 
 .the-camera-title .section-title {
-    margin: .2em;
+    margin: .1em;
     font-size: 80px;
 }
 
@@ -566,10 +566,6 @@ a.collection-camera-thumbnail:hover {
 @media (min-width: 1200px) {
     .section-content {
         width: 1190px;
-    }
-    
-    .the-camera-image {
-        height: 370px;
     }
     
     .welcome-intro {
