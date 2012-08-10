@@ -1,3 +1,5 @@
+{% load thisismycam_extras %}
+
 <div class="section">
     <h1 class="title section-title">{% if is_owner %}Your{% else %}{{ flickr_user.username|possessive }}{% endif %} Camera Collection</h1>
     <div class="section-content inset" id="js-camera-collection">
