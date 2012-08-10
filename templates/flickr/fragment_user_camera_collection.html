@@ -1,0 +1,16 @@
+<div class="section">
+    <h1 class="title section-title">{% if is_owner %}Your{% else %}{{ flickr_user.username|possessive }}{% endif %} Camera Collection</h1>
+    <div class="section-content inset" id="js-camera-collection">
+        <div class="container">
+            <div class="row">
+                {% for camera in user_cameras %}
+                    {% include 'flickr/fragment_user_camera.html' %}
+                    {% if forloop.counter|divisibleby:"4" and flickr_user.date_last_photo_update %}
+                        </div>
+                        <div class="row">
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

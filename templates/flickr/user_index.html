@@ -36,21 +36,7 @@
             </div>
         </div>
         
-        <h2 class="title section-title">Oh, what things {% if is_owner %}you've{% else %}they've{% endif %} seen!</h2>
-        
-        <div class="row">
-            <div class="span12">
-                <ul class="thumbnails">
-                    {% for photo in photos %}
-                        <li class="span2">
-                            <a href="{{ photo.flickr_photo_page }}" target="_blank" class="thumbnail">
-                                <img src="{{ photo.square_150_url }}" alt="{{ photo.title|safe }}">
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
+		{% include 'flickr/fragment_camera_photos.html' %}
     {% else %}
     <div class="setup-welcome">
         <div class="row">
@@ -86,22 +72,8 @@
     </div>
 </div>
 
-<div class="section">
-    <h1 class="title section-title">{% if is_owner %}Your{% else %}{{ flickr_user.username|possessive }}{% endif %} Camera Collection</h1>
-    <div class="section-content inset" id="js-camera-collection">
-        <div class="container">
-            <div class="row">
-                {% for camera in user_cameras %}
-                    {% include 'flickr/fragment_user_camera.html' %}
-                    {% if forloop.counter|divisibleby:"4" and flickr_user.date_last_photo_update %}
-                        </div>
-                        <div class="row">
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-</div>
+{% include 'flickr/fragment_user_camera_collection.html' %}
+
 {% endblock %}
 
 {% block javascripts %}
