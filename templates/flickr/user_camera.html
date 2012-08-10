@@ -8,9 +8,8 @@
     <div class="container">
     {% if flickr_user.date_last_photo_update %}
         <div class="the-camera-title">
-            <h3 class="title">The fantastic</h3>
+            <h3 class="title">This is {% if is_owner %}your{% else %}{{ flickr_user.username|possessive }}{% endif %}</h3>
             <h1 class="title section-title brand">{{ primary_camera.camera.name }}</h1>
-            <h3 class="title">is {% if is_owner %}your{% else %}{{ flickr_user.username|possessive }}{% endif %} camera of choice.</h3>
         </div>
         
         <div class="row">
