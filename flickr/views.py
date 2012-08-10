@@ -76,7 +76,7 @@ def user_camera(request, user_slug, camera_slug):
     camera = get_object_or_404(Camera, slug=camera_slug)
     user_camera = flickr_user.flickrusercamera_set.get(camera = camera)
     
-	if request.user.is_authenticated():
+    if request.user.is_authenticated():
         user = request.user.get_profile()
         if user.flickr_nsid == flickr_user.nsid:
             is_owner = True
