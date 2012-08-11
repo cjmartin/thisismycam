@@ -35,7 +35,6 @@
                 </div>
             </div>
         </div>
-        
 		{% include 'flickr/fragment_camera_photos.html' %}
     {% else %}
     <div class="setup-welcome">
@@ -69,6 +68,19 @@
         </div>
     </div>
     {% endif %}
+    </div>
+</div>
+
+<div class="section">
+    <h1 class="title section-title">{% if is_owner %}Your{% else %}{{ flickr_user.username|possessive }}{% endif %} Contacts</h1>
+    <div class="section-content inset" id="js-camera-collection">
+        <div class="container">
+            <div class="row">
+                {% for contact in contacts %}
+                    {{ contact.username }}<br />
+                {% endfor %}
+            </div>
+        </div>
     </div>
 </div>
 
