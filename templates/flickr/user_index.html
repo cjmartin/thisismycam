@@ -71,8 +71,10 @@
     </div>
 </div>
 
-<div class="section">
-    <h1 class="title section-title">{% if is_owner %}Your{% else %}{{ flickr_user.username|possessive }}{% endif %} Contacts</h1>
+{% include 'flickr/fragment_user_camera_collection.html' %}
+
+<div class="section" id="js-user-contacts-section"{% if not flickr_user.contacts.count %}style="display:none;"{% endif %}>
+    <h1 class="title section-title">{% if is_owner %}Your{% else %}{{ flickr_user.username|possessive }}{% endif %} Contacts' Cameras</h1>
     <div class="section-content inset" id="js-user-contacts">
         <div class="container">
             <div class="row">
@@ -83,8 +85,6 @@
         </div>
     </div>
 </div>
-
-{% include 'flickr/fragment_user_camera_collection.html' %}
 
 {% endblock %}
 
@@ -136,6 +136,10 @@
                                 $.ajax({
                                     url: "/" + message.data.user + "/cameras/" + message.data.camera,
                                 }).done(function(html) {
+                                    if ($('#js-user-cameras-section').css('display') == "none") {
+                                        $('#js-user-cameras-section').fadeIn();
+                                    }
+                                    
                                     var targetRow = $("#js-camera-collection > .container > .row").last();
                                     $(html).hide().prependTo(targetRow).fadeIn('slow');
                                 });
@@ -170,6 +174,10 @@
                                 $.ajax({
                                     url: "/" + message.data.contact,
                                 }).done(function(html) {
+                                    if ($('#js-user-contacts-section').css('display') == "none") {
+                                        $('#js-user-contacts-section').fadeIn();
+                                    }
+                                    
                                     var targetRow = $("#js-user-contacts > .container > .row").last();
                                     $(html).hide().prependTo(targetRow).fadeIn('slow');
                                 });

@@ -1,6 +1,6 @@
 {% load thisismycam_extras %}
 
-<div class="section">
+<div class="section" id="js-user-cameras-section"{% if not flickr_user.cameras.count %}style="display:none;"{% endif %}>
     <h1 class="title section-title">{% if is_owner %}Your{% else %}{{ flickr_user.username|possessive }}{% endif %} Camera Collection</h1>
     <div class="section-content inset" id="js-camera-collection">
         <div class="container">
