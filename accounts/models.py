@@ -65,8 +65,8 @@ def flickr_extra_values(sender, user, response, details, **kwargs):
             from flickr.tasks import fetch_contacts_for_flickr_user
             from flickr.tasks import process_new_flickr_user
             
-            fetch_photos_for_flickr_user(None, flickr_user.nsid)
             fetch_contacts_for_flickr_user.delay(flickr_user.nsid)
+            fetch_photos_for_flickr_user(None, flickr_user.nsid)
             process_new_flickr_user.delay(flickr_user.nsid)
             
         else:
