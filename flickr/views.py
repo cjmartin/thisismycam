@@ -69,7 +69,7 @@ def user(request, user_slug):
         data['primary_camera'] = user_cameras[0]
         data['photos'] = Photo.objects.filter(camera = user_cameras[0].camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:18]
     
-    data['contacts'] = flickr_user.contacts.all()
+    data['contacts'] = load_cameras_for_contacts(flickr_user.contacts.all(), 8)
     
     return render_to_response('flickr/user_index.html', data)
         
@@ -116,22 +116,36 @@ def user_camera(request, user_slug, camera_slug):
 def load_photos_for_cameras(user_cameras, nsid):
     cameras_and_photos = []
     for user_camera in user_cameras:
-        if user_camera.camera.amazon_image_response:
-            user_camera.camera.amazon_image_response = simplejson.loads(user_camera.camera.amazon_image_response)
-            
-        if user_camera.camera.amazon_item_response:
-            user_camera.camera.amazon_item_response = simplejson.loads(user_camera.camera.amazon_item_response)
-            if not user_camera.camera.amazon_url:
-                # Clean up and add the item url
-                url = urllib2.unquote(user_camera.camera.amazon_item_response['DetailPageURL'])
-                split_url = url.split('?')
-                pretty_url = split_url[0] + "?tag=" + settings.AWS_ASSOCIATE_TAG
-                user_camera.camera.amazon_url = pretty_url
-                
+        # if user_camera.camera.amazon_image_response:
+        #             user_camera.camera.amazon_image_response = simplejson.loads(user_camera.camera.amazon_image_response)
+        #             
+        #         if user_camera.camera.amazon_item_response:
+        #             user_camera.camera.amazon_item_response = simplejson.loads(user_camera.camera.amazon_item_response)
+        #             if not user_camera.camera.amazon_url:
+        #                 # Clean up and add the item url
+        #                 url = urllib2.unquote(user_camera.camera.amazon_item_response['DetailPageURL'])
+        #                 split_url = url.split('?')
+        #                 pretty_url = split_url[0] + "?tag=" + settings.AWS_ASSOCIATE_TAG
+        #                 user_camera.camera.amazon_url = pretty_url
+        
         photos = Photo.objects.filter(camera = user_camera.camera, owner_nsid = nsid).order_by('-date_taken')[:6]
         cameras_and_photos.append({'user_camera': user_camera, 'photos': photos})
         
     return cameras_and_photos
+    
+def load_cameras_for_contacts(contacts, count=None):
+    contacts_with_cameras = []
+    for contact in contacts:
+        if count:
+            cameras = contact.cameras.all()[:count]
+        else:
+            cameras = contact.cameras.all()
+            
+        count_cameras = contact.cameras.count()
+        
+        contacts_with_cameras.append({'contact': contact, 'count_cameras': count_cameras, 'cameras': cameras})
+        
+    return contacts_with_cameras
     
 def get_user_by_slug(user_slug):
     # NSID

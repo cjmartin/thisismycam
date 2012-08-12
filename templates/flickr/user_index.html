@@ -41,7 +41,7 @@
         <div class="row">
             <div class="span4 offset1">
                 <div class="image cover buddyicon" style="background-image: url('http://flickr.com/buddyicons/{{ user.flickr_nsid }}.jpg');">
-                    <img src="http://flickr.com/buddyicons/{{ flickr_user.nsid }}.jpg" />
+                    <img src="http://flickr.com/buddyicons/{{ user.flickr_nsid }}.jpg" />
                 </div>
                 <h2>Hi {{ flickr_user.username }}!</h2>
                 <p>
@@ -76,8 +76,25 @@
     <div class="section-content inset" id="js-camera-collection">
         <div class="container">
             <div class="row">
-                {% for contact in contacts %}
-                    {{ contact.username }}<br />
+                {% for user_contact in contacts %}
+                <div class="span3">
+                    <div class="collection-contact">
+                        <div class="image cover buddyicon" style="background-image: url('http://flickr.com/buddyicons/{{ user_contact.contact.nsid }}.jpg');">
+                            <img src="http://flickr.com/buddyicons/{{ user_contact.contact.nsid }}.jpg" />
+                        </div>
+                        <h3>{{ user_contact.contact.username }}</h3>
+                        {{ user_contact.count_cameras }} Cameras
+                        
+                        <div class="contact-camera-thumbnails">
+                            {% for camera in user_contact.cameras %}
+                            <div class="image camera-image contact-camera-thumbnail {{ camera.medium_orientation }}" style="background-image: url('{{ camera.medium_photo_url }}');">
+                                <img src="{{ camera.medium_photo_url }}">
+                                <a href="{% url flickr-user-camera user_contact.contact.slug camera.slug %}"></a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
                 {% endfor %}
             </div>
         </div>

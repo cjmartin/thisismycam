@@ -43,17 +43,17 @@ p {
 }
 
 .landscape {
-    -webkit-background-size: 100% auto;
-    -moz-background-size: 100% auto;
-    -o-background-size: 100% auto;
-    background-size: 100% auto;
+    -webkit-background-size: 90% auto;
+    -moz-background-size: 90% auto;
+    -o-background-size: 90% auto;
+    background-size: 90% auto;
 }
 
 .portrait, .square {
-    -webkit-background-size: auto 100%;
-    -moz-background-size: auto 100%;
-    -o-background-size: auto 100%;
-    background-size: auto 100%;
+    -webkit-background-size: auto 90%;
+    -moz-background-size: auto 90%;
+    -o-background-size: auto 90%;
+    background-size: auto 90%;
 }
 
 .camera-image {
@@ -254,7 +254,7 @@ h4.title {
     box-shadow: 0 0 1px rgba(0,0,0,0.2) inset;
 }
 
-.thumbnail, a.thumbnail:hover, .collection-camera {
+.thumbnail, a.thumbnail:hover, .collection-camera, .collection-contact {
     background-color: #FFFFFF;
     border: 1px solid #DDD;
     -webkit-border-radius: 3px;
@@ -412,11 +412,37 @@ a.welcome-login-button:hover {
     margin-top: 16px;
 }
 
+/* Contacts */
+
+.collection-contact {
+    margin: 10px 0;
+    padding: 15px;
+}
+
+.collection-contact .buddyicon {
+    float: left;
+    margin: 0 10px 15px 0;
+}
+
+.contact-camera-thumbnails {
+    clear: both;
+    margin-left: -5px;
+}
+
+.contact-camera-thumbnail {
+    width: 51px;
+    height: 51px;
+    margin: 5px 0 0 5px;
+    
+    border: 1px solid #DDD;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
 /* Cameras */
 
 .the-camera {
-    padding: 10px;
-    
     text-align: center;
     background-color: #FFFFFF;
     
@@ -444,7 +470,6 @@ a.welcome-login-button:hover {
     min-height: 462px;
     margin: 10px 0;
     text-align: center;
-    background-color: #FFFFFF;
 }
 
 .collection-camera-image {
