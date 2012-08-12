@@ -45,17 +45,25 @@ def user(request, user_slug):
         user = None
         is_owner = False
     
-    shasum = hashlib.sha1()
-    shasum.update(flickr_user.nsid + settings.PUSHY_SALT)
-    pushy_channel = "%s_%s" % (flickr_user.nsid, shasum.hexdigest())
-    
     data = {
         'user': user,
         'flickr_user': flickr_user,
         'is_owner': is_owner,
-        'pushy_url': settings.PUSHY_URL,
-        'pushy_channel': pushy_channel,
     }
+    
+    if request.is_ajax():
+        cameras = flickr_user.cameras.all()[:8]
+        count_cameras = flickr_user.cameras.count()
+        
+        data['user_contact'] = {'contact': flickr_user, 'count_cameras': count_cameras, 'cameras': cameras}
+        return render_to_response('flickr/fragment_user_contact.html', data)
+    
+    shasum = hashlib.sha1()
+    shasum.update(flickr_user.nsid + settings.PUSHY_SALT)
+    pushy_channel = "%s_%s" % (flickr_user.nsid, shasum.hexdigest())
+    
+    data['pushy_url'] = settings.PUSHY_URL
+    data['pushy_channel'] = pushy_channel
     
     user_cameras = flickr_user.flickrusercamera_set.order_by('-date_last_taken', '-count_photos')
     

@@ -4,7 +4,7 @@
 {% load humanize %}
 
 {% block body %}
-<div class="inset-section">
+<div class="section inset-section">
     <div class="container">
     {% if flickr_user.date_last_photo_update %}
         <div class="the-camera-title">
@@ -73,29 +73,12 @@
 
 <div class="section">
     <h1 class="title section-title">{% if is_owner %}Your{% else %}{{ flickr_user.username|possessive }}{% endif %} Contacts</h1>
-    <div class="section-content inset" id="js-camera-collection">
+    <div class="section-content inset" id="js-user-contacts">
         <div class="container">
             <div class="row">
-                {% for user_contact in contacts %}
-                <div class="span3">
-                    <div class="collection-contact">
-                        <div class="image cover buddyicon" style="background-image: url('http://flickr.com/buddyicons/{{ user_contact.contact.nsid }}.jpg');">
-                            <img src="http://flickr.com/buddyicons/{{ user_contact.contact.nsid }}.jpg" />
-                        </div>
-                        <h3>{{ user_contact.contact.username }}</h3>
-                        {{ user_contact.count_cameras }} Cameras
-                        
-                        <div class="contact-camera-thumbnails">
-                            {% for camera in user_contact.cameras %}
-                            <div class="image camera-image contact-camera-thumbnail {{ camera.medium_orientation }}" style="background-image: url('{{ camera.medium_photo_url }}');">
-                                <img src="{{ camera.medium_photo_url }}">
-                                <a href="{% url flickr-user-camera user_contact.contact.slug camera.slug %}"></a>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
+            {% for user_contact in contacts %}
+                {% include 'flickr/fragment_user_contact.html %}
+            {% endfor %}
             </div>
         </div>
     </div>
@@ -180,6 +163,18 @@
                                 // Quick hack to reload page for now.
                                 location.reload();
                                 
+                                break;
+                                
+                            case 'fetch_contacts.new_contact':
+                                
+                                $.ajax({
+                                    url: "/" + message.data.contact,
+                                }).done(function(html) {
+                                    var targetRow = $("#js-user-contacts > .container > .row").last();
+                                    $(html).hide().prependTo(targetRow).fadeIn('slow');
+                                });
+                                
+                                break;
                         }
                         
                     }

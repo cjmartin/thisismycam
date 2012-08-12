@@ -178,6 +178,17 @@ def fetch_contacts_for_flickr_user(nsid):
                     
                     flickr_user_contact, created = FlickrUserContact.objects.get_or_create(flickr_user = flickr_user, contact = contact)
                     
+                    if created:
+                        logger.info("Push found contact.")
+                        values = {
+                            'secret': settings.PUSHY_SECRET,
+                            'user_id': flickr_user.nsid,
+                            'message': simplejson.dumps({'type': 'fetch_contacts.new_contact', 'data': {'contact': contact.slug}}),
+                        }
+                        data = urllib.urlencode(values)
+                        req = urllib2.Request(settings.PUSHY_URL_LOCAL, data)
+                        response = urllib2.urlopen(req)
+                    
                 except FlickrUser.DoesNotExist:
                     logger.info("Bummer, they haven't been here yet.")
                     
