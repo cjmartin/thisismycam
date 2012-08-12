@@ -77,7 +77,8 @@ def user(request, user_slug):
         data['primary_camera'] = user_cameras[0]
         data['photos'] = Photo.objects.filter(camera = user_cameras[0].camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:18]
     
-    data['contacts'] = load_cameras_for_contacts(flickr_user.contacts.all(), 8)
+    if flickr_user.contacts.count():
+        data['contacts'] = load_cameras_for_contacts(flickr_user.contacts.all(), 8)
     
     return render_to_response('flickr/user_index.html', data)
         
