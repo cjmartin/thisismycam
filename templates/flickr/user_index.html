@@ -64,6 +64,11 @@
                 <p>
                     As new cameras are found they'll appear below. The progress bar above will keep you informed of the overall progress, and there's no need to stay on this page, everything will be just fine if you leave and come back later.
                 </p>
+                <!--
+                <p>
+                    Want an email when everything is finished? We can do that.
+                </p>
+                -->
             </span>
         </div>
     </div>
@@ -74,7 +79,7 @@
 {% include 'flickr/fragment_user_camera_collection.html' %}
 
 <div class="section" id="js-user-contacts-section"{% if not flickr_user.contacts.count %}style="display:none;"{% endif %}>
-    <h1 class="title section-title">{% if is_owner %}Your{% else %}{{ flickr_user.username|possessive }}{% endif %} Contacts' Cameras</h1>
+    <h1 class="title section-title">{% if is_owner %}Your{% else %}{{ flickr_user.username|possessive }}{% endif %} Contacts</h1>
     <div class="section-content inset" id="js-user-contacts">
         <div class="container">
             <div class="row">

@@ -4,10 +4,6 @@ sudo apt-get install git apache2 nginx libapache2-mod-wsgi build-essential mysql
 
 sudo pip install django celery django-celery south django-social-auth bottlenose pytz python-memcached
 
-RabbitMQ: http://www.rabbitmq.com/install-debian.html Install with dpkg.
-
-RabbitMQ configuration: http://ask.github.com/celery/getting-started/broker-installation.html
-
 Date taken should be stored as UTC and always displayed as the UTC time.
 
 Refactor how last update time is stored to user. Currently it's stored as when the update task starts, which doesn't take into account the possibility that some or all of the photo processing tasks will fail. Should probably be set to the date_upload of the latest photo...
@@ -15,3 +11,13 @@ Refactor how last update time is stored to user. Currently it's stored as when t
 Eventually add a check to see if a photo already exists (maybe the date-upload was changed on Flickr).
 
 Continue catching URL fetch errors.
+
+Offline task box setup:
+
+Broker:
+RabbitMQ: http://www.rabbitmq.com/install-debian.html Install with dpkg.
+RabbitMQ configuration: http://ask.github.com/celery/getting-started/broker-installation.html
+
+Worker:
+sudo apt-get install git build-essential mysql-client python2.7-dev python-pip python-mysqldb
+sudo pip install django celery django-celery south django-social-auth bottlenose pytz python-memcached
