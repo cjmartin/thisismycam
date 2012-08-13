@@ -48,6 +48,11 @@ def flickr_extra_values(sender, user, response, details, **kwargs):
     if json and json['stat'] == "ok":
         api_user = json['person']
         
+        try:
+          profile = user.get_profile()
+        except:
+          profile = UserProfile.objects.create(user = user)
+        
         flickr_user, created = FlickrUser.objects.get_or_create(
             nsid = response['id'],
             defaults = {
@@ -60,13 +65,22 @@ def flickr_extra_values(sender, user, response, details, **kwargs):
             }
         )
         
+        profile.flickr_nsid = response['id']
+        profile.flickr_username = response['username']
+        profile.flickr_fullname = response['fullname']
+        profile.flickr_oauth_token = access_token['oauth_token'][0]
+        profile.flickr_oauth_token_secret = access_token['oauth_token_secret'][0]
+        profile.flickr_user = flickr_user
+
+        profile.save()
+        
         if created:
             from photos.tasks import fetch_photos_for_flickr_user
             from flickr.tasks import fetch_contacts_for_flickr_user
             from flickr.tasks import process_new_flickr_user
             
+            fetch_photos_for_flickr_user.delay(None, flickr_user.nsid)
             fetch_contacts_for_flickr_user.delay(flickr_user.nsid)
-            fetch_photos_for_flickr_user(None, flickr_user.nsid)
             process_new_flickr_user.delay(flickr_user.nsid)
             
         else:
@@ -77,21 +91,7 @@ def flickr_extra_values(sender, user, response, details, **kwargs):
             flickr_user.iconfarm = api_user['iconfarm']
     
             flickr_user.save()
-    
-    try:
-      profile = user.get_profile()
-    except:
-      profile = UserProfile.objects.create(user = user)
-      
-    profile.flickr_nsid = response['id']
-    profile.flickr_username = response['username']
-    profile.flickr_fullname = response['fullname']
-    profile.flickr_oauth_token = access_token['oauth_token'][0]
-    profile.flickr_oauth_token_secret = access_token['oauth_token_secret'][0]
-    if flickr_user:
-        profile.flickr_user = flickr_user
-    
-    profile.save()
-    return True
+            
+        return True
     
 pre_update.connect(flickr_extra_values, sender=FlickrBackend)
