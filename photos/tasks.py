@@ -116,7 +116,7 @@ def fetch_photos_for_flickr_user(results, nsid, page=None):
             raise fetch_photos_for_flickr_user.retry(countdown=1)
             
     logger.warning("Photos for %s have already been fetched within the last hour." % (nsid))
-    return
+    return True
 
 @task()
 def process_flickr_photo(api_photo, nsid):
