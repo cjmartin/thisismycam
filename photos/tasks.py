@@ -49,7 +49,7 @@ def fetch_photos_for_flickr_user(results, nsid, page=None):
     # cache.add fails if if the key already exists
     acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
      
-    if acquire_lock():
+    if page or acquire_lock():
     
         flickr_user = FlickrUser.objects.get(nsid = nsid)
     
