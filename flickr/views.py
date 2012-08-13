@@ -68,9 +68,9 @@ def user(request, user_slug):
     user_cameras = flickr_user.flickrusercamera_set.order_by('-date_last_taken', '-count_photos')
     
     #Temp, add widths and heights to cameras if they don't exist
-    for user_camera in user_cameras:
-        if not user_camera.camera.large_photo_width:
-            add_aws_item_to_camera.delay(user_camera.camera.id)
+    # for user_camera in user_cameras:
+    #     if not user_camera.camera.large_photo_width:
+    #         add_aws_item_to_camera.delay(user_camera.camera.id)
     
     if user_cameras:        
         data['user_cameras'] = load_photos_for_cameras(user_cameras, flickr_user.nsid)
