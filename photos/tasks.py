@@ -115,7 +115,7 @@ def fetch_photos_for_flickr_user(results, nsid, page=None):
             logger.error("Problem talking to Flickr (FlickrError), re-scheduling task.\n Error: %s" % (e))
             raise fetch_photos_for_flickr_user.retry(countdown=1)
             
-    print "Photos for %s have already been fetched within the last hour." % (flickr_user.username)
+    logger.warning("Photos for %s have already been fetched within the last hour." % (flickr_user.username))
     return
 
 @task()
