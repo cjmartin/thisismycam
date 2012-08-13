@@ -501,6 +501,64 @@ a.collection-camera-thumbnail:hover {
     max-width: 100%;
 }
 
+/* For the footer */
+
+html, body {
+    height: 100%;
+}
+
+#wrap {
+    min-height: 100%;
+}
+
+#main {
+    overflow:auto;
+	padding-bottom: 80px;
+}  /* must be same height as the footer */
+
+#footer {
+    position: relative;
+	margin-top: -80px; /* negative value of footer height */
+	height: 80px;
+	clear:both;
+}
+
+#footer {
+    display: block !important;
+}
+
+#footer ul{
+    display: inline-block;    
+    list-style-type: none;
+    margin: 0;
+}
+
+#footer li{
+    float: left;
+}
+
+.footer-links {
+    float: right;
+}
+
+.footer-links li {
+    line-height: 80px;
+    margin-left: 25px;
+}
+
+.footer-links li.link {
+    list-style-type: disc;
+}
+
+/*Opera Fix*/
+body:before {
+	content:"";
+	height:100%;
+	float:left;
+	width:0;
+	margin-top:-32767px;/
+}
+
 /* Teh Media Queries */
 
 @media (max-width: 480px) {

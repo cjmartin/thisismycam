@@ -31,7 +31,6 @@
                 {% else %}
                     <a class="header-login" href="{% url socialauth_begin 'flickr' %}">Log in with Flickr</a>
                 {% endif %}
-                </div>
             </div>
         </div>
         
@@ -39,8 +38,21 @@
             {% block body %}{% endblock %}
         </div>
     </div>
-    <div id="footer">
-        <!-- i can haz footer? -->
+    <div id="footer" class="inset-section">
+        <div class="container">
+        	<div class="row">
+        	    <div class="span12 footer-content">
+        		    <ul class="footer-links">
+                        <li>
+                    		Built by <a href="http://twitter.com/cjmartin">@cjmartin</a>, powered by awesomesauce from the <a href="http://flickr.com/services">Flickr API</a>.
+                    	</li>
+                    	<li class="link">
+                    	    <a href="http://www.flickr.com/services/apps/72157630574568476/">Feedback<a>
+                    	</li>
+                    </ul>
+                </div>
+        	</div>
+        </div>
     </div>
     {% block javascripts %}
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
