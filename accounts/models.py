@@ -86,11 +86,15 @@ def flickr_extra_values(sender, user, response, details, **kwargs):
             flickr_user.iconserver = api_user['iconserver']
             flickr_user.iconfarm = api_user['iconfarm']
             
-        if api_user['realname']:
+        try:
             flickr_user.realname = api_user['realname']['_content']
+        except KeyError:
+            flickr_user.realname = None
             
-        if api_user['path_alias']:
+        try:
             flickr_user.path_alias = api_user['path_alias']
+        except KeyError:
+            flickr_user.path_alias = None
 
         flickr_user.save()
             
