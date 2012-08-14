@@ -418,6 +418,15 @@ a.welcome-login-button:hover {
     padding: 15px;
 }
 
+a.collection-contact-link {
+    display: block;
+    color: inherit;
+}
+
+a.collection-contact-link:hover {
+    border-bottom: none;
+}
+
 .collection-contact .buddyicon {
     float: left;
     margin: 0 10px 15px 0;

@@ -194,7 +194,7 @@ def process_flickr_photo(api_photo, nsid):
                     )
                     
                 except IntegrityError:
-                    logger.warning("Camera %s already exists, but we're trying to add it again. Rescheduling task." % (exif_camera))
+                    logger.warning("Camera %s already exists, but we're trying to add it again. Rescheduling task." % (camera_name))
                     raise process_flickr_photo.retry(countdown=1)
                     
                 if created:

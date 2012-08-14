@@ -1,10 +1,12 @@
 <div class="span3">
     <div class="collection-contact">
-        <div class="image cover buddyicon" style="background-image: url('http://flickr.com/buddyicons/{{ user_contact.contact.nsid }}.jpg');">
-            <img src="http://flickr.com/buddyicons/{{ user_contact.contact.nsid }}.jpg" />
-        </div>
-        <h3>{{ user_contact.contact.username }}</h3>
-        {{ user_contact.count_cameras }} Cameras
+        <a class="collection-contact-link" href="{% url flickr-user user_contact.contact.slug %}">
+            <div class="image cover buddyicon" style="background-image: url('http://flickr.com/buddyicons/{{ user_contact.contact.nsid }}.jpg');">
+                <img src="http://flickr.com/buddyicons/{{ user_contact.contact.nsid }}.jpg" />
+            </div>
+            <h3>{{ user_contact.contact.username }}</h3>
+            {{ user_contact.count_cameras }} Cameras
+        </a>
         
         <div class="contact-camera-thumbnails">
             {% for camera in user_contact.cameras %}
