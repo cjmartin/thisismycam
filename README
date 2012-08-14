@@ -15,9 +15,8 @@ Continue catching URL fetch errors.
 Offline task box setup:
 
 Broker:
-RabbitMQ: http://www.rabbitmq.com/install-debian.html Install with dpkg.
-RabbitMQ configuration: http://ask.github.com/celery/getting-started/broker-installation.html
+sudo apt-get install redis-server
 
 Worker:
 sudo apt-get install git build-essential mysql-client python2.7-dev python-pip python-mysqldb
-sudo pip install django celery django-celery south django-social-auth bottlenose pytz python-memcached
+sudo pip install django celery django-celery-with-redis south django-social-auth bottlenose pytz python-memcached
