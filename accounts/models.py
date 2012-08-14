@@ -57,8 +57,6 @@ def flickr_extra_values(sender, user, response, details, **kwargs):
             nsid = response['id'],
             defaults = {
                 'username': api_user['username']['_content'],
-                'realname': api_user['realname']['_content'],
-                'path_alias': api_user['path_alias'],
                 'iconserver': api_user['iconserver'],
                 'iconfarm': api_user['iconfarm'],
                 'count_photos': api_user['photos']['count']['_content'],
@@ -85,12 +83,16 @@ def flickr_extra_values(sender, user, response, details, **kwargs):
             
         else:
             flickr_user.username = api_user['username']['_content']
-            flickr_user.realname = api_user['realname']['_content']
-            flickr_user.path_alias = api_user['path_alias']
             flickr_user.iconserver = api_user['iconserver']
             flickr_user.iconfarm = api_user['iconfarm']
-    
-            flickr_user.save()
+            
+        if api_user['realname']:
+            flickr_user.realname = api_user['realname']['_content']
+            
+        if api_user['path_alias']:
+            flickr_user.path_alias = api_user['path_alias']
+
+        flickr_user.save()
             
         return True
     
