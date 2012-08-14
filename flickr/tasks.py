@@ -178,7 +178,7 @@ def fetch_contacts_for_flickr_user(nsid):
                     
                     flickr_user_contact, created = FlickrUserContact.objects.get_or_create(flickr_user = flickr_user, contact = contact)
                     
-                    if created:
+                    if created and contact.date_last_photo_update:
                         logger.info("Push found contact.")
                         values = {
                             'secret': settings.PUSHY_SECRET,
