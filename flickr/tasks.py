@@ -65,10 +65,13 @@ def flickr_user_fetch_photos_complete(results, nsid):
         
         total_photos = total_photos + photos_count
         
-    last_photo = Photo.objects.filter(owner_nsid=flickr_user.nsid).latest('date_upload')
+    last_upload = Photo.objects.filter(owner_nsid=flickr_user.nsid).latest('date_upload')
     
-    flickr_user.date_last_photo_update = calendar.timegm(last_photo.date_upload.timetuple())
+    flickr_user.date_last_photo_update = calendar.timegm(last_upload.date_upload.timetuple())
     flickr_user.count_photos_processed = total_photos
+    
+    flickr_user.current_camera = flickr_user.calculate_current_camera()
+    
     flickr_user.save()
     
     logger.info("Fetch for %s complete. That was fun!" % (flickr_user.username))
@@ -272,3 +275,4 @@ def delete_flickr_user(nsid, reset=False):
     else:
         logger.info("Deleting Flickr user %s" % (nsid))
         flickr_user.delete()
+        

@@ -15,6 +15,7 @@ class FlickrUser(models.Model):
     
     cameras = models.ManyToManyField(Camera, through='FlickrUserCamera')
     contacts = models.ManyToManyField('self', through='FlickrUserContact', symmetrical=False)
+    current_camera = models.ForeignKey(FlickrUserCamera)
     
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
@@ -34,6 +35,28 @@ class FlickrUser(models.Model):
         return "http://flickr.com/photos/%s/" % self.slug
         
     photos_url = property(_get_photos_url)
+    
+    def calculate_current_camera(self):
+        from photos.models import Photos
+        from datetime import timedelta
+        import operator
+        
+        last_taken = Photo.objects.filter(owner_nsid=self.nsid).latest('date_taken')
+
+        # Determine "The Cam"
+        recent_photos = Photo.objects.filter(owner_nsid=self.nsid, date_taken__gt=(last_taken.date_taken - timedelta(days=30)))
+        recent_cameras = {}
+
+        for photo in recent_photos:
+            try:
+                recent_cameras[photo.camera.id] += 1
+            except KeyError:
+                recent_cameras[photo.camera.id] = 1
+                
+        camera_id = max(recent_cameras.iteritems(), key=operator.itemgetter(1))[0]
+        
+        return self.flickrusercamera_set.get(camera=camera_id)
+            
     
 class FlickrUserCamera(models.Model):
     flickr_user = models.ForeignKey(FlickrUser)
