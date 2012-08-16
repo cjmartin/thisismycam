@@ -14,11 +14,14 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        flickr_user = FlickrUser.objects.get(nsid=options.get('user'))
+        flickr_users = FlickrUser.objects.all()
+
+        for flickr_user in flickr_users:
+            flickr_user = FlickrUser.objects.get(nsid=options.get('user'))
         
-        flickr_user.current_camera = flickr_user.calculate_current_camera()
+            flickr_user.current_camera = flickr_user.calculate_current_camera()
         
-        self.stdout.write("Setting current camera for %s to %s" % (flickr_user.username, flickr_user.current_camera.camera.name))
-        flickr_user.save()
+            self.stdout.write("Setting current camera for %s to %s\n" % (flickr_user.username, flickr_user.current_camera.camera.name))
+            flickr_user.save()
         
         self.stdout.write("All Done!\n")
