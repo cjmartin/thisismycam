@@ -87,6 +87,10 @@
             <div class="row">
             {% for user_contact in contacts %}
                 {% include 'flickr/fragment_user_contact.html' %}
+                {% if forloop.counter|divisibleby:"4" and flickr_user.date_last_photo_update %}
+                    </div>
+                    <div class="row">
+                {% endif %}
             {% endfor %}
             </div>
         </div>
