@@ -75,7 +75,7 @@ def user(request, user_slug):
     if user_cameras:        
         data['user_cameras'] = load_photos_for_cameras(user_cameras, flickr_user.nsid)
         data['primary_camera'] = flickr_user.current_camera
-        data['photos'] = Photo.objects.filter(camera = flickr_user.current_camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:18]
+        data['photos'] = Photo.objects.filter(camera = flickr_user.current_camera.camera, owner_nsid = flickr_user.nsid).order_by('-date_taken')[:18]
         
     data['contacts'] = load_cameras_for_contacts(flickr_user.contacts.filter(date_last_photo_update__isnull=False), 8)
     
