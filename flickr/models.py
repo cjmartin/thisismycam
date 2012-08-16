@@ -15,7 +15,7 @@ class FlickrUser(models.Model):
     
     cameras = models.ManyToManyField(Camera, through='FlickrUserCamera')
     contacts = models.ManyToManyField('self', through='FlickrUserContact', symmetrical=False)
-    current_camera = models.ForeignKey(FlickrUserCamera)
+    current_camera = models.ForeignKey('FlickrUserCamera', null=True, blank=True)
     
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
