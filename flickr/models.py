@@ -37,7 +37,7 @@ class FlickrUser(models.Model):
     photos_url = property(_get_photos_url)
     
     def calculate_current_camera(self):
-        from photos.models import Photos
+        from photos.models import Photo
         from datetime import timedelta
         import operator
         
