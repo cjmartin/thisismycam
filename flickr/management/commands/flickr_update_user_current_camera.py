@@ -17,11 +17,12 @@ class Command(BaseCommand):
         flickr_users = FlickrUser.objects.all()
 
         for flickr_user in flickr_users:
-            flickr_user = FlickrUser.objects.get(nsid=options.get('user'))
+            if flickr_user.cameras.count():            
+                flickr_user.current_camera = flickr_user.calculate_current_camera()
         
-            flickr_user.current_camera = flickr_user.calculate_current_camera()
-        
-            self.stdout.write("Setting current camera for %s to %s\n" % (flickr_user.username, flickr_user.current_camera.camera.name))
-            flickr_user.save()
+                self.stdout.write("Setting current camera for %s to %s\n" % (flickr_user.username, flickr_user.current_camera.camera.name))
+                flickr_user.save()
+            else:
+                self.stdout.write("%s doesn't have any cameras\n" % (flickr_user.username))
         
         self.stdout.write("All Done!\n")
