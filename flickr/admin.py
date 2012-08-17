@@ -10,6 +10,8 @@ class FlickrUserCameraInline(admin.TabularInline):
     extra = 0
     
 class FlickrUserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'realname', 'nsid', 'path_alias', 'count_photos', 'count_photos_processed', 'date_last_photo_update', 'date_create')
+    
     inlines = [
         FlickrUserCameraInline
     ]
