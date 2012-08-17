@@ -13,6 +13,7 @@ class FlickrUser(models.Model):
     date_last_photo_update = models.IntegerField(null=True, blank=True)
     count_photos = models.IntegerField(default=0)
     count_cameras = models.IntegerField(default=0)
+    count_contacts = models.IntegerField(default=0)
     initial_fetch_completed = models.BooleanField(default=0)
     
     cameras = models.ManyToManyField(Camera, through='FlickrUserCamera')

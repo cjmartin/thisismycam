@@ -76,6 +76,7 @@ def flickr_user_fetch_photos_complete(results, nsid):
     
     flickr_user.date_last_photo_update = calendar.timegm(last_upload_date.timetuple())
     flickr_user.count_photos_processed = total_photos
+    flickr_user.count_cameras = flickr_user.cameras.count()
     flickr_user.initial_fetch_completed = True
     
     flickr_user.save()
@@ -210,7 +211,9 @@ def fetch_contacts_for_flickr_user(nsid):
                             'iconfarm': contact['iconfarm'],
                         }
                     )
-                
+                    
+            flickr_user.count_contacts = flickr_user.contacts.count()
+            
     except URLError, e:
         logger.error("Problem talking to Flickr (URLError), will try again. Reason: %s" % (e.reason))
         return fetch_contacts_for_flickr_user.retry(countdown=5)
@@ -225,7 +228,12 @@ def process_new_flickr_user(nsid):
     
     for contact_lookup in contact_lookups:
         logger.info("Hooray, %s will be so happy %s is here!" % (contact_lookup.flickr_user.username, flickr_user.username))
-        flickr_user_contact, created = FlickrUserContact.objects.get_or_create(flickr_user = contact_lookup.flickr_user, contact = flickr_user)
+        updating_flickr_user = contact_lookup.flickr_user
+        
+        flickr_user_contact, created = FlickrUserContact.objects.get_or_create(flickr_user = updating_flickr_user, contact = flickr_user)
+        
+        updating_flickr_user.count_contacts = updating_flickr_user.contacts.count()
+        updaing_flickr_user.save()
         
         contact_lookup.delete()
         
