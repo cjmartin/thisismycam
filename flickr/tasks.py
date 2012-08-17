@@ -6,6 +6,7 @@ from django.db.models import F
 from django.db.models import Sum
 
 import calendar
+import datetime
 import urllib
 import urllib2
 from urllib2 import URLError
@@ -65,12 +66,17 @@ def flickr_user_fetch_photos_complete(results, nsid):
         
         total_photos = total_photos + photos_count
         
-    last_upload = Photo.objects.filter(owner_nsid=flickr_user.nsid).latest('date_upload')
+    if total_photos:
+        last_upload = Photo.objects.filter(owner_nsid=flickr_user.nsid).latest('date_upload')
+        last_update_date = last_upload.date_upload
+        flickr_user.current_camera = flickr_user.calculate_current_camera()
+        
+    else:
+        last_upload_date = datetime.date.today()
     
-    flickr_user.date_last_photo_update = calendar.timegm(last_upload.date_upload.timetuple())
+    flickr_user.date_last_photo_update = calendar.timegm(last_upload_date.timetuple())
     flickr_user.count_photos_processed = total_photos
-    
-    flickr_user.current_camera = flickr_user.calculate_current_camera()
+    flickr_user.initial_fetch_completed = True
     
     flickr_user.save()
     
