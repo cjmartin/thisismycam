@@ -68,7 +68,7 @@ def flickr_user_fetch_photos_complete(results, nsid):
         
     if total_photos:
         last_upload = Photo.objects.filter(owner_nsid=flickr_user.nsid).latest('date_upload')
-        last_update_date = last_upload.date_upload
+        last_upload_date = last_upload.date_upload
         flickr_user.current_camera = flickr_user.calculate_current_camera()
         
     else:
