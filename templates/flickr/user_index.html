@@ -8,7 +8,8 @@
 {% block body %}
 <div class="section inset-section">
     <div class="container">
-    {% if flickr_user.date_last_photo_update %}
+    {% if flickr_user.initial_fetch_completed %}
+        {% if flickr_user.count_cameras %}
         <div class="the-camera-title">
             <h3 class="title">The fantastic</h3>
             <h1 class="title section-title brand">{{ primary_camera.camera.name }}</h1>
@@ -38,6 +39,13 @@
             </div>
         </div>
 		{% include 'flickr/fragment_camera_photos.html' %}
+		{% elif flickr_user.count_photos %}
+		    <p>Hum, we scanned all your photos but couldn't find any cameras :-(</p>
+		    <p>This is my Cam needs Exif data to know what camera you used to take a photo, and we only use public photos and Exif data to build your camera collection. Maybe you have "Hide your EXIF data" set to yes in <a href="http://www.flickr.com/account/privacy/">your flickr settings</a>?</p>
+		{% else %}
+		    <p>Oh no, it doesn't look like you have any public photos, so we couldn't find any cameras :-(</p>
+		    <p>This is my Cam only uses public photos to build your camera collection. Sorry, but managing privacy is out of our budget.</p>
+		{% endif %}
     {% else %}
     <div class="setup-welcome">
         <div class="row">
@@ -80,7 +88,7 @@
 
 {% include 'flickr/fragment_user_camera_collection.html' %}
 
-<div class="section" id="js-user-contacts-section"{% if not flickr_user.contacts.count %}style="display:none;"{% endif %}>
+<div class="section" id="js-user-contacts-section"{% if not flickr_user.count_contacts %}style="display:none;"{% endif %}>
     <h1 class="title section-title">{% if is_owner %}Your{% else %}{{ flickr_user.username|possessive }}{% endif %} Contacts</h1>
     <div class="section-content inset" id="js-user-contacts">
         <div class="container">
