@@ -40,11 +40,24 @@
         </div>
 		{% include 'flickr/fragment_camera_photos.html' %}
 		{% elif flickr_user.count_photos %}
-		    <p>Hum, we scanned all your photos but couldn't find any cameras :-(</p>
-		    <p>This is my Cam needs Exif data to know what camera you used to take a photo, and we only use public photos and Exif data to build your camera collection. Maybe you have "Hide your EXIF data" set to yes in <a href="http://www.flickr.com/account/privacy/">your flickr settings</a>?</p>
+    		<div class="setup-welcome">
+        		<div class="row">
+        		    <div class="span10 offset1">
+            		    <p>Hum, we scanned all your photos but couldn't find any cameras :-(</p>
+            		    <p>This is my Cam needs Exif data to know what camera you used to take a photo, and we only use public photos and Exif data to build your camera collection.</p>
+            		    <p>Maybe you have "Hide your EXIF data" set to yes in <a href="http://www.flickr.com/account/privacy/">your flickr settings</a>?</p>
+            		</div>
+            	</div>
+            </div>
 		{% else %}
-		    <p>Oh no, it doesn't look like you have any public photos, so we couldn't find any cameras :-(</p>
-		    <p>This is my Cam only uses public photos to build your camera collection. Sorry, but managing privacy is out of our budget.</p>
+    		<div class="setup-welcome">
+        		<div class="row">
+        		    <div class="span10 offset1">
+            		    <p>Oh no, it doesn't look like you have any public photos, so we couldn't find any cameras :-(</p>
+            		    <p>This is my Cam only uses public photos to build your camera collection. Sorry, but managing privacy is out of our budget.</p>
+            		</div>
+            	</div>
+            </div>
 		{% endif %}
     {% else %}
     <div class="setup-welcome">
