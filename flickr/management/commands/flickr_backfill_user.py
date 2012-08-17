@@ -13,7 +13,7 @@ class Command(BaseCommand):
         
         for flickr_user in flickr_users:
             
-            flickr_user.count_cameras = flickr_user.cameras.count()
+            flickr_user.count_contacts = flickr_user.contacts.count()
             flickr_user.save()
             
             # if flickr_user.date_last_photo_update:            
