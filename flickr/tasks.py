@@ -123,6 +123,7 @@ def update_flickr_user_camera(photo_id, nsid):
             
         if created:
             Camera.objects.filter(pk=camera.pk).update(count=F('count')+1)
+            FlickrUser.objects.filter(pk=flickr_user.pk).update(count=F('count_cameras')+1)
             
             logger.info("Push new camera.")
             values = {
