@@ -233,7 +233,7 @@ def process_new_flickr_user(nsid):
         flickr_user_contact, created = FlickrUserContact.objects.get_or_create(flickr_user = updating_flickr_user, contact = flickr_user)
         
         updating_flickr_user.count_contacts = updating_flickr_user.contacts.count()
-        updaing_flickr_user.save()
+        updating_flickr_user.save()
         
         contact_lookup.delete()
         
