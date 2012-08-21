@@ -4,6 +4,9 @@ from optparse import make_option
 
 from flickr.models import FlickrUser
 
+from flickr.tasks import fetch_contacts_for_flickr_user
+from flickr.tasks import process_new_flickr_user
+
 class Command(BaseCommand):
     help = 'Backfill flickr users'
 
@@ -13,8 +16,11 @@ class Command(BaseCommand):
         
         for flickr_user in flickr_users:
             
-            flickr_user.count_contacts = flickr_user.contacts.count()
-            flickr_user.save()
+            fetch_contacts_for_flickr_user.delay(user.nsid)
+            process_new_flickr_user.delay(user.nsid)
+            
+            # flickr_user.count_contacts = flickr_user.contacts.count()
+            # flickr_user.save()
             
             # if flickr_user.date_last_photo_update:            
             #     flickr_user.initial_fetch_completed = True
