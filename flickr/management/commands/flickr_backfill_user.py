@@ -16,8 +16,8 @@ class Command(BaseCommand):
         
         for flickr_user in flickr_users:
             
-            fetch_contacts_for_flickr_user.delay(user.nsid)
-            process_new_flickr_user.delay(user.nsid)
+            fetch_contacts_for_flickr_user.delay(flickr_user.nsid)
+            process_new_flickr_user.delay(flickr_user.nsid)
             
             # flickr_user.count_contacts = flickr_user.contacts.count()
             # flickr_user.save()
