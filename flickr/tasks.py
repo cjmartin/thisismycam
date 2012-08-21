@@ -214,6 +214,7 @@ def fetch_contacts_for_flickr_user(nsid):
                     )
                     
             flickr_user.count_contacts = flickr_user.contacts.count()
+            flickr_user.save()
             
     except URLError, e:
         logger.error("Problem talking to Flickr (URLError), will try again. Reason: %s" % (e.reason))
