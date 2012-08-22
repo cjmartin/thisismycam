@@ -41,13 +41,13 @@ class FlickrUser(models.Model):
     
     def calculate_current_camera(self):
         from photos.models import Photo
-        from datetime import timedelta
+        from datetime import datetime, timedelta
         import operator
         
-        last_taken = Photo.objects.filter(owner_nsid=self.nsid).latest('date_taken')
+        last_taken = Photo.objects.filter(owner_nsid=self.nsid, date_taken__lte=datetime.now()).latest('date_taken')
 
         # Determine "The Cam"
-        recent_photos = Photo.objects.filter(owner_nsid=self.nsid, date_taken__gt=(last_taken.date_taken - timedelta(days=30)))
+        recent_photos = Photo.objects.filter(owner_nsid=self.nsid, date_taken__gte=(last_taken.date_taken - timedelta(days=30)))
         recent_cameras = {}
 
         for photo in recent_photos:

@@ -6,18 +6,22 @@ from flickr.models import FlickrUser
 
 from flickr.tasks import fetch_contacts_for_flickr_user
 from flickr.tasks import process_new_flickr_user
+from flickr.tasks import flickr_user_fetch_photos_complete
 
 class Command(BaseCommand):
     help = 'Backfill flickr users'
 
     def handle(self, *args, **options):
-        flickr_users = FlickrUser.objects.all()
-        users_to_update = []
         
-        for flickr_user in flickr_users:
-            
-            fetch_contacts_for_flickr_user.delay(flickr_user.nsid)
-            process_new_flickr_user.delay(flickr_user.nsid)
+        flickr_user_fetch_photos_complete.delay(None, '88034992@N00')
+        
+        # flickr_users = FlickrUser.objects.all()
+        # users_to_update = []
+        # 
+        # for flickr_user in flickr_users:
+        #     
+        #     fetch_contacts_for_flickr_user.delay(flickr_user.nsid)
+        #     process_new_flickr_user.delay(flickr_user.nsid)
             
             # flickr_user.count_contacts = flickr_user.contacts.count()
             # flickr_user.save()
