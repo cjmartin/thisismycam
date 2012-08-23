@@ -35,6 +35,11 @@
                     <p>
                         The <strong><a href="{{ flickr_user.photos_url }}{{ primary_camera.last_taken_id }}" target="_blank">last photo</a></strong> {% if is_owner %}you{% else %}they{% endif %} took with {% if is_owner %}your{% else %}their{% endif %} {{ primary_camera.camera.model }} was <strong>{{ primary_camera.date_last_taken|naturaltime }}</strong>.{% if is_owner %} Maybe it's time to go outside and take a few more?{% endif %}
                     </p>
+                    {% if not is_owner and primary_camera.camera.amazon_url %}
+                    <p>
+                        Want more? <a href="{{ primary_camera.camera.amazon_url }}">See info and reviews for the {{ primary_camera.camera.name }} on Amazon &rarr;</a>
+                    </p>
+                    {% endif %}
                 </div>
             </div>
         </div>
