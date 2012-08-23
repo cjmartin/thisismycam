@@ -101,7 +101,7 @@
 
 {% include 'flickr/fragment_user_camera_collection.html' %}
 
-<div class="section" id="js-user-contacts-section"{% if not contacts.count %}style="display:none;"{% endif %}>
+<div class="section" id="js-user-contacts-section"{% if not contacts %}style="display:none;"{% endif %}>
     <h1 class="title section-title">{% if is_owner %}Your{% else %}{{ flickr_user.username|possessive }}{% endif %} Contacts</h1>
     <div class="section-content inset" id="js-user-contacts">
         <div class="container">
