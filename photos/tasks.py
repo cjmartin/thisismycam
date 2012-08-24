@@ -192,40 +192,39 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
                 photo_updates = []
 
                 for photo in json['photos']['photo']:
-                    if update_all is False and photo['dateupload'] > flickr_user.date_last_photo_update:
+                    if update_all or photo['dateupload'] > flickr_user.date_last_photo_update:
                         photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))))
                         
-                if photo_updates and page != pages:
+                if photo_updates:
                     logger.info("Firing tasks for page %s of %s for %s" % (page, pages, flickr_user.username))
-                    next_page = page + 1
                     
-                    pct = ((float(page) / float(pages)) * 100)
-                    logger.info("pct should be: %s/%s * 100 = %s" % (page, pages, pct))
-
-                    logger.info("Push it.")
-                    values = {
-                        'secret': settings.PUSHY_SECRET,
-                        'user_id': flickr_user.nsid,
-                        'message': simplejson.dumps({'type': 'fetch_photos.update_progress_bar', 'data': {'pct': pct}}),
-                    }
-                    data = urllib.urlencode(values)
-                    req = urllib2.Request(settings.PUSHY_URL_LOCAL, data)
-                    
-                    try:
-                        response = urllib2.urlopen(req)
-                    except:
-                        logger.error("Problem calling pushy from photos update.")
-                    
-                    return chord(photo_updates)(update_photos_for_flickr_user.subtask((flickr_user.nsid, next_page, update_all, )))
-                    
-                else:
-                    logger.info("This is the last page (%s) for %s!" % (pages, flickr_user.username))
-                    
-                    if photo_updates:
+                    if page == pages:
                         return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((flickr_user.nsid, )))
                         
                     else:
-                        return flickr_user_fetch_photos_complete.delay(None, flickr_user.nsid)
+                        next_page = page + 1
+                    
+                        pct = ((float(page) / float(pages)) * 100)
+                        logger.info("pct should be: %s/%s * 100 = %s" % (page, pages, pct))
+
+                        logger.info("Push it.")
+                        values = {
+                            'secret': settings.PUSHY_SECRET,
+                            'user_id': flickr_user.nsid,
+                            'message': simplejson.dumps({'type': 'fetch_photos.update_progress_bar', 'data': {'pct': pct}}),
+                        }
+                        data = urllib.urlencode(values)
+                        req = urllib2.Request(settings.PUSHY_URL_LOCAL, data)
+                    
+                        try:
+                            response = urllib2.urlopen(req)
+                        except:
+                            logger.error("Problem calling pushy from photos update.")
+                    
+                        return chord(photo_updates)(update_photos_for_flickr_user.subtask((flickr_user.nsid, next_page, update_all, )))
+                    
+                else:
+                    return flickr_user_fetch_photos_complete.delay(None, flickr_user.nsid)
                     
             else:
                 logger.error("Flickr api query did not respond OK, will try again.")
