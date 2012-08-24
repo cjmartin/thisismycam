@@ -58,7 +58,7 @@ def fetch_photos_for_flickr_user(results, nsid, page=None):
         if not page:
             page = math.ceil(float(flickr_user.count_photos) / float(20))
     
-        per_page = 20
+        per_page = 100
     
         logger.info("Fetching page %s for %s" % (page, flickr_user.username))
     
@@ -172,7 +172,7 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
         if not page:
             page = 1
     
-        per_page = 20
+        per_page = 100
     
         logger.info("Fetching page %s for %s" % (page, flickr_user.username))
         
