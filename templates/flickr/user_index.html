@@ -152,7 +152,7 @@
         });
     */
     </script>
-    {% if not flickr_user.initial_fetch_complete %}
+    {% if not flickr_user.date_last_photo_update %}
         <script src="{{ pushy_url }}/socket.io/socket.io.js"></script>
         <script>
             $(document).ready(function(){
