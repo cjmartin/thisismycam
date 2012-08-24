@@ -165,7 +165,7 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
     # acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
     acquire_lock = True
      
-    if page or acquire_lock():
+    if page or acquire_lock:
         if flickr_user.count_photos == 0:
             return flickr_user_fetch_photos_complete.delay(None, flickr_user.nsid)
     
