@@ -381,36 +381,37 @@ def process_flickr_photo(api_photo, nsid):
                             'camera': camera,
                         }
                     )
-                
-                    photo.title = api_photo['title']
-                    photo.path_alias = api_photo['pathalias']
-                    photo.date_taken = api_date_taken
-                    photo.date_upload = api_date_upload
-                    photo.comments_count = api_photo['count_comments']
-                    photo.faves_count = api_photo['count_faves']
-                
-                    if camera.make:
-                        photo.camera_make = camera.make
                     
-                    if api_photo['latitude'] or api_photo['longitude'] and api_photo['geo_is_public']:
-                        photo.has_geo =  1
-                        photo.latitude = api_photo['latitude']
-                        photo.longitude = api_photo['longitude']
-                        photo.accuracy = api_photo['accuracy']
-                        photo.context = api_photo['context']
-                    
-                    else:
-                        photo.has_geo = 0
-                    
-                    # Ok, save the photo.
-                    logger.info("Saving photo %s for camera %s.\n" % (photo.photo_id, camera.name))
-                    photo.save()
-                
                     if created:
+                        photo.title = api_photo['title']
+                        photo.path_alias = api_photo['pathalias']
+                        photo.date_taken = api_date_taken
+                        photo.date_upload = api_date_upload
+                        photo.comments_count = api_photo['count_comments']
+                        photo.faves_count = api_photo['count_faves']
+                
+                        if camera.make:
+                            photo.camera_make = camera.make
+                    
+                        if api_photo['latitude'] or api_photo['longitude'] and api_photo['geo_is_public']:
+                            photo.has_geo =  1
+                            photo.latitude = api_photo['latitude']
+                            photo.longitude = api_photo['longitude']
+                            photo.accuracy = api_photo['accuracy']
+                            photo.context = api_photo['context']
+                    
+                        else:
+                            photo.has_geo = 0
+                    
+                        # Ok, save the photo.
+                        logger.info("Saving photo %s for camera %s.\n" % (photo.photo_id, camera.name))
+                        photo.save()
+                        
                         Camera.objects.filter(slug=camera_slug).update(count_photos=F('count_photos')+1)
                         return photo.photo_id
                     
                     else:
+                        logger.info("We've seen this photo before, moving on.")
                         return False
                     
                 # The photo doesn't have camera info
