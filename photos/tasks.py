@@ -139,8 +139,9 @@ def process_flickr_photo(api_photo, nsid):
             exif_model = ""
             exif_software = ""
             
-            try exif = json['photo']['exif']:
-            
+            try:
+                exif = json['photo']['exif']
+                
                 for tag in exif:
                     if tag['label'] == "Make" :
                         raw_exif_make = tag['raw']['_content']
