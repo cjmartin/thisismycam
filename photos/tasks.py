@@ -418,7 +418,7 @@ def process_flickr_photo(api_photo, nsid):
                     return False
                     
             except KeyError:
-                logger.info("The photo doesn't have Exif data.")
+                logger.error("KeyError! The photo doesn't have Exif data. (%s)" % (api_photo['id']))
                 return False
                 
         else:
