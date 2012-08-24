@@ -53,7 +53,7 @@ def fetch_photos_for_flickr_user(results, nsid, page=None):
     
         flickr_user = FlickrUser.objects.get(nsid = nsid)
         
-        if FlickrUser.count_photos == 0:
+        if flickr_user.count_photos == 0:
             return flickr_user_fetch_photos_complete.delay(None, flickr_user.nsid)
     
         if not page:
