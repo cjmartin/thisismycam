@@ -162,7 +162,8 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
     lock_id = "%s-lock-%s" % ("update_photos", nsid_digest)
     
     # cache.add fails if if the key already exists
-    acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
+    # acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
+    acquire_lock = True
      
     if page or acquire_lock():
         if flickr_user.count_photos == 0:
@@ -192,11 +193,13 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
                 photo_updates = []
 
                 for photo in json['photos']['photo']:
+                    logger.warning("Checking photo for %s, last update: %s | this photo: %s" % (flickr_user.username, flickr_user.date_last_photo_update, photo['dateupload']))
                     if update_all or photo['dateupload'] > flickr_user.date_last_photo_update:
+                        logger.warning("This photo is new!")
                         photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))))
                         
                 if photo_updates:
-                    logger.info("Firing tasks for page %s of %s for %s" % (page, pages, flickr_user.username))
+                    logger.warning("Firing update tasks for page %s of %s for %s" % (page, pages, flickr_user.username))
                     
                     if page == pages:
                         return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((flickr_user.nsid, )))
@@ -220,10 +223,12 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
                             response = urllib2.urlopen(req)
                         except:
                             logger.error("Problem calling pushy from photos update.")
-                    
+                        
+                        logger.warning("Scheduling chord of photo updates with callpack for next page")
                         return chord(photo_updates)(update_photos_for_flickr_user.subtask((flickr_user.nsid, next_page, update_all, )))
                     
                 else:
+                    logger.warning("No more new photos, calling fetch photos complete")
                     return flickr_user_fetch_photos_complete.delay(None, flickr_user.nsid)
                     
             else:
