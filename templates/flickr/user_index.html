@@ -11,7 +11,7 @@
 <div class="section inset-section">
     <div class="container">
     {% if flickr_user.initial_fetch_completed %}
-        {% if flickr_user.count_cameras %}
+        {% if flickr_user.count_cameras and primary_camera %}
         <div class="the-camera-title">
             <h3 class="title">The fantastic</h3>
             <h1 class="title section-title brand">{{ primary_camera.camera.name }}</h1>
@@ -46,6 +46,15 @@
             </div>
         </div>
 		{% include 'flickr/fragment_camera_photos.html' %}
+		{% elif flickr_user.count_cameras %}
+		    <div class="setup-welcome">
+        		<div class="row">
+        		    <div class="span10 offset1">
+            		    <p>Hum, it looks like we've found some cameras, but haven't calculated {% if is_owner %}your{% else %}{{ flickr_user.username|possessive }}{% endif %} current camera of choice.</p>
+            		    <p>If the calculation is in progress, you should see {% if is_owner %}your{% else %}{{ flickr_user.username|possessive }}{% endif %} cam here soon, otherwise it will update the next time we check for new photos (sometime in the next 24 hours).</p>
+            		</div>
+            	</div>
+            </div>
 		{% elif flickr_user.count_photos %}
     		<div class="setup-welcome">
         		<div class="row">
