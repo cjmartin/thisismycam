@@ -22,10 +22,10 @@ class Command(BaseCommand):
         for flickr_user in flickr_users:
             self.stdout.write("Scheduling %s for an update\n" % (flickr_user.username))
             
-            # fetch_photos_for_flickr_user.delay(None, flickr_user.nsid)
+            fetch_photos_for_flickr_user.delay(None, flickr_user.nsid)
             
-            # fetch_contacts_for_flickr_user.delay(flickr_user.nsid)
-            # process_new_flickr_user.delay(flickr_user.nsid)
+            fetch_contacts_for_flickr_user.delay(flickr_user.nsid)
+            process_new_flickr_user.delay(flickr_user.nsid)
             
             # flickr_user.count_contacts = flickr_user.contacts.count()
             # flickr_user.save()
