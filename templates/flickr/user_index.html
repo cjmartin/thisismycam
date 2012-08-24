@@ -5,6 +5,8 @@
 
 {% block title %}{{ flickr_user.username }} | This Is My Cam!{% endblock %}
 
+{% block description %}{{ flickr_user.username|possessive }} current camera of choice is the {{ primary_camera.camera.name }}!{% endblock %}
+
 {% block body %}
 <div class="section inset-section">
     <div class="container">
