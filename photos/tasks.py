@@ -192,12 +192,9 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
                 pages = json['photos']['pages']
                 photo_updates = []
 
-                for photo in json['photos']['photo']:
-                    if update_all:
-                        logger.warning("Update all is true")
-                    
+                for photo in json['photos']['photo']:                    
                     logger.warning("Checking photo for %s, this photo: %s | date update: %s" % (flickr_user.username, photo['dateupload'], flickr_user.date_last_photo_update))
-                    if photo['dateupload'] >= flickr_user.date_last_photo_update:
+                    if update_all or int(photo['dateupload']) >= int(flickr_user.date_last_photo_update):
                         logger.warning("This photo is new!")
                         photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))))
                         
