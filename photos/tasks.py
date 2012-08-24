@@ -297,7 +297,7 @@ def process_flickr_photo(api_photo, nsid):
                 return False
                 
         else:
-            logger.error("The Flickr api did not return status ok, re-scheduling task. %s" % (api_photo['id']))
+            logger.info("We probably don't have permission to see the Exif, carry on. %s" % (api_photo['id']))
             return False
             #raise fetch_photos_for_flickr_user.retry(countdown=1)
             
