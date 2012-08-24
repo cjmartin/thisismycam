@@ -69,12 +69,13 @@ def flickr_user_fetch_photos_complete(results, nsid):
     if total_photos:
         last_upload = Photo.objects.filter(owner_nsid=flickr_user.nsid).latest('date_upload')
         last_upload_date = last_upload.date_upload
+        flickr_user.date_last_photo_update = calendar.timegm(last_upload_date.timetuple())
+        
         flickr_user.current_camera = flickr_user.calculate_current_camera()
         
     else:
-        last_upload_date = datetime.date.today()
+        flickr_user.date_last_photo_update = 0
     
-    flickr_user.date_last_photo_update = calendar.timegm(last_upload_date.timetuple())
     flickr_user.count_photos_processed = total_photos
     flickr_user.count_cameras = flickr_user.cameras.count()
     flickr_user.initial_fetch_completed = True
