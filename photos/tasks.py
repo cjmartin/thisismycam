@@ -128,167 +128,177 @@ def process_flickr_photo(api_photo, nsid):
     try:
         # Query Flickr for this photo's Exif data
         exif_rsp = flickr.photos.getExif(photo_id=api_photo['id'],format="json",nojsoncallback="true")
-        exif = simplejson.loads(exif_rsp)
+        json = simplejson.loads(exif_rsp)
         
         # If it exists, process it
-        if exif and exif['stat'] == 'ok':
+        if json and json['stat'] == 'ok':
             exif_camera = ""
             raw_exif_make = ""
             exif_make = ""
             raw_exif_model = ""
             exif_model = ""
             exif_software = ""
-        
-            for tag in exif['photo']['exif'] :
-                if tag['label'] == "Make" :
-                    raw_exif_make = tag['raw']['_content']
+            
+            try exif = json['photo']['exif']:
+            
+                for tag in exif:
+                    if tag['label'] == "Make" :
+                        raw_exif_make = tag['raw']['_content']
                                     
-                if tag['label'] == "Model" :
-                    raw_exif_model = tag['raw']['_content']
+                    if tag['label'] == "Model" :
+                        raw_exif_model = tag['raw']['_content']
                                     
-                if tag['label'] == "Software" :
-                    exif_software = tag['raw']['_content']
+                    if tag['label'] == "Software" :
+                        exif_software = tag['raw']['_content']
                     
-            # This is the "name" that Flickr uses, it's usually nice
-            # if exif['photo']['camera']:
-            #    exif_camera = exif['photo']['camera']
+                # This is the "name" that Flickr uses, it's usually nice
+                # if exif['photo']['camera']:
+                #    exif_camera = exif['photo']['camera']
             
-            # Create a clean version of the raw Exif make
-            exif_make = clean_make(raw_exif_make)
+                # Create a clean version of the raw Exif make
+                exif_make = clean_make(raw_exif_make)
             
-            # Create a clean version of the raw Exif model, and remove the make if it's duplicated
-            exif_model = clean_model(raw_exif_model, exif_make)
+                # Create a clean version of the raw Exif model, and remove the make if it's duplicated
+                exif_model = clean_model(raw_exif_model, exif_make)
                 
-            # If there's a model (camera) we'll carry on
-            if exif_model:
+                # If there's a model (camera) we'll carry on
+                if exif_model:
                 
-                # Process the date taken and date upload into nice time objecs
+                    # Process the date taken and date upload into nice time objecs
                 
-                # Date taken is a time string of the local time when the photo was taken,
-                # we don't know the time zone, so we'll store it as UTC and always display it as UTC
-                naive = parse_datetime(api_photo['datetaken'])
-                api_date_taken = pytz.timezone("UTC").localize(naive)
+                    # Date taken is a time string of the local time when the photo was taken,
+                    # we don't know the time zone, so we'll store it as UTC and always display it as UTC
+                    naive = parse_datetime(api_photo['datetaken'])
+                    api_date_taken = pytz.timezone("UTC").localize(naive)
                 
-                # Date upload is a unix timestamp, so we can store it as UTC and convert to whatever tz we want.
-                api_date_upload = datetime.utcfromtimestamp(float(api_photo['dateupload'])).replace(tzinfo=timezone.utc)
+                    # Date upload is a unix timestamp, so we can store it as UTC and convert to whatever tz we want.
+                    api_date_upload = datetime.utcfromtimestamp(float(api_photo['dateupload'])).replace(tzinfo=timezone.utc)
                 
-                # Create the camera slug with things that should never change
-                # I would use exif_camera, but I'm afraid those might change on Flickr's side
-                camera_slug = slugify(exif_make + " " + exif_model)
+                    # Create the camera slug with things that should never change
+                    # I would use exif_camera, but I'm afraid those might change on Flickr's side
+                    camera_slug = slugify(exif_make + " " + exif_model)
                 
-                # Create a name for the camera
-                if exif_make:
-                    camera_name = exif_make + " " + exif_model
-                else:
-                    camera_name = exif_model
+                    # Create a name for the camera
+                    if exif_make:
+                        camera_name = exif_make + " " + exif_model
+                    else:
+                        camera_name = exif_model
                         
-                # Try to create the camera, or get it if it existsg
-                try:
-                    camera, created = Camera.objects.get_or_create(
-                        slug = camera_slug,
+                    # Try to create the camera, or get it if it existsg
+                    try:
+                        camera, created = Camera.objects.get_or_create(
+                            slug = camera_slug,
+                            defaults = {
+                                'name': camera_name,
+                                'model': exif_model,
+                                'exif_model': raw_exif_model,
+                                'exif_make': raw_exif_make,
+                                'count': 0,
+                                'count_photos': 0,
+                            }
+                        )
+                    
+                    except IntegrityError:
+                        logger.warning("Camera %s already exists, but we're trying to add it again. Rescheduling task." % (camera_name))
+                        raise process_flickr_photo.retry(countdown=1)
+                    
+                    if created:
+                        if exif_make:
+                            make_slug = slugify(exif_make)
+                        
+                            try:
+                                make, created = Make.objects.get_or_create(
+                                    slug = make_slug,
+                                    defaults = {
+                                        'name': exif_make,
+                                        'count': 1,
+                                    }
+                                )
+                            
+                            except IntegrityError:
+                                logger.warning("Make %s already exists, but we're trying to add it again. Rescheduling task." % (exif_make))
+                                raise process_flickr_photo.retry(countdown=1)
+                            
+                            if not created:
+                                Make.objects.filter(slug=make_slug).update(count=F('count')+1)
+                            
+                            camera.make = make
+                            camera.save()
+                
+                    # In case we need to create cache keys
+                    id_digest = md5(str(camera.id)).hexdigest()
+                
+                    # A little bonus here, if the camera doesn't have aws info, try to get it.
+                    if not camera.amazon_item_response:
+                        lock_id = "%s-lock-%s" % ("aws_update", id_digest)
+                        acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
+                    
+                        if acquire_lock():
+                            logger.info("Fetching aws info for %s." % (camera.name))
+                            add_aws_item_to_camera.delay(camera.id)
+                        
+                        else:
+                            logger.info("AWS item update for %s already scheduled, skipping." % (camera.name))
+                            
+                    photo, created = Photo.objects.get_or_create(
+                        photo_id = api_photo['id'],
                         defaults = {
-                            'name': camera_name,
-                            'model': exif_model,
-                            'exif_model': raw_exif_model,
-                            'exif_make': raw_exif_make,
-                            'count': 0,
-                            'count_photos': 0,
+                            'secret': api_photo['secret'],
+                            'server': api_photo['server'],
+                            'farm': api_photo['farm'],
+                            'license': api_photo['license'],
+                            'media': api_photo['media'],
+                            'owner_nsid': api_photo['owner'],
+                            'owner_name': api_photo['ownername'],
+                            'date_taken': api_date_taken,
+                            'date_upload': api_date_upload,
+                            'camera': camera,
                         }
                     )
-                    
-                except IntegrityError:
-                    logger.warning("Camera %s already exists, but we're trying to add it again. Rescheduling task." % (camera_name))
-                    raise process_flickr_photo.retry(countdown=1)
-                    
-                if created:
-                    if exif_make:
-                        make_slug = slugify(exif_make)
-                        
-                        try:
-                            make, created = Make.objects.get_or_create(
-                                slug = make_slug,
-                                defaults = {
-                                    'name': exif_make,
-                                    'count': 1,
-                                }
-                            )
-                            
-                        except IntegrityError:
-                            logger.warning("Make %s already exists, but we're trying to add it again. Rescheduling task." % (exif_make))
-                            raise process_flickr_photo.retry(countdown=1)
-                            
-                        if not created:
-                            Make.objects.filter(slug=make_slug).update(count=F('count')+1)
-                            
-                        camera.make = make
-                        camera.save()
                 
-                # In case we need to create cache keys
-                id_digest = md5(str(camera.id)).hexdigest()
+                    photo.title = api_photo['title']
+                    photo.path_alias = api_photo['pathalias']
+                    photo.date_taken = api_date_taken
+                    photo.date_upload = api_date_upload
+                    photo.comments_count = api_photo['count_comments']
+                    photo.faves_count = api_photo['count_faves']
                 
-                # A little bonus here, if the camera doesn't have aws info, try to get it.
-                if not camera.amazon_item_response:
-                    lock_id = "%s-lock-%s" % ("aws_update", id_digest)
-                    acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
+                    if camera.make:
+                        photo.camera_make = camera.make
                     
-                    if acquire_lock():
-                        logger.info("Fetching aws info for %s." % (camera.name))
-                        add_aws_item_to_camera.delay(camera.id)
-                        
+                    if api_photo['latitude'] or api_photo['longitude'] and api_photo['geo_is_public']:
+                        photo.has_geo =  1
+                        photo.latitude = api_photo['latitude']
+                        photo.longitude = api_photo['longitude']
+                        photo.accuracy = api_photo['accuracy']
+                        photo.context = api_photo['context']
+                    
                     else:
-                        logger.info("AWS item update for %s already scheduled, skipping." % (camera.name))
-                            
-                photo, created = Photo.objects.get_or_create(
-                    photo_id = api_photo['id'],
-                    defaults = {
-                        'secret': api_photo['secret'],
-                        'server': api_photo['server'],
-                        'farm': api_photo['farm'],
-                        'license': api_photo['license'],
-                        'media': api_photo['media'],
-                        'owner_nsid': api_photo['owner'],
-                        'owner_name': api_photo['ownername'],
-                        'date_taken': api_date_taken,
-                        'date_upload': api_date_upload,
-                        'camera': camera,
-                    }
-                )
+                        photo.has_geo = 0
+                    
+                    # Ok, save the photo.
+                    logger.info("Saving photo %s for camera %s.\n" % (photo.photo_id, camera.name))
+                    photo.save()
                 
-                photo.title = api_photo['title']
-                photo.path_alias = api_photo['pathalias']
-                photo.date_taken = api_date_taken
-                photo.date_upload = api_date_upload
-                photo.comments_count = api_photo['count_comments']
-                photo.faves_count = api_photo['count_faves']
-                
-                if camera.make:
-                    photo.camera_make = camera.make
+                    if created:
+                        Camera.objects.filter(slug=camera_slug).update(count_photos=F('count_photos')+1)
+                        return photo.photo_id
                     
-                if api_photo['latitude'] or api_photo['longitude'] and api_photo['geo_is_public']:
-                    photo.has_geo =  1
-                    photo.latitude = api_photo['latitude']
-                    photo.longitude = api_photo['longitude']
-                    photo.accuracy = api_photo['accuracy']
-                    photo.context = api_photo['context']
+                    else:
+                        return False
                     
-                else:
-                    photo.has_geo = 0
-                    
-                # Ok, save the photo.
-                logger.info("Saving photo %s for camera %s.\n" % (photo.photo_id, camera.name))
-                photo.save()
-                
-                if created:
-                    Camera.objects.filter(slug=camera_slug).update(count_photos=F('count_photos')+1)
-                    return photo.photo_id
-                    
+                # The photo doesn't have camera info
                 else:
                     return False
                     
-            # The photo doesn't have camera info
-            else:
+            except KeyError:
+                logger.info("The photo doesn't have Exif data.")
                 return False
                 
+        else:
+            logger.error("The Flickr api did not return status ok, re-scheduling task.")
+            raise fetch_photos_for_flickr_user.retry(countdown=1)
+            
     except URLError:
         logger.error("Problem talking to Flickr (URLError), re-scheduling task.")
         raise fetch_photos_for_flickr_user.retry(countdown=1)

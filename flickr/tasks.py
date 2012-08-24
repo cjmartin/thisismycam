@@ -179,43 +179,48 @@ def fetch_contacts_for_flickr_user(nsid):
         json = simplejson.loads(rsp)
         
         if json and json['stat'] == 'ok':
-            contacts = json['contacts']['contact']
+            try:
+                contacts = json['contacts']['contact']
             
-            for contact in contacts:
-                logger.info("Contact! %s" % (contact['username']))
+                for contact in contacts:
+                    logger.info("Contact! %s" % (contact['username']))
                 
-                try:
-                    contact = FlickrUser.objects.get(pk = contact['nsid'])
-                    logger.info("Sweet, they're already here!")
+                    try:
+                        contact = FlickrUser.objects.get(pk = contact['nsid'])
+                        logger.info("Sweet, they're already here!")
                     
-                    flickr_user_contact, created = FlickrUserContact.objects.get_or_create(flickr_user = flickr_user, contact = contact)
+                        flickr_user_contact, created = FlickrUserContact.objects.get_or_create(flickr_user = flickr_user, contact = contact)
                     
-                    if created and contact.date_last_photo_update:
-                        logger.info("Push found contact.")
-                        values = {
-                            'secret': settings.PUSHY_SECRET,
-                            'user_id': flickr_user.nsid,
-                            'message': simplejson.dumps({'type': 'fetch_contacts.new_contact', 'data': {'contact': contact.slug}}),
-                        }
-                        data = urllib.urlencode(values)
-                        req = urllib2.Request(settings.PUSHY_URL_LOCAL, data)
-                        response = urllib2.urlopen(req)
+                        if created and contact.date_last_photo_update:
+                            logger.info("Push found contact.")
+                            values = {
+                                'secret': settings.PUSHY_SECRET,
+                                'user_id': flickr_user.nsid,
+                                'message': simplejson.dumps({'type': 'fetch_contacts.new_contact', 'data': {'contact': contact.slug}}),
+                            }
+                            data = urllib.urlencode(values)
+                            req = urllib2.Request(settings.PUSHY_URL_LOCAL, data)
+                            response = urllib2.urlopen(req)
                     
-                except FlickrUser.DoesNotExist:
-                    logger.info("Bummer, they haven't been here yet.")
+                    except FlickrUser.DoesNotExist:
+                        logger.info("Bummer, they haven't been here yet.")
                     
-                    flickr_contact_lookup, created = FlickrContactLookup.objects.get_or_create(
-                        flickr_user = flickr_user,
-                        nsid = contact['nsid'],
-                        defaults = {
-                            'username': contact['username'],
-                            'iconserver': contact['iconserver'],
-                            'iconfarm': contact['iconfarm'],
-                        }
-                    )
+                        flickr_contact_lookup, created = FlickrContactLookup.objects.get_or_create(
+                            flickr_user = flickr_user,
+                            nsid = contact['nsid'],
+                            defaults = {
+                                'username': contact['username'],
+                                'iconserver': contact['iconserver'],
+                                'iconfarm': contact['iconfarm'],
+                            }
+                        )
                     
-            flickr_user.count_contacts = flickr_user.contacts.count()
-            flickr_user.save()
+                flickr_user.count_contacts = flickr_user.contacts.count()
+                flickr_user.save()
+                
+            except KeyError:
+                logger.info("Looks like this user doesn't have any contacts.")
+                return
             
     except URLError, e:
         logger.error("Problem talking to Flickr (URLError), will try again. Reason: %s" % (e.reason))
