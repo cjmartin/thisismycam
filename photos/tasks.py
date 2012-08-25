@@ -81,7 +81,8 @@ def fetch_photos_for_flickr_user(results, nsid, page=None):
                 for photo in json['photos']['photo']:
                     if not flickr_user.date_last_photo_update or int(photo['dateupload']) >= int(flickr_user.date_last_photo_update):
                         photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))))
-                
+                        photo_update_date = photo['dateupload']
+                        
                 if page == 1:
                     logger.info("This is the last page (%s) for %s!" % (pages, flickr_user.username))
                     if photo_updates:
@@ -105,9 +106,16 @@ def fetch_photos_for_flickr_user(results, nsid, page=None):
                     }
                     data = urllib.urlencode(values)
                     req = urllib2.Request(settings.PUSHY_URL_LOCAL, data)
-                    response = urllib2.urlopen(req)
+                    
+                    try:
+                        response = urllib2.urlopen(req)
+                    except:
+                        logger.error("Problem calling pushy from photos fetch.")
                     
                     if photo_updates:
+                        flickr_user.date_last_photo_update = photo_update_date
+                        flickr_user.save()
+                        
                         return chord(photo_updates)(fetch_photos_for_flickr_user.subtask((flickr_user.nsid, next_page, )))
                     else:
                         return fetch_photos_for_flickr_user.delay(None, flickr_user.nsid, next_page)
