@@ -79,7 +79,7 @@ def fetch_photos_for_flickr_user(results, nsid, page=None):
                 photo_updates = []
             
                 for photo in json['photos']['photo']:
-                    if flickr_user.date_last_photo_update is False or int(photo['dateupload']) >= int(flickr_user.date_last_photo_update):
+                    if not flickr_user.date_last_photo_update or int(photo['dateupload']) >= int(flickr_user.date_last_photo_update):
                         photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))))
                 
                 if page == 1:
