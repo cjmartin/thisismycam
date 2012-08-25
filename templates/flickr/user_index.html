@@ -11,7 +11,7 @@
 <div class="section inset-section">
     <div class="container">
     {% if flickr_user.initial_fetch_completed %}
-        {% if flickr_user.count_cameras and primary_camera %}
+        {% if primary_camera %}
         <div class="the-camera-title">
             <h3 class="title">The fantastic</h3>
             <h1 class="title section-title brand">{{ primary_camera.camera.name }}</h1>
