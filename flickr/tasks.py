@@ -18,6 +18,7 @@ from celery import chord
 
 import flickr_api
 from flickr_api.api import flickr
+from flickr_api.base import FlickrError
 
 from accounts.models import UserProfile
 
