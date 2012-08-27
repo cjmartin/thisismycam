@@ -31,6 +31,61 @@ import logging
 logger = logging.getLogger(__name__)
 
 @task()
+def update_flickr_users(results, page=None, per_page=5):
+    limit = page * per_page
+    offset = limit - per_page
+    
+    flickr_users = FlickrUser.objects.order_by('date_create')[offset:limit]
+    user_updates = []
+    
+    for flickr_user in flickr_users:
+        nsid_digest = md5(flickr_user.nsid).hexdigest()
+        lock_id = "%s-lock-%s" % ("update_photos", nsid_digest)
+
+        # cache.add fails if if the key already exists
+        acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
+        
+        if acquire_lock:
+            try:
+                # First, update the flickr_user
+                rsp = flickr.people.getInfo(user_id=flickr_user.nsid,format="json",nojsoncallback="true")
+                json = simplejson.loads(rsp)
+            
+                if json and json['stat'] == "ok":
+                    api_user = json['person']
+                
+                    flickr_user.username = api_user['username']['_content']
+                    flickr_user.iconserver = api_user['iconserver']
+                    flickr_user.iconfarm = api_user['iconfarm']
+                    flickr_user.count_photos = api_user['photos']['count']['_content']
+
+                    try:
+                        flickr_user.realname = api_user['realname']['_content']
+                    except KeyError:
+                        flickr_user.realname = None
+
+                    try:
+                        flickr_user.path_alias = api_user['path_alias']
+                    except KeyError:
+                        flickr_user.path_alias = None
+
+                    flickr_user.save()
+            
+            except URLError, e:
+                logger.error("Problem talking to Flickr when calling people.getInfo (URLError), will try again. Reason: %s" % (e.reason))
+                return update_photos_for_flickr_user.retry(countdown=5)
+        
+            except FlickrError, e:
+                logger.error("Problem talking to Flickr when calling people.getInfo (FlickrError), re-scheduling task.\n Error: %s" % (e))
+                raise update_photos_for_flickr_user.retry(countdown=5)
+        
+            user_updates.append(update_photos_for_flickr_user.subtask((None, flickr_user.nsid), link=fetch_contacts_for_flickr_user.subtask((flickr_user.nsid, ))))
+            
+        if user_updates:
+            next_page = page + 1
+            return chord(user_updates)(update_flickr_users.subtask((next_page, per_page, )))
+            
+@task()
 def flickr_user_fetch_photos_complete(results, nsid):
     flickr_user = FlickrUser.objects.get(nsid = nsid)
     
