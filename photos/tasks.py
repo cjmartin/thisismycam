@@ -31,8 +31,6 @@ from cameras.models import Camera
 from cameras.tasks import add_aws_item_to_camera
 
 from flickr.models import FlickrUser
-from flickr.tasks import update_flickr_user_camera
-from flickr.tasks import flickr_user_fetch_photos_complete
 
 from photos.models import Photo
 
@@ -43,6 +41,9 @@ LOCK_EXPIRE = 60 * 60 # Lock expires in 60 minutes
 
 @task()
 def fetch_photos_for_flickr_user(results, nsid, page=None):
+    from flickr.tasks import update_flickr_user_camera
+    from flickr.tasks import flickr_user_fetch_photos_complete
+    
     nsid_digest = md5(nsid).hexdigest()
     lock_id = "%s-lock-%s" % ("fetch_photos", nsid_digest)
     
@@ -134,87 +135,6 @@ def fetch_photos_for_flickr_user(results, nsid, page=None):
             
     logger.warning("Photos for %s have already been fetched within the last hour." % (nsid))
     return True
-
-@task()
-def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
-    flickr_user = FlickrUser.objects.get(nsid = nsid)
-    
-    if flickr_user.count_photos == 0:
-        return flickr_user_fetch_photos_complete.delay(None, flickr_user.nsid)
-
-    if not page:
-        page = 1
-
-    per_page = 20
-
-    logger.info("Fetching page %s for %s" % (page, flickr_user.username))
-    
-    try:
-        # Fetch a page of photos
-        photos_rsp = flickr.people.getPublicPhotos(
-            user_id=flickr_user.nsid,
-            per_page=per_page,
-            page=page,
-            extras="date_taken,date_upload,license,owner_name,media,path_alias,count_comments,count_faves,geo",
-            format="json",
-            nojsoncallback="true",
-        )
-        json = simplejson.loads(photos_rsp)
-
-        if json and json['stat'] == 'ok':
-            pages = json['photos']['pages']
-            photo_updates = []
-
-            for photo in json['photos']['photo']:                    
-                logger.warning("Checking photo for %s, this photo: %s | date update: %s" % (flickr_user.username, photo['dateupload'], flickr_user.date_last_photo_update))
-                if update_all or int(photo['dateupload']) >= int(flickr_user.date_last_photo_update):
-                    logger.warning("This photo is new!")
-                    photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))))
-                    
-            if photo_updates:
-                logger.warning("Firing update tasks for page %s of %s for %s" % (page, pages, flickr_user.username))
-                
-                if page == pages:
-                    return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((flickr_user.nsid, )))
-                    
-                else:
-                    next_page = page + 1
-                
-                    pct = ((float(page) / float(pages)) * 100)
-                    logger.info("pct should be: %s/%s * 100 = %s" % (page, pages, pct))
-
-                    logger.info("Push it.")
-                    values = {
-                        'secret': settings.PUSHY_SECRET,
-                        'user_id': flickr_user.nsid,
-                        'message': simplejson.dumps({'type': 'fetch_photos.update_progress_bar', 'data': {'pct': pct}}),
-                    }
-                    data = urllib.urlencode(values)
-                    req = urllib2.Request(settings.PUSHY_URL_LOCAL, data)
-                
-                    try:
-                        response = urllib2.urlopen(req)
-                    except:
-                        logger.error("Problem calling pushy from photos update.")
-                    
-                    logger.warning("Scheduling chord of photo updates with callpack for next page")
-                    return chord(photo_updates)(update_photos_for_flickr_user.subtask((flickr_user.nsid, next_page, update_all, )))
-                
-            else:
-                logger.warning("No more new photos, calling fetch photos complete")
-                return flickr_user_fetch_photos_complete.delay(None, flickr_user.nsid)
-                
-        else:
-            logger.error("Flickr api query did not respond OK, will try again.")
-            return update_photos_for_flickr_user.retry(countdown=5)
-
-    except URLError, e:
-        logger.error("Problem talking to Flickr when fetching a page of photos (URLError), will try again. Reason: %s" % (e.reason))
-        return update_photos_for_flickr_user.retry(countdown=5)
-
-    except FlickrError, e:
-        logger.error("Problem talking to Flickr when fetching a page of photos (FlickrError), re-scheduling task.\n Error: %s" % (e))
-        raise update_photos_for_flickr_user.retry(countdown=5)
 
 @task()
 def process_flickr_photo(api_photo, nsid):
