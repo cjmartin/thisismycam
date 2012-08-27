@@ -32,7 +32,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 @task()
-def update_flickr_users(results, page=None, per_page=5):
+def update_flickr_users(results, page=1, per_page=5):
     limit = page * per_page
     offset = limit - per_page
     
