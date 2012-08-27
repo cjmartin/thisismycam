@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+<div class="section">
+	<h1 class="section-header">The Lost Cams</h1>
+	<div class="section-content inset">
+		<div class="container">
+			<div class="row">
+				<div class="span12">
+					<table>
+						<tr>
+							<th>Image</th>
+							<th>Name</th>
+							<th>Make</th>
+							<th>Model</th>
+							<th>Count</th>
+							<th>Today</th>
+							<th>30 Day</th>
+							<th>Admin</th>
+							<th>Categories</th>
+						</tr>
+						{% for camera in cameras %}
+						<tr>
+							<td>
+								<div class="image square-50{% if camera.amazon_image_response.0.SmallImage.Height > camera.amazon_image_response.0.SmallImage.Width %} portrait{% else %} landscape{% endif %}" style="background-image: url('{{ camera.amazon_image_response.0.SmallImage.URL }}');">
+									<img src="{{ camera.amazon_image_response.0.SmallImage.URL }}" />
+								</div>
+							</td>
+							<td><a href="{{ camera.amazon_url }}" title="View this camera on Amazon">{{ camera.name }}</a></td>
+							<td>{{ camera.make }}</td>
+							<td>{{ camera.model }}</td>
+							<td>{{ camera.count }}</td>
+							<td>{{ camera.count_day }}</td>
+							<td>{{ camera.avg_30_day }}</td>
+							<td><a href="/admin/cameras/camera/{{ camera.id }}">edit</a></td>
+							<td>
+								<ul id="cats-{{ camera.id }}" style="display:none;">	
+								</ul>
+								<form class="cat-form" id="cat-form-{{ camera.id }}" style="margin-bottom:0;">
+									<input type="hidden" name="camera_id" value="{{ camera.id }}" />
+									<select class="cat-selector" name="category_id">
+										<option selected="selected">Add a Category?</option>
+										{% for category in categories %}
+										<option id="cat-option-{{ camera.id }}-{{ category.id }}" value="{{ category.id }}">{{ category.name }}</option>
+										{% endfor %}
+									</select>
+									<!-- <input type="submit" value="Categorize!" /> -->
+								</form>
+							</td>
+						</tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ block.super }}
+<script src="{% get_static_prefix %}js/jquery/jquery.form.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+
+	var categories = {
+		{% for category in categories %}
+		{{ category.id }}: "{{ category.name }}"{% if not forloop.last %},{% endif %}
+		{% endfor %}
+	}
+	
+	var options = {
+		url: "/admin/cameras/category/missing/",
+		type: "POST",
+		dataType: "json",
+		resetForm: true,
+		beforeSubmit: showNewCat,
+		success: confirmNewCat
+	};
+	
+	function showNewCat(formData, jqForm, options) {
+		//console.log("Before Submit:");
+		//console.log(formData[0]);
+		//console.log(jqForm);
+		//console.log(options);
+		//return true;
+		var camera_id = null;
+		var category_id = null;
+		
+		for (key in formData) {
+			if (formData[key].name == "category_id") {
+				category_id = formData[key].value;
+			}
+			if (formData[key].name == "camera_id") {
+				camera_id = formData[key].value;
+			}
+		}
+		
+		if (camera_id && category_id) {
+			$('#cats-' + camera_id).append("<li id=\"cat-li-" + camera_id + "-" + category_id + "\" class=\"pending\">" + categories[category_id] + "</li>");
+			$('#cats-' + camera_id).fadeIn();
+		}
+	}
+	
+	function confirmNewCat(data, status, xhr) {
+		//console.log("Success:");
+		//console.log(data);
+		//console.log(status);
+		//console.log(xhr);
+		$('#cat-li-' + data.camera_id + '-' + data.category_id).removeClass('pending');
+		$('#cat-option-' + data.camera_id + '-' + data.category_id).remove();
+	}
+	
+	$('.cat-form').each(function() {		
+		$(this).children('.cat-selector').change(function() {
+			$(this).parent().ajaxSubmit(options);
+		});
+	});
+});
+</script>
+{% endblock %}
