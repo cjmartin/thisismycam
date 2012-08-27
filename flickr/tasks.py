@@ -14,6 +14,7 @@ import urllib2
 from urllib2 import URLError
 
 from celery.task import task
+from celery import chord
 
 import flickr_api
 from flickr_api.api import flickr
