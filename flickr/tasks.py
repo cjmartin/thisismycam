@@ -26,6 +26,7 @@ from flickr.models import FlickrContactLookup
 from cameras.models import Camera
 
 from photos.models import Photo
+from photos.tasks import update_photos_for_flickr_user
 
 import logging
 logger = logging.getLogger(__name__)
