@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.utils import simplejson
 from django.db import IntegrityError
+from django.utils.hashcompat import md5_constructor as md5
+from django.core.cache import cache
 
 from django.db.models import F
 from django.db.models import Sum
