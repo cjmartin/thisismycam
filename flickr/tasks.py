@@ -83,7 +83,7 @@ def update_flickr_users(results, page=1, per_page=5):
                 logger.error("Problem talking to Flickr when calling people.getInfo (FlickrError), re-scheduling task.\n Error: %s" % (e))
                 raise update_photos_for_flickr_user.retry(countdown=5)
         
-            user_updates.append(update_photos_for_flickr_user.subtask((None, flickr_user.nsid), link=fetch_contacts_for_flickr_user.subtask((flickr_user.nsid, ))))
+            user_updates.append(update_photos_for_flickr_user.subtask((None, flickr_user.nsid)))
             
     if user_updates:
         next_page = page + 1
