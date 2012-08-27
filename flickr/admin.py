@@ -11,7 +11,7 @@ class FlickrUserCameraInline(admin.TabularInline):
     
 class FlickrUserAdmin(admin.ModelAdmin):
     search_fields = ['username']
-    list_display = ('username', 'realname', 'nsid', 'path_alias', 'count_cameras', 'count_contacts', 'count_photos', 'count_photos_processed', 'date_last_photo_update', 'date_create')
+    list_display = ('username', 'nsid', 'path_alias', 'count_cameras', 'count_contacts', 'count_photos', 'count_photos_processed', 'date_last_photo_update', 'date_create', 'date_update')
     
     inlines = [
         FlickrUserCameraInline
