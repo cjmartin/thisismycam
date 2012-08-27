@@ -82,9 +82,9 @@ def update_flickr_users(results, page=None, per_page=5):
         
             user_updates.append(update_photos_for_flickr_user.subtask((None, flickr_user.nsid), link=fetch_contacts_for_flickr_user.subtask((flickr_user.nsid, ))))
             
-        if user_updates:
-            next_page = page + 1
-            return chord(user_updates)(update_flickr_users.subtask((next_page, per_page, )))
+    if user_updates:
+        next_page = page + 1
+        return chord(user_updates)(update_flickr_users.subtask((next_page, per_page, )))
             
 @task()
 def flickr_user_fetch_photos_complete(results, nsid):
