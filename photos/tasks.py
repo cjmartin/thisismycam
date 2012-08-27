@@ -122,15 +122,15 @@ def fetch_photos_for_flickr_user(results, nsid, page=None):
                         return fetch_photos_for_flickr_user.delay(None, flickr_user.nsid, next_page)
                 
             else:
-                logger.error("Flickr api query did not respond OK, will try again.")
+                logger.error("Flickr api query did not respond OK calling getPublicPhotos for %s in fetch_photos, will try again." % (flickr_user.nsid))
                 return fetch_photos_for_flickr_user.retry(countdown=5)
             
         except URLError, e:
-            logger.error("Problem talking to Flickr (URLError), will try again. Reason: %s" % (e.reason))
+            logger.error("Problem talking to Flickr when calling getPublicPhotos for %s in fetch_photos (URLError), will try again. Reason: %s" % (flickr_user.nsid, e.reason))
             return fetch_photos_for_flickr_user.retry(countdown=5)
         
         except FlickrError, e:
-            logger.error("Problem talking to Flickr (FlickrError), re-scheduling task.\n Error: %s" % (e))
+            logger.error("Problem talking to Flickr when calling getPublicPhotos for %s in fetch_photos (FlickrError), re-scheduling task.\n Error: %s" % (flickr_user.nsid, e))
             raise fetch_photos_for_flickr_user.retry(countdown=5)
             
     logger.warning("Photos for %s have already been fetched within the last hour." % (nsid))
@@ -318,11 +318,11 @@ def process_flickr_photo(api_photo, nsid):
             #raise fetch_photos_for_flickr_user.retry(countdown=5)
             
     except URLError:
-        logger.error("Problem talking to Flickr (URLError), re-scheduling task.")
+        logger.error("Problem talking to Flickr in process_photo (URLError), re-scheduling task.")
         raise fetch_photos_for_flickr_user.retry(countdown=5)
         
     except FlickrError, e:
-        logger.error("Problem talking to Flickr (FlickrError), re-scheduling task.\n Error: %s" % (e))
+        logger.error("Problem talking to Flickr in process_photo (FlickrError), re-scheduling task.\n Error: %s" % (e))
         raise fetch_photos_for_flickr_user.retry(countdown=5)
 
 def clean_make(make):

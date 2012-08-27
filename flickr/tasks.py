@@ -79,11 +79,11 @@ def update_flickr_users(results, page=1, per_page=5):
                     flickr_user.save()
             
             except URLError, e:
-                logger.error("Problem talking to Flickr when calling people.getInfo (URLError), will try again. Reason: %s" % (e.reason))
+                logger.error("Problem talking to Flickr when calling people.getInfo from update_flickr_users (URLError), will try again. Reason: %s" % (e.reason))
                 return update_photos_for_flickr_user.retry(countdown=5)
         
             except FlickrError, e:
-                logger.error("Problem talking to Flickr when calling people.getInfo (FlickrError), re-scheduling task.\n Error: %s" % (e))
+                logger.error("Problem talking to Flickr when calling people.getInfo from update_flickr_users (FlickrError), re-scheduling task.\n Error: %s" % (e))
                 raise update_photos_for_flickr_user.retry(countdown=5)
         
             user_updates.append(update_photos_for_flickr_user.subtask((None, flickr_user.nsid)))
@@ -125,11 +125,11 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
             for photo in json['photos']['photo']:                    
                 logger.warning("Checking photo for %s, this photo: %s | date update: %s" % (flickr_user.username, photo['dateupload'], flickr_user.date_last_photo_update))
                 if update_all or int(photo['dateupload']) >= int(flickr_user.date_last_photo_update):
-                    logger.warning("This photo is new!")
+                    logger.info("This photo is new!")
                     photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))))
 
             if photo_updates:
-                logger.warning("Firing update tasks for page %s of %s for %s" % (page, pages, flickr_user.username))
+                logger.info("Firing update tasks for page %s of %s for %s" % (page, pages, flickr_user.username))
 
                 if page == pages:
                     return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((flickr_user.nsid, )))
@@ -154,23 +154,23 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
                     except:
                         logger.error("Problem calling pushy from photos update.")
 
-                    logger.warning("Scheduling chord of photo updates with callpack for next page")
+                    logger.info("Scheduling chord of photo updates with callpack for next page")
                     return chord(photo_updates)(update_photos_for_flickr_user.subtask((flickr_user.nsid, next_page, update_all, )))
 
             else:
-                logger.warning("No more new photos, calling fetch photos complete")
+                logger.info("No more new photos, calling fetch photos complete")
                 return flickr_user_fetch_photos_complete.delay(None, flickr_user.nsid)
 
         else:
-            logger.error("Flickr api query did not respond OK, will try again.")
+            logger.error("Flickr api query did not respond OK calling getPublicPhotos for %s in update_photos, will try again." % (flickr_user.nsid))
             return update_photos_for_flickr_user.retry(countdown=5)
 
     except URLError, e:
-        logger.error("Problem talking to Flickr when fetching a page of photos (URLError), will try again. Reason: %s" % (e.reason))
+        logger.error("Problem talking to Flickr when calling getPublicPhotos for %s in update_photos (URLError), will try again. Reason: %s" % (flickr_user.nsid, e.reason))
         return update_photos_for_flickr_user.retry(countdown=5)
 
     except FlickrError, e:
-        logger.error("Problem talking to Flickr when fetching a page of photos (FlickrError), re-scheduling task.\n Error: %s" % (e))
+        logger.error("Problem talking to Flickr when calling getPublicPhotos for %s in update_photos (FlickrError), re-scheduling task.\n Error: %s" % (flickr_user.nsid, e))
         raise update_photos_for_flickr_user.retry(countdown=5)
 
     
