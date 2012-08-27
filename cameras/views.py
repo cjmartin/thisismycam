@@ -30,7 +30,7 @@ def categorizer(request):
         user = request.user.get_profile()
         
         #cameras = Camera.objects.filter(category__isnull=True).order_by('-avg_30_day')[:10]
-        cameras = Camera.objects.filter(category__isnull=True).order_by('-count_day')[:20]
+        cameras = Camera.objects.filter(category__isnull=True).order_by('-count')[:20]
         for camera in cameras:
             if camera.amazon_image_response:
                 camera.amazon_image_response = simplejson.loads(camera.amazon_image_response)
