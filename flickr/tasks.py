@@ -181,7 +181,7 @@ def flickr_user_fetch_photos_complete(results, nsid, date_last_update=None):
     
     total_photos = 0
     if date_last_update:
-        cameras = flickr_user.cameras.filter(date_last_upload__gte=date_last_update)
+        cameras = flickr_user.cameras.filter(last_upload__gte=date_last_update)
     else:
         cameras = flickr_user.cameras.all()
     
