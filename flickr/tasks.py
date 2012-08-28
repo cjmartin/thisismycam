@@ -192,7 +192,7 @@ def flickr_user_fetch_photos_complete(results, nsid, date_last_update=None):
         photos_count = photos.count()
         last_upload = photos.latest('date_upload')
         
-        if not date_last_update or last_upload >= date_last_update:
+        if not date_last_update or last_upload.date_upload >= date_last_update:
             logger.info("Camera %s for %s may have new photos, updating" % (camera, flickr_user))
             
             first_taken = photos.order_by('date_taken')[:1].get()
