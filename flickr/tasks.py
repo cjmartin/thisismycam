@@ -180,12 +180,13 @@ def flickr_user_fetch_photos_complete(results, nsid, date_last_update=None):
     flickr_user = FlickrUser.objects.get(pk = nsid)
     
     total_photos = 0
-    if date_last_update:
-        cameras = flickr_user.cameras.filter(last_upload__gte=date_last_update)
-    else:
-        cameras = flickr_user.cameras.all()
+    cameras = flickr_user.cameras.all()
     
     for camera in cameras:
+        if date_last_update:
+            logger.info("Date last update is: %s" % (date_last_update))
+            return
+            
         logger.info("Updating camera %s for %s" % (camera, flickr_user))
         
         photos = Photo.objects.filter(camera=camera, owner_nsid=flickr_user.nsid)
