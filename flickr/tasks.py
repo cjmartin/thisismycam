@@ -133,6 +133,7 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
 
                 if page == pages:
                     date_last_update = datetime.utcfromtimestamp(float(flickr_user.date_last_photo_update)).replace(tzinfo=timezone.utc)
+                    logger.info("Date last update is: %s" % (date_last_update))
                     return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((flickr_user.nsid, date_last_update, )))
 
                 else:
