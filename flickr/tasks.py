@@ -95,7 +95,8 @@ def update_flickr_users(results, page=1, per_page=2):
 @task()
 def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
     flickr_user = FlickrUser.objects.get(pk=nsid)
-
+    date_last_update = datetime.utcfromtimestamp(float(flickr_user.date_last_photo_update)).replace(tzinfo=timezone.utc)
+    
     if flickr_user.count_photos == 0:
         return flickr_user_fetch_photos_complete.delay(None, flickr_user.nsid)
 
@@ -132,8 +133,6 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
                 logger.info("Firing update tasks for page %s of %s for %s" % (page, pages, flickr_user.username))
 
                 if page == pages:
-                    date_last_update = datetime.utcfromtimestamp(float(flickr_user.date_last_photo_update)).replace(tzinfo=timezone.utc)
-                    logger.info("Date last update is: %s" % (date_last_update))
                     return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((flickr_user.nsid, date_last_update, )))
 
                 else:
@@ -161,7 +160,7 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
 
             else:
                 logger.info("No more new photos, calling fetch photos complete")
-                return flickr_user_fetch_photos_complete.delay(None, flickr_user.nsid)
+                return flickr_user_fetch_photos_complete.delay(None, flickr_user.nsid, date_last_update)
 
         else:
             logger.error("Flickr api query did not respond OK calling getPublicPhotos for %s in update_photos, will try again." % (flickr_user.nsid))
