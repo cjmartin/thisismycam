@@ -8,7 +8,9 @@ from django.db.models import F
 from django.db.models import Sum
 
 import calendar
-import datetime
+from datetime import datetime
+from django.utils import timezone
+
 import urllib
 import urllib2
 from urllib2 import URLError
