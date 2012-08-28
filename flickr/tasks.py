@@ -42,7 +42,7 @@ def update_flickr_users(results, page=1, per_page=5):
     limit = page * per_page
     offset = limit - per_page
     
-    flickr_users = FlickrUser.objects.order_by('date_create')[offset:limit]
+    flickr_users = FlickrUser.objects.all()[offset:limit]
     user_updates = []
     
     for flickr_user in flickr_users:
@@ -94,7 +94,7 @@ def update_flickr_users(results, page=1, per_page=5):
         
 @task()
 def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
-    flickr_user = FlickrUser.objects.get(nsid = nsid)
+    flickr_user = FlickrUser.objects.get(pk=nsid)
 
     if flickr_user.count_photos == 0:
         return flickr_user_fetch_photos_complete.delay(None, flickr_user.nsid)
@@ -124,7 +124,7 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
 
             for photo in json['photos']['photo']:                    
                 logger.warning("Checking photo for %s, this photo: %s | date update: %s" % (flickr_user.username, photo['dateupload'], flickr_user.date_last_photo_update))
-                if update_all or int(photo['dateupload']) >= int(flickr_user.date_last_photo_update):
+                if update_all or int(photo['dateupload']) > int(flickr_user.date_last_photo_update):
                     logger.info("This photo is new!")
                     photo_updates.append(process_flickr_photo.subtask((photo, flickr_user.nsid), link=update_flickr_user_camera.subtask((flickr_user.nsid, ))))
 
@@ -132,7 +132,8 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
                 logger.info("Firing update tasks for page %s of %s for %s" % (page, pages, flickr_user.username))
 
                 if page == pages:
-                    return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((flickr_user.nsid, )))
+                    date_last_update = datetime.utcfromtimestamp(float(flickr_user.date_last_photo_update)).replace(tzinfo=timezone.utc)
+                    return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((flickr_user.nsid, date_last_update, )))
 
                 else:
                     next_page = page + 1
@@ -175,11 +176,14 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
 
     
 @task()
-def flickr_user_fetch_photos_complete(results, nsid):
-    flickr_user = FlickrUser.objects.get(nsid = nsid)
+def flickr_user_fetch_photos_complete(results, nsid, date_last_update=None):
+    flickr_user = FlickrUser.objects.get(pk = nsid)
     
     total_photos = 0
-    cameras = flickr_user.cameras.all()
+    if date_last_update:
+        cameras = flickr_user.cameras.filter(date_last_upload__gte=date_last_update)
+    else:
+        cameras = flickr_user.cameras.all()
     
     for camera in cameras:
         logger.info("Updating camera %s for %s" % (camera, flickr_user))
