@@ -44,7 +44,7 @@ def update_flickr_users(results, page=1, per_page=2):
     limit = page * per_page
     offset = limit - per_page
     
-    flickr_users = FlickrUser.objects.all()[offset:limit]
+    flickr_users = FlickrUser.objects.order_by('date_create')[offset:limit]
     user_updates = []
     
     for flickr_user in flickr_users:
@@ -186,15 +186,15 @@ def flickr_user_fetch_photos_complete(results, nsid, datetime_last_update=None):
     
     try:
         last_upload = Photo.objects.filter(owner_nsid=flickr_user.nsid).latest('date_upload')
-        logger.info("Awesome, this user has photos!")
+        logger.info("Awesome, %s user has photos!" % (flickr_user.username))
         
-        logger.info("Are any new? The lasst update was: %s and the latest photo is: %s" % (datetime_last_update, last_upload.date_upload))
+        logger.info("Checking for new photos for %s. The last update was: %s and the latest photo is: %s" % (flickr_user.username, datetime_last_update, last_upload.date_upload))
         if datetime_last_update and last_upload.date_upload == datetime_last_update:
-            logger.info("Nope, no new photos since last time.")
+            logger.info("No new photos for %s since last time." % (flickr_user.username))
             return
             
     except Photo.DoesNotExist:
-        logger.info("Aww, this user doesn't have any photos.")
+        logger.info("Aww, %s doesn't have any photos." % (flickr_user.username))
         last_upload = None
         fetch_cameras = False
     
@@ -202,7 +202,7 @@ def flickr_user_fetch_photos_complete(results, nsid, datetime_last_update=None):
         cameras = flickr_user.cameras.all()
         
         for camera in cameras:            
-            logger.info("Updating camera %s for %s" % (camera, flickr_user))
+            logger.info("Updating camera %s for %s" % (camera, flickr_user.username))
         
             photos = Photo.objects.filter(camera=camera, owner_nsid=flickr_user.nsid)
         
@@ -210,7 +210,7 @@ def flickr_user_fetch_photos_complete(results, nsid, datetime_last_update=None):
             last_upload = photos.latest('date_upload')
         
             if not datetime_last_update or last_upload.date_upload > datetime_last_update:
-                logger.info("Camera %s for %s may have new photos, updating" % (camera, flickr_user))
+                logger.info("Camera %s for %s may have new photos, updating" % (camera, flickr_user.username))
             
                 first_taken = photos.order_by('date_taken')[:1].get()
                 last_taken = photos.latest('date_taken')
