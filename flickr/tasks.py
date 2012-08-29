@@ -97,7 +97,7 @@ def update_flickr_users(results, page=1, per_page=2):
 @task()
 def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
     flickr_user = FlickrUser.objects.get(pk=nsid)
-    date_last_update = datetime.utcfromtimestamp(float(flickr_user.date_last_photo_update)).replace(tzinfo=timezone.utc)
+    datetime_last_update = datetime.utcfromtimestamp(float(flickr_user.date_last_photo_update)).replace(tzinfo=timezone.utc)
     
     if flickr_user.count_photos == 0:
         return flickr_user_fetch_photos_complete.delay(None, flickr_user.nsid)
@@ -135,7 +135,7 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
                 logger.info("Firing update tasks for page %s of %s for %s" % (page, pages, flickr_user.username))
 
                 if page == pages:
-                    return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((flickr_user.nsid, date_last_update, )))
+                    return chord(photo_updates)(flickr_user_fetch_photos_complete.subtask((flickr_user.nsid, datetime_last_update, )))
 
                 else:
                     next_page = page + 1
@@ -162,7 +162,7 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
 
             else:
                 logger.info("No more new photos, calling fetch photos complete")
-                return flickr_user_fetch_photos_complete.delay(None, flickr_user.nsid, date_last_update)
+                return flickr_user_fetch_photos_complete.delay(None, flickr_user.nsid, datetime_last_update)
 
         else:
             logger.error("Flickr api query did not respond OK calling getPublicPhotos for %s in update_photos, will try again." % (flickr_user.nsid))
@@ -178,47 +178,62 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
 
     
 @task()
-def flickr_user_fetch_photos_complete(results, nsid, date_last_update=None):
+def flickr_user_fetch_photos_complete(results, nsid, datetime_last_update=None):
     flickr_user = FlickrUser.objects.get(pk = nsid)
     
+    fetch_cameras = True
     total_photos = 0
-    cameras = flickr_user.cameras.all()
     
-    for camera in cameras:            
-        logger.info("Updating camera %s for %s" % (camera, flickr_user))
-        
-        photos = Photo.objects.filter(camera=camera, owner_nsid=flickr_user.nsid)
-        
-        photos_count = photos.count()
-        last_upload = photos.latest('date_upload')
-        
-        if not date_last_update or last_upload.date_upload >= date_last_update:
-            logger.info("Camera %s for %s may have new photos, updating" % (camera, flickr_user))
-            
-            first_taken = photos.order_by('date_taken')[:1].get()
-            last_taken = photos.latest('date_taken')
-            first_upload = photos.order_by('date_upload')[:1].get()
-            comments_count = photos.aggregate(Sum('comments_count'))
-            faves_count = photos.aggregate(Sum('faves_count'))
-                
-            FlickrUserCamera.objects.filter(camera=camera, flickr_user=flickr_user).update(
-                count_photos = photos_count,
-                date_first_taken = first_taken.date_taken,
-                first_taken_id = first_taken.photo_id,
-                date_first_upload = first_upload.date_upload,
-                first_upload_id = first_upload.photo_id,
-                date_last_taken = last_taken.date_taken,
-                last_taken_id = last_taken.photo_id,
-                date_last_upload = last_upload.date_upload,
-                last_upload_id = last_upload.photo_id,
-                comments_count = comments_count['comments_count__sum'],
-                faves_count = faves_count['faves_count__sum'],
-            )
-        
-        total_photos = total_photos + photos_count
-        
-    if total_photos:
+    try:
         last_upload = Photo.objects.filter(owner_nsid=flickr_user.nsid).latest('date_upload')
+        logger.info("Awesome, this user has photos!")
+        
+        logger.info("Are any new? The lasst update was: %s and the latest photo is: %s" % (datetime_last_update, last_upload.date_upload))
+        if datetime_last_update and last_upload.date_upload == datetime_last_update:
+            logger.info("Nope, no new photos since last time.")
+            fetch_cameras = False
+            
+    except Photo.DoesNotExist:
+        logger.info("Aww, this user doesn't have any photos.")
+        last_upload = None
+        fetch_cameras = False
+    
+    if fetch_cameras:
+        cameras = flickr_user.cameras.all()
+        
+        for camera in cameras:            
+            logger.info("Updating camera %s for %s" % (camera, flickr_user))
+        
+            photos = Photo.objects.filter(camera=camera, owner_nsid=flickr_user.nsid)
+        
+            photos_count = photos.count()
+            last_upload = photos.latest('date_upload')
+        
+            if not datetime_last_update or last_upload.date_upload > datetime_last_update:
+                logger.info("Camera %s for %s may have new photos, updating" % (camera, flickr_user))
+            
+                first_taken = photos.order_by('date_taken')[:1].get()
+                last_taken = photos.latest('date_taken')
+                first_upload = photos.order_by('date_upload')[:1].get()
+                comments_count = photos.aggregate(Sum('comments_count'))
+                faves_count = photos.aggregate(Sum('faves_count'))
+                
+                FlickrUserCamera.objects.filter(camera=camera, flickr_user=flickr_user).update(
+                    count_photos = photos_count,
+                    date_first_taken = first_taken.date_taken,
+                    first_taken_id = first_taken.photo_id,
+                    date_first_upload = first_upload.date_upload,
+                    first_upload_id = first_upload.photo_id,
+                    date_last_taken = last_taken.date_taken,
+                    last_taken_id = last_taken.photo_id,
+                    date_last_upload = last_upload.date_upload,
+                    last_upload_id = last_upload.photo_id,
+                    comments_count = comments_count['comments_count__sum'],
+                    faves_count = faves_count['faves_count__sum'],
+                )
+        
+            total_photos = total_photos + photos_count
+        
         last_upload_date = last_upload.date_upload
         flickr_user.date_last_photo_update = calendar.timegm(last_upload_date.timetuple())
         
