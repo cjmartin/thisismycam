@@ -191,11 +191,11 @@ def flickr_user_fetch_photos_complete(results, nsid, datetime_last_update=None):
         logger.info("Checking for new photos for %s. The last update was: %s and the latest photo is: %s" % (flickr_user.username, datetime_last_update, last_upload.date_upload))
         if datetime_last_update and last_upload.date_upload == datetime_last_update:
             logger.info("No new photos for %s since last time." % (flickr_user.username))
-            return
+            total_photos = flickr_user.count_photos_processed
+            fetch_cameras = False
             
     except Photo.DoesNotExist:
         logger.info("Aww, %s doesn't have any photos." % (flickr_user.username))
-        last_upload = None
         fetch_cameras = False
     
     if fetch_cameras:
@@ -240,7 +240,8 @@ def flickr_user_fetch_photos_complete(results, nsid, datetime_last_update=None):
         flickr_user.current_camera = flickr_user.calculate_current_camera()
         
     else:
-        flickr_user.date_last_photo_update = 0
+        if not datetime_last_update:
+            flickr_user.date_last_photo_update = 0
     
     flickr_user.count_photos_processed = total_photos
     flickr_user.count_cameras = flickr_user.cameras.count()
