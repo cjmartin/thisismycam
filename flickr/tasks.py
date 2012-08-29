@@ -191,7 +191,7 @@ def flickr_user_fetch_photos_complete(results, nsid, datetime_last_update=None):
         logger.info("Are any new? The lasst update was: %s and the latest photo is: %s" % (datetime_last_update, last_upload.date_upload))
         if datetime_last_update and last_upload.date_upload == datetime_last_update:
             logger.info("Nope, no new photos since last time.")
-            fetch_cameras = False
+            return
             
     except Photo.DoesNotExist:
         logger.info("Aww, this user doesn't have any photos.")
