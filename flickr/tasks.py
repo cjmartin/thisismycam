@@ -99,7 +99,9 @@ def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
     flickr_user = FlickrUser.objects.get(pk=nsid)
     datetime_last_update = datetime.utcfromtimestamp(float(flickr_user.date_last_photo_update)).replace(tzinfo=timezone.utc)
     
-    if flickr_user.count_photos == 0:
+    # If the user doesn't have any public photos, or they don't have any previously processed photos (probably exif off), skip.
+    # Need a way to re-check the exif-off people, but re-scanning all their photos every time is too much.
+    if flickr_user.count_photos == 0 or flickr_user.count_photos_processed == 0:
         return flickr_user_fetch_photos_complete.delay(None, flickr_user.nsid)
 
     if not page:
