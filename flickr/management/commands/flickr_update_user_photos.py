@@ -19,7 +19,16 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        user = FlickrUser.objects.get(nsid=options.get('user'))                
+        user = FlickrUser.objects.get(nsid=options.get('user'))
+        
+        rsp = flickr.people.getInfo(user_id=user.nsid,format="json",nojsoncallback="true")
+        json = simplejson.loads(rsp)
+
+        if json and json['stat'] == "ok":
+            api_user = json['person']
+            
+            user.count_photos = api_user['photos']['count']['_content']
+            user.save()
             
         update_photos_for_flickr_user.delay(None, user.nsid)
         
