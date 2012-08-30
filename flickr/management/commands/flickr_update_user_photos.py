@@ -7,7 +7,7 @@ from flickr_api.api import flickr
 
 from flickr.models import FlickrUser
 
-from photos.tasks import update_photos_for_flickr_user
+from flickr.tasks import update_photos_for_flickr_user
 
 class Command(BaseCommand):
     help = 'Updatte photos for a flickr user.'
