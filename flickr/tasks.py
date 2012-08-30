@@ -209,9 +209,9 @@ def flickr_user_fetch_photos_complete(results, nsid, datetime_last_update=None):
             photos = Photo.objects.filter(camera=camera, owner_nsid=flickr_user.nsid)
         
             photos_count = photos.count()
-            last_upload = photos.latest('date_upload')
+            camera_last_upload = photos.latest('date_upload')
         
-            if not datetime_last_update or last_upload.date_upload > datetime_last_update:
+            if not datetime_last_update or camera_last_upload.date_upload > datetime_last_update:
                 logger.info("Camera %s for %s may have new photos, updating" % (camera, flickr_user.username))
             
                 first_taken = photos.order_by('date_taken')[:1].get()
@@ -228,8 +228,8 @@ def flickr_user_fetch_photos_complete(results, nsid, datetime_last_update=None):
                     first_upload_id = first_upload.photo_id,
                     date_last_taken = last_taken.date_taken,
                     last_taken_id = last_taken.photo_id,
-                    date_last_upload = last_upload.date_upload,
-                    last_upload_id = last_upload.photo_id,
+                    date_last_upload = camera_last_upload.date_upload,
+                    last_upload_id = camera_last_upload.photo_id,
                     comments_count = comments_count['comments_count__sum'],
                     faves_count = faves_count['faves_count__sum'],
                 )
@@ -248,6 +248,8 @@ def flickr_user_fetch_photos_complete(results, nsid, datetime_last_update=None):
     flickr_user.count_photos_processed = total_photos
     flickr_user.count_cameras = flickr_user.cameras.count()
     flickr_user.initial_fetch_completed = True
+    
+    logger.info("Saving values for %n | ")
     
     flickr_user.save()
     
