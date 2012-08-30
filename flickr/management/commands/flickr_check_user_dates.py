@@ -6,6 +6,7 @@ from datetime import datetime
 from django.utils import timezone
 
 from flickr.models import FlickrUser
+from photos.models import Photo
 
 class Command(BaseCommand):
     help = 'Debug flickr user update dates'
