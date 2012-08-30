@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 LOCK_EXPIRE = 60 * 60 # Lock expires in 60 minutes
 
 @task()
-def update_flickr_users(results, page=1, per_page=2):
+def update_flickr_users(results, page=1, per_page=1):
     limit = page * per_page
     offset = limit - per_page
     
