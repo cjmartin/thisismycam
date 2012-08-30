@@ -27,6 +27,6 @@ class Command(BaseCommand):
                     self.stdout.write("%s | last photo: %s | last update: %s\n" % (flickr_user.username, last_upload.date_upload, datetime_last_update))
 
             except Photo.DoesNotExist:
-                self.stdout.write("%s doesn't have any photos" % (flickr_user.username))
+                self.stdout.write("%s doesn't have any photos\n" % (flickr_user.username))
         
         self.stdout.write("All Done!\n")
