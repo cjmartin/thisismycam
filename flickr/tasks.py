@@ -248,9 +248,7 @@ def flickr_user_fetch_photos_complete(results, nsid, datetime_last_update=None):
     flickr_user.count_photos_processed = total_photos
     flickr_user.count_cameras = flickr_user.cameras.count()
     flickr_user.initial_fetch_completed = True
-    
-    logger.info("Saving values for %n | ")
-    
+        
     flickr_user.save()
     
     logger.info("Fetch for %s complete. That was fun!" % (flickr_user.username))
