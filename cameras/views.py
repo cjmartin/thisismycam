@@ -7,10 +7,13 @@ from django.views.decorators.csrf import csrf_exempt
 from cameras.models import Camera
 from cameras.models import Category
 
+from flickr.models import FlickrUserCamera
+
 import urllib2
 
 def camera(request, camera_slug):
     camera = get_object_or_404(Camera, slug=camera_slug)
+    user_cameras = FlickrUserCamera.objects.filter(camera = camera)
     
     return HttpResponse(camera.name)
 
