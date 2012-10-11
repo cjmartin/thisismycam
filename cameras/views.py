@@ -15,7 +15,11 @@ def camera(request, camera_slug):
     camera = get_object_or_404(Camera, slug=camera_slug)
     user_cameras = FlickrUserCamera.objects.filter(camera = camera)
     
-    return HttpResponse(camera.name)
+    data = {
+        'camera': camera,
+        'user_cameras': user_cameras
+    }
+    return render_to_response('cameras/camera.html', data)
 
 @csrf_exempt
 def categorizer(request):
