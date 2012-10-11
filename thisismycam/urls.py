@@ -23,6 +23,9 @@ urlpatterns = patterns('',
     url(r'', include('social_auth.urls')),
     url(r'^logout', 'accounts.views.logout_view', name='logout'),
     
+    # Camera Pages
+    url(r'^cameras/', include('cameras.urls')),
+    
     # User and User Camera Pages
-    url(r'^(?P<user_slug>[\w@]+)/', include('flickr.urls')),
+    url(r'^(?P<user_slug>[\w@-]+)/', include('flickr.urls')),
 )
