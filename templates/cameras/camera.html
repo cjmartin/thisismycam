@@ -7,6 +7,22 @@
 
 {% block body %}
 
+<div class="section inset-section">
+    <div class="container">
+        <div class="row">
+            
+            <div class="span5">
+                <div class="the-camera">
+                    <div class="image camera-image the-camera-image {{ camera.large_orientation }}" style="background-image: url('{{ camera.large_photo_url }}');">
+                        <img src="{{ camera.large_photo_url }}">
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
 {% for user_camera in user_cameras %}
     <a href="{% url flickr-user-camera user_camera.flickr_user.slug camera.slug %}">{{ user_camera.flickr_user.username }}</a><br />
 {% endfor %}
