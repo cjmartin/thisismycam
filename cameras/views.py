@@ -8,6 +8,7 @@ from cameras.models import Camera
 from cameras.models import Category
 
 from flickr.models import FlickrUserCamera
+from flickr.views import load_photos_for_cameras
 
 import urllib2
 
@@ -17,7 +18,7 @@ def camera(request, camera_slug):
     
     data = {
         'camera': camera,
-        'user_cameras': user_cameras
+        'user_cameras': load_photos_for_cameras(user_cameras)
     }
     return render_to_response('cameras/camera.html', data)
 

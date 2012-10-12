@@ -21,14 +21,24 @@
             
             <div class="span9">
                 <h1 class="title section-title brand">{{ camera.name }}</h1>
+                
+                <div class="row">
+                    {% for camera in user_cameras %}
+                        {% include 'flickr/fragment_user_camera.html' %}
+                        {% if forloop.counter|divisibleby:"4" %}
+                            </div>
+                            <div class="row">
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>
             
         </div>
     </div>
 </div>
 
-{% for user_camera in user_cameras %}
-    <a href="{% url flickr-user-camera user_camera.flickr_user.slug camera.slug %}">{{ user_camera.flickr_user.username }}</a><br />
+{% for camera in user_cameras %}
+    <a href="{% url flickr-user-camera user_camera.flickr_user.slug camera.slug %}">{{ camera.user_camera.flickr_user.username }}</a><br />
 {% endfor %}
 
 {% endblock %}

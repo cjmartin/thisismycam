@@ -123,21 +123,17 @@ def user_camera(request, user_slug, camera_slug):
     
     return render_to_response('flickr/user_camera.html', data)
     
-def load_photos_for_cameras(user_cameras, nsid):
+def load_photos_for_cameras(user_cameras, nsid=None):
+    if not nsid:
+        fetch_owner = True
+    else:
+        fetch_owner = False
+        
     cameras_and_photos = []
     for user_camera in user_cameras:
-        # if user_camera.camera.amazon_image_response:
-        #             user_camera.camera.amazon_image_response = simplejson.loads(user_camera.camera.amazon_image_response)
-        #             
-        #         if user_camera.camera.amazon_item_response:
-        #             user_camera.camera.amazon_item_response = simplejson.loads(user_camera.camera.amazon_item_response)
-        #             if not user_camera.camera.amazon_url:
-        #                 # Clean up and add the item url
-        #                 url = urllib2.unquote(user_camera.camera.amazon_item_response['DetailPageURL'])
-        #                 split_url = url.split('?')
-        #                 pretty_url = split_url[0] + "?tag=" + settings.AWS_ASSOCIATE_TAG
-        #                 user_camera.camera.amazon_url = pretty_url
-        
+        if fetch_owner:
+            nsid = user_camera.flickr_user
+            
         photos = Photo.objects.filter(camera = user_camera.camera, owner_nsid = nsid).order_by('-date_taken')[:6]
         cameras_and_photos.append({'user_camera': user_camera, 'photos': photos})
         
