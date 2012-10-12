@@ -123,7 +123,7 @@ def user_camera(request, user_slug, camera_slug):
     
     return render_to_response('flickr/user_camera.html', data)
     
-def load_photos_for_cameras(user_cameras, nsid=None):
+def load_photos_for_cameras(user_cameras, nsid=None, count=6):
     if not nsid:
         fetch_owner = True
     else:
@@ -132,9 +132,9 @@ def load_photos_for_cameras(user_cameras, nsid=None):
     cameras_and_photos = []
     for user_camera in user_cameras:
         if fetch_owner:
-            nsid = user_camera.flickr_user
+            nsid = user_camera.flickr_user.nsid
             
-        photos = Photo.objects.filter(camera = user_camera.camera, owner_nsid = nsid).order_by('-date_taken')[:6]
+        photos = Photo.objects.filter(camera = user_camera.camera, owner_nsid = nsid).order_by('-date_taken')[:count]
         cameras_and_photos.append({'user_camera': user_camera, 'photos': photos})
         
     return cameras_and_photos

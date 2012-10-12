@@ -426,7 +426,7 @@ a.collection-contact-link:hover {
     border-bottom: none;
 }
 
-.collection-contact .buddyicon {
+.collection-contact-link .buddyicon {
     float: left;
     margin: 0 10px 15px 0;
 }

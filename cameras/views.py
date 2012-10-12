@@ -14,11 +14,11 @@ import urllib2
 
 def camera(request, camera_slug):
     camera = get_object_or_404(Camera, slug=camera_slug)
-    user_cameras = FlickrUserCamera.objects.filter(camera = camera)
+    user_cameras = FlickrUserCamera.objects.filter(camera = camera).order_by('-date_update')
     
     data = {
         'camera': camera,
-        'user_cameras': load_photos_for_cameras(user_cameras)
+        'user_cameras': load_photos_for_cameras(user_cameras, None, 8)
     }
     return render_to_response('cameras/camera.html', data)
 
