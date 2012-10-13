@@ -9,19 +9,48 @@
 
 <div class="section inset-section">
     <div class="container">
+        <div class="the-camera-title">
+            <h3 class="title">Presenting {{ camera.count }} lucky {% if camera.count > 1 %}owners{% else %}owner{% endif %} of the</h3>
+            <h1 class="title section-title brand">{{ camera.name }}</h1>
+        </div>
+        
         <div class="row">
             
             <div class="span3">
-                <div class="the-camera">
-                    <div class="image camera-image sidebar-camera-image {{ camera.large_orientation }}" style="background-image: url('{{ camera.large_photo_url }}');">
-                        <img src="{{ camera.large_photo_url }}">
+                <div class="sidebar">
+                    <div class="the-camera">
+                        <div class="image camera-image sidebar-camera-image {{ camera.large_orientation }}" style="background-image: url('{{ camera.large_photo_url }}');">
+                            <img src="{{ camera.large_photo_url }}">
+                        </div>
+                    </div>
+                
+                    <div class="amazon-sidebar hidden-phone">
+                        <p>
+                            Stuff from Amazon!<br />
+                            <small>(Which helps pay the bills.)</small>
+                        </p>
+                        <script type='text/javascript'>
+                            var amzn_wdgt={widget:'Search'};
+                            amzn_wdgt.tag='yayamazon-20';
+                            amzn_wdgt.columns='1';
+                            amzn_wdgt.rows='5';
+                            amzn_wdgt.defaultSearchTerm='{{ camera.name }}';
+                            amzn_wdgt.searchIndex='Photo';
+                            amzn_wdgt.width='270';
+                            amzn_wdgt.showImage='True';
+                            amzn_wdgt.showPrice='True';
+                            amzn_wdgt.showRating='True';
+                            amzn_wdgt.design='2';
+                            amzn_wdgt.marketPlace='US';
+                            amzn_wdgt.borderColor='transparent';
+                        </script>
+                        <script type='text/javascript' src='http://wms.assoc-amazon.com/20070822/US/js/AmazonWidgets.js'>
+                        </script>
                     </div>
                 </div>
             </div>
             
             <div class="span9">
-                <h1 class="title section-title brand">{{ camera.name }}</h1>
-                
                 <div class="row">
                     {% for camera in user_cameras %}
                         {% include 'cameras/fragment_camera_user.html' %}

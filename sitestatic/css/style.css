@@ -263,6 +263,9 @@ h4.title {
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 
+.sidebar {
+}
+
 /* Logged out index */
 
 .huge-welcome {
@@ -514,6 +517,52 @@ a.collection-camera-thumbnail:hover {
     max-width: 100%;
 }
 
+/* Amazon Overrides */
+
+.amazon-sidebar {
+    background-color: white;
+    border: 1px solid #DDD;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
+    -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.075);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
+    
+    margin: 20px 0;
+    padding-top: 10px;
+}
+
+.amazon-sidebar p {
+    text-align: center;
+    margin: 0;
+    line-height: 1em;
+}
+
+.amzn_wdgt {
+    width: 95% !important;
+    margin: -10px auto 0 !important;
+}
+
+#searchBoxForm {
+    display: none;
+}
+
+#wdgt_brdr div:first-child {
+    font-size: 0px !important;
+    line-height: 0px !important;
+    
+    width: auto !important;
+}
+
+.wdgt_tl_pad, .wdgt_tl {
+    width: 100% !important;
+}
+
+#wdgt_ft {
+    display: none;
+}
+
 /* For the footer */
 
 html, body {
@@ -662,6 +711,8 @@ body:before {
         width: 200px;
         height: 200px;
     }
+    
+    
 }
 
 @media (min-width: 1200px) {
