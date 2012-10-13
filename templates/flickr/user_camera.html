@@ -37,7 +37,7 @@
                     </p>
                     {% if primary_camera.camera.count > 1 %}
                     <p>
-                        Who else has this camera? <a href="{% url camera primary_camera.camera.slug %}">{{ primary_camera.camera.count }} lucky people</a>!
+                        <a href="{% url camera primary_camera.camera.slug %}">{{ primary_camera.camera.count }} other people</a> have this camera in their collections!
                     </p>
                     {% endif %}
                     {% if not is_owner and primary_camera.camera.amazon_url %}
