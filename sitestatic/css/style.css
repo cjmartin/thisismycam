@@ -252,7 +252,7 @@ h4.title {
     box-shadow: 0 0 1px rgba(0,0,0,0.2) inset;
 }
 
-.thumbnail, a.thumbnail:hover, .collection-camera, .collection-contact {
+.thumbnail, a.thumbnail:hover, .collection-camera, .collection-contact, .amazon-sidebar, .amazon-carousel {
     background-color: #FFFFFF;
     border: 1px solid #DDD;
     -webkit-border-radius: 3px;
@@ -517,18 +517,25 @@ a.collection-camera-thumbnail:hover {
     max-width: 100%;
 }
 
-/* Amazon Overrides */
+/* Amazon */
+
+.amazon-carousel {
+    position: relative;
+    display: inline-block;
+    
+    margin-top: 30px;
+}
+
+.amazon-carousel p {
+    position: absolute;
+    bottom: 5px;
+    width: 100%;
+    
+    line-height: 11px;
+    margin: 0;
+}
 
 .amazon-sidebar {
-    background-color: white;
-    border: 1px solid #DDD;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-    -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
-    -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.075);
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
-    
     margin: 20px 0;
     padding-top: 10px;
 }

@@ -125,6 +125,26 @@
     </div>
 </div>
 
+<div class="visible-desktop" style="text-align:center;">
+    <div class="amazon-carousel">
+        <script type='text/javascript'>
+            var amzn_wdgt={widget:'Carousel'};
+            amzn_wdgt.tag='yayamazon-20';
+            amzn_wdgt.widgetType='SearchAndAdd';
+            amzn_wdgt.searchIndex='Photo';
+            amzn_wdgt.keywords='{{ primary_camera.camera.name }}';
+            amzn_wdgt.width='940';
+            amzn_wdgt.height='250';
+            amzn_wdgt.marketPlace='US';
+        </script>
+        <script type='text/javascript' src='http://wms.assoc-amazon.com/20070822/US/js/swfobject_1_5.js'>
+        </script>
+        <p>
+            <small>These links help pay the bills :)</small>
+        </p>
+    </div>
+</div>
+
 {% include 'flickr/fragment_user_camera_collection.html' %}
 
 <div class="section" id="js-user-contacts-section"{% if not contacts %}style="display:none;"{% endif %}>
