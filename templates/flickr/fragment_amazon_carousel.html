@@ -4,7 +4,11 @@
             var amzn_wdgt={widget:'Carousel'};
             amzn_wdgt.tag='yayamazon-20';
             amzn_wdgt.widgetType='SearchAndAdd';
+{% if primary_camera.category.name == "Cameraphone" %}
             amzn_wdgt.searchIndex='Photo';
+{% else %}
+            amzn_wdgt.searchIndex='Electronics';
+{% endif %}
             amzn_wdgt.keywords='{{ primary_camera.camera.name }}';
             amzn_wdgt.width='940';
             amzn_wdgt.height='250';
