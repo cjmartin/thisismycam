@@ -16,6 +16,12 @@ class Command(BaseCommand):
         action='store',
         dest='user',
         help='User (flickr) to fetch photos for.'),
+        make_option('--all',
+        action='store_true',
+        dest='all',
+        default=False,
+        help='Update all photos, not just new ones.'),
+        )
     )
 
     def handle(self, *args, **options):
@@ -30,6 +36,9 @@ class Command(BaseCommand):
             user.count_photos = api_user['photos']['count']['_content']
             user.save()
             
-        update_photos_for_flickr_user.delay(None, user.nsid)
+        if options['all']:
+            update_photos_for_flickr_user(None, user.nsid, None, True)
+        else:
+            update_photos_for_flickr_user.delay(None, user.nsid)
         
         self.stdout.write("All Done!\n")
