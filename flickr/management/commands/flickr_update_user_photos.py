@@ -21,7 +21,6 @@ class Command(BaseCommand):
         dest='all',
         default=False,
         help='Update all photos, not just new ones.'),
-        )
     )
 
     def handle(self, *args, **options):
