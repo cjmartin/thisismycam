@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 LOCK_EXPIRE = 60 * 60 # Lock expires in 60 minutes
 
 @task()
-def update_flickr_users(results, page=1, per_page=1):
+def update_flickr_users(results, page=1, per_page=1, all_photos=False):
     limit = page * per_page
     offset = limit - per_page
     
@@ -88,11 +88,11 @@ def update_flickr_users(results, page=1, per_page=1):
                 logger.error("Problem talking to Flickr when calling people.getInfo from update_flickr_users (FlickrError), re-scheduling task.\n Error: %s" % (e))
                 raise update_photos_for_flickr_user.retry(countdown=5)
         
-            user_updates.append(update_photos_for_flickr_user.subtask((None, flickr_user.nsid)))
+            user_updates.append(update_photos_for_flickr_user.subtask((None, flickr_user.nsid, None, all_photos)))
             
     if user_updates:
         next_page = page + 1
-        return chord(user_updates)(update_flickr_users.subtask((next_page, per_page, )))
+        return chord(user_updates)(update_flickr_users.subtask((next_page, per_page, all_photos, )))
         
 @task()
 def update_photos_for_flickr_user(results, nsid, page=None, update_all=False):
